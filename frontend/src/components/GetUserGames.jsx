@@ -4,26 +4,29 @@ const GetUserGames = () => {
 	const [chessComUsername, setChessComUsername] = useState("")
 	const [lichessUsername, setLichessUsername] = useState("")
 
-	const handleSubmit = () => {
-        
+	const handleSubmit = event => {
+        event.preventDefault()
+		console.log({ lichessUsername, chessComUsername })
 	}
+
+    // https://lichess.org/api/games/user/{käyttäjänimi}
 
 	return (
 		<div className="getUserGamesTestSection" >
 			<p>Get usergames testsection (in the real app move this to a more logical place)</p>
-			<form action="">
+			<form onSubmit={handleSubmit}>
 				<div>
 					<div>
-						<label htmlFor="chessComUsername">Lichess username: </label>
-						<input id="chessComUsername" type="text" />
+						<label htmlFor="lichessUsername">Lichess username: </label>
+						<input id="lichessUsername" type="text" onChange={(event) => setLichessUsername(event.target.value)} value={lichessUsername}/>
 					</div>
 
 					<div>
-						<label htmlFor="lichessUsername">Chess.com username: </label>
-						<input id="lichessUsername" type="text" />
+						<label htmlFor="chessComUsername">Chess.com username: </label>
+						<input id="chessComUsername" type="text" onChange={(event) => setChessComUsername(event.target.value)} value={chessComUsername} />
 					</div>
 				</div>
-				<button onClick={handleSubmit}>get games</button>
+				<button type="submit">get games</button>
 			</form>
 		</div>
 	)
