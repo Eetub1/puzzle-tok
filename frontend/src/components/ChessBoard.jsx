@@ -88,12 +88,29 @@ export function ChessBoard() {
         }
     }
 
+    // Determines if a piece can be dragged from the given square
     function canDragPiece({ square }) {
         const piece = game.get(square);
         if(gameover) {
             return false;
         }
         return piece && piece.color === game.turn();
+    }
+
+    // Palauttaa tyylit jokaiselle ruudulle, mukaan lukien viimeisin siirto ja valittu ruutu
+    function getSquareStyles() {
+        const styles = {};
+        const history = game.history({ verbose: true });
+        if(history.length > 0) {
+            const lastMove =history[history.length - 1];
+            styles[lastMove.from] = { background: '#c8d67a' };
+            styles[lastMove.to] = { background: '#c8d67a' };
+        }
+        
+        if(selectedSquare) {
+            styles [selectedSquare] = {background: 'rgba(255, 255, 0, 0.5)',};
+        }
+        return styles;
     }
 
 
@@ -108,7 +125,7 @@ export function ChessBoard() {
                 onSquareClick, 
                 canDragPiece,
                 // Highlight the selected square 
-                squareStyles: selectedSquare ? { [selectedSquare]: { background: 'rgba(255, 255, 0, 0.5)' } } : {},
+                squareStyles: getSquareStyles(),
             }}  
         />
     );
