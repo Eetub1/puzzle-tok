@@ -97,18 +97,36 @@ export function ChessBoard() {
         return piece && piece.color === game.turn();
     }
 
-    // Palauttaa tyylit jokaiselle ruudulle, mukaan lukien viimeisin siirto ja valittu ruutu
+    // Returns the styles for each square 
     function getSquareStyles() {
-        const styles = {};
-        const history = game.history({ verbose: true });
+        const styles = {}; // Object to hold styles for each square
+        const history = game.history({ verbose: true }); // Get the move history in object
         if(history.length > 0) {
             const lastMove =history[history.length - 1];
             styles[lastMove.from] = { background: '#c8d67a' };
             styles[lastMove.to] = { background: '#c8d67a' };
         }
+
+        // Highlight king in check
+        if (game.isCheck()) {
+            const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });;
+            if (kingSquare) styles[kingSquare] = { background: 'rgba(255, 0, 0, 0.4)' };
+        }
         
         if(selectedSquare) {
+            // Highlight the selected square
             styles [selectedSquare] = {background: 'rgba(255, 255, 0, 0.5)',};
+            // Get all possible moves from the selected square
+            const moves = game.moves({
+                square: selectedSquare,
+                verbose: true, //moves in object format
+            });
+            // Highlight all possible target squares for the selected piece
+            moves.forEach((move) => {
+                styles[move.to] = {
+                    background: 'radial-gradient(circle, rgba(0, 0, 0, 0.35) 20%, transparent 21%)',
+                };
+            });
         }
         return styles;
     }
@@ -120,12 +138,11 @@ export function ChessBoard() {
         <Chessboard
             options={{
                 position: game.fen(), // FEN representing current game state
-                onPieceDrag,
-                onPieceDrop, 
-                onSquareClick, 
-                canDragPiece,
-                // Highlight the selected square 
-                squareStyles: getSquareStyles(),
+                onPieceDrag, // Handle piece drag events
+                onPieceDrop,  // Handle piece drop events
+                onSquareClick, // Handle square click events
+                canDragPiece,  // Determine if piece can be dragged
+                squareStyles: getSquareStyles(), // Apply styles to squares
             }}  
         />
     );
