@@ -5,6 +5,7 @@ import { Chess } from 'chess.js';
 export function ChessBoard() {
     const [game, setGame] = useState(() => new Chess());
     const [selectedSquare, setSelectedSquare] = useState(null);
+    const [gameover, setGameover] = useState(false);
 
     // Handles piece drop events
     function onPieceDrop({ sourceSquare, targetSquare }) {
@@ -19,6 +20,9 @@ export function ChessBoard() {
 
     // Handles square click events
     function onSquareClick({ square }) {
+        if(gameover) {
+            return;
+        }
         // No square is selected yet -> select this one
         if (!selectedSquare) {
             const piece = game.get(square);
@@ -51,6 +55,14 @@ export function ChessBoard() {
             }
         }
     }
+
+    // Handles piece drag events
+    function onPieceDrag({ square }) {
+        const piece = game.get(square);
+        if (piece && piece.color === game.turn()) {
+            setSelectedSquare(square);
+        }
+    }
     
     // Attempts to make a move and returns whether it was successful.
     function makeMove(sourceSquare, targetSquare) {
@@ -66,6 +78,9 @@ export function ChessBoard() {
 
             setGame(gameCopy);
             setSelectedSquare(null);
+            if (gameCopy.isGameOver()) {
+                setGameover(true);
+            }
             return true;
 
         } catch {
@@ -73,14 +88,25 @@ export function ChessBoard() {
         }
     }
 
+    function canDragPiece({ square }) {
+        const piece = game.get(square);
+        if(gameover) {
+            return false;
+        }
+        return piece && piece.color === game.turn();
+    }
+
+
     
     return (
         // Render the chessboard with handlers.
         <Chessboard
             options={{
                 position: game.fen(), // FEN representing current game state
+                onPieceDrag,
                 onPieceDrop, 
                 onSquareClick, 
+                canDragPiece,
                 // Highlight the selected square 
                 squareStyles: selectedSquare ? { [selectedSquare]: { background: 'rgba(255, 255, 0, 0.5)' } } : {},
             }}  
