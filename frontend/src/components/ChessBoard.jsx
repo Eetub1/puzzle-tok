@@ -1,9 +1,15 @@
-
+import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 
 export function ChessBoard() {
-  return (
-    <div className="chess-board">
-    </div>
-  );
+    
+
+
+
+
+
+    return (
+        <Chessboard/>
+    );
 };
 
