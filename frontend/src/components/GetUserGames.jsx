@@ -1,15 +1,18 @@
 import { useState } from "react"
+import { getUserGames } from "../services/gameService"
 
 const GetUserGames = () => {
 	const [chessComUsername, setChessComUsername] = useState("")
 	const [lichessUsername, setLichessUsername] = useState("")
 
-	const handleSubmit = event => {
-        event.preventDefault()
+	const handleSubmit = async event => {
+		event.preventDefault()
 		console.log({ lichessUsername, chessComUsername })
+
+		const result = await getUserGames({"lichess": lichessUsername, "chessCom": chessComUsername})
+		console.log(result)
 	}
 
-    // https://lichess.org/api/games/user/{käyttäjänimi}
 
 	return (
 		<div className="getUserGamesTestSection" >
