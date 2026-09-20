@@ -103,32 +103,50 @@ export function ChessBoard() {
         const history = game.history({ verbose: true }); // Get the move history in object
         if(history.length > 0) {
             const lastMove =history[history.length - 1];
-            styles[lastMove.from] = { background: '#c8d67a' };
-            styles[lastMove.to] = { background: '#c8d67a' };
+            addSquareStyles(styles, lastMove.from, '#c8d67a');
+            addSquareStyles(styles, lastMove.to, '#c8d67a');
         }
+            
+        
 
         // Highlight king in check
         if (game.isCheck()) {
-            const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });;
+            const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });
             if (kingSquare) styles[kingSquare] = { background: 'rgba(255, 0, 0, 0.4)' };
         }
         
         if(selectedSquare) {
             // Highlight the selected square
-            styles [selectedSquare] = {background: 'rgba(255, 255, 0, 0.5)',};
+            addSquareStyles(styles, selectedSquare, 'rgba(255, 255, 0, 0.5)');
             // Get all possible moves from the selected square
             const moves = game.moves({
                 square: selectedSquare,
                 verbose: true, //moves in object format
             });
-            // Highlight all possible target squares for the selected piece
+            // Highlight all possible target squares for selected piece
             moves.forEach((move) => {
-                styles[move.to] = {
-                    background: 'radial-gradient(circle, rgba(0, 0, 0, 0.35) 20%, transparent 21%)',
+                // If possible move captures piece, highlight with different style
+                if(move.captured) {
+                    addSquareStyles(styles, move.to, 'radial-gradient(circle, transparent 80%, rgba(255, 255, 0, 0.5) 80%)');
+                } else { 
+                    addSquareStyles(styles, move.to, 'radial-gradient(circle, rgba(0, 0, 0, 0.35) 20%, transparent 21%)');
                 };
             });
         }
+
         return styles;
+    }
+
+    // Adds background style for given square in styles object
+    function addSquareStyles(styles, square, background) {
+        // If square already has style, combine new background with existing one
+        if(styles[square]) {
+            const existing = styles[square].background;
+            styles[square] = { background: `${background}, ${existing}` };
+        }
+        else {
+            styles[square] = { background };
+        }
     }
 
 
