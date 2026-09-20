@@ -24,6 +24,7 @@ export default defineConfig([
 		rules: {
 			'@stylistic/indent': ['error', 'tab'],
 			'@stylistic/jsx-indent-props': ['error', 'tab'],
+			'@stylistic/semi': ['error', 'never'],
 		},
 	},
 ])
