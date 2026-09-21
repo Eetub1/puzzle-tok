@@ -210,8 +210,8 @@ export function ChessBoard() {
                 <div className="promotion-picker">
                     {['q', 'r', 'b', 'n'].map((piece) => ( 
                         <button key={piece} onClick={() => completePromotion(piece)}>
-                            {defaultPieces[`w${piece.toUpperCase()}`]()}
-                        </button> 
+                            {defaultPieces[game.turn() === 'w' ? `w${piece.toUpperCase()}` : `b${piece.toUpperCase()}`]()}
+                        </button> // Render button for each promotion piece
                     ))}
                 </div>
             ) : null}

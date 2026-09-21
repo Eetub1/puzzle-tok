@@ -8,3 +8,11 @@
     max-width: 1000px;
     margin: 0 auto;
 }
+
+.promotion-picker {
+    position: relative;
+    display: flex;  
+    flex-direction: column;
+    width: 12.5%;
+    height: 12.5%;
+}
