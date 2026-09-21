@@ -100,7 +100,7 @@ export function ChessBoard() {
     // Returns the styles for each square 
     function getSquareStyles() {
         const styles = {}; // Object to hold styles for each square
-        const history = game.history({ verbose: true }); // Get the move history in object
+        const history = game.history({ verbose: true }); // Get the move history in object format
         if(history.length > 0) {
             const lastMove =history[history.length - 1];
             addSquareStyles(styles, lastMove.from, '#c8d67a');
@@ -108,16 +108,30 @@ export function ChessBoard() {
         }
             
         
-
         // Highlight king in check
         if (game.isCheck()) {
+            // Find the king
             const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });
-            if (kingSquare) styles[kingSquare] = { background: 'rgba(255, 0, 0, 0.4)' };
+            if (kingSquare) 
+            {
+                addSquareStyles(styles, kingSquare, 'radial-gradient(circle,  rgba(255, 0, 0, 0.4) 50%, transparent 90%)');
+            }
+            // Highlight selected square differently if king is in check
+            if(selectedSquare){
+                if(selectedSquare === kingSquare) {
+                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, transparent 40%, rgba(255, 255, 0, 0.5) 100%)');
+                } else{
+                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, rgba(255, 255, 0, 0.5) 100%, rgba(255, 255, 0, 0.5) 100%)');
+                }
+            }
+            
         }
         
         if(selectedSquare) {
-            // Highlight the selected square
-            addSquareStyles(styles, selectedSquare, 'rgba(255, 255, 0, 0.5)');
+            // Highlight the selected square if not in check
+            if (!game.isCheck()) {
+                addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, rgba(255, 255, 0, 0.5) 100%, rgba(255, 255, 0, 0.5) 100%)');
+            }
             // Get all possible moves from the selected square
             const moves = game.moves({
                 square: selectedSquare,
@@ -152,17 +166,20 @@ export function ChessBoard() {
 
     
     return (
-        // Render the chessboard with handlers.
-        <Chessboard
-            options={{
-                position: game.fen(), // FEN representing current game state
-                onPieceDrag, // Handle piece drag events
-                onPieceDrop,  // Handle piece drop events
-                onSquareClick, // Handle square click events
-                canDragPiece,  // Determine if piece can be dragged
-                squareStyles: getSquareStyles(), // Apply styles to squares
-            }}  
-        />
+        //Render the chessboard with handlers.
+        <div className="chessboard-container">
+            <Chessboard
+                options={{
+                    position: game.fen(), // FEN representing current game state
+                    onPieceDrag, // Handle piece drag events
+                    onPieceDrop,  // Handle piece drop events
+                    onSquareClick, // Handle square click events
+                    canDragPiece,  // Determine if piece can be dragged
+                    squareStyles: getSquareStyles(), // Apply styles to squares
+                }}  
+            />
+        </div>
+        
     );
 };
 
