@@ -1,0 +1,10 @@
+.chessboard-container {
+    --color-last-move: #c8d67a;
+    --color-selected: rgba(255, 255, 0, 0.5);
+    --color-check: rgba(255, 0, 0, 0.4);
+    --color-legal-move: rgba(0, 0, 0, 0.35);
+    --color-capture: rgba(255, 255, 0, 0.5);
+
+    max-width: 1000px;
+    margin: 0 auto;
+}

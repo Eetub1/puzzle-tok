@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import './ChessBoard.css';
 
 export function ChessBoard() {
     const [game, setGame] = useState(() => new Chess());
@@ -103,8 +104,8 @@ export function ChessBoard() {
         const history = game.history({ verbose: true }); // Get the move history in object format
         if(history.length > 0) {
             const lastMove =history[history.length - 1];
-            addSquareStyles(styles, lastMove.from, '#c8d67a');
-            addSquareStyles(styles, lastMove.to, '#c8d67a');
+            addSquareStyles(styles, lastMove.from, 'var(--color-last-move)');
+            addSquareStyles(styles, lastMove.to, 'var(--color-last-move)');
         }
             
         
@@ -114,14 +115,14 @@ export function ChessBoard() {
             const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });
             if (kingSquare) 
             {
-                addSquareStyles(styles, kingSquare, 'radial-gradient(circle,  rgba(255, 0, 0, 0.4) 50%, transparent 90%)');
+                addSquareStyles(styles, kingSquare, 'radial-gradient(circle, var(--color-check) 50%, transparent 90%)');
             }
             // Highlight selected square differently if king is in check
             if(selectedSquare){
                 if(selectedSquare === kingSquare) {
-                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, transparent 40%, rgba(255, 255, 0, 0.5) 100%)');
+                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, transparent 40%, var(--color-selected) 100%)');
                 } else{
-                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, rgba(255, 255, 0, 0.5) 100%, rgba(255, 255, 0, 0.5) 100%)');
+                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, var(--color-selected) 100%, var(--color-selected) 100%)');
                 }
             }
             
@@ -130,7 +131,7 @@ export function ChessBoard() {
         if(selectedSquare) {
             // Highlight the selected square if not in check
             if (!game.isCheck()) {
-                addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, rgba(255, 255, 0, 0.5) 100%, rgba(255, 255, 0, 0.5) 100%)');
+                addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, var(--color-selected) 100%, var(--color-selected) 100%)');
             }
             // Get all possible moves from the selected square
             const moves = game.moves({
@@ -141,9 +142,9 @@ export function ChessBoard() {
             moves.forEach((move) => {
                 // If possible move captures piece, highlight with different style
                 if(move.captured) {
-                    addSquareStyles(styles, move.to, 'radial-gradient(circle, transparent 80%, rgba(255, 255, 0, 0.5) 80%)');
+                    addSquareStyles(styles, move.to, 'radial-gradient(circle, transparent 80%, var(--color-capture) 80%)');
                 } else { 
-                    addSquareStyles(styles, move.to, 'radial-gradient(circle, rgba(0, 0, 0, 0.35) 20%, transparent 21%)');
+                    addSquareStyles(styles, move.to, 'radial-gradient(circle, var(--color-legal-move) 20%, transparent 21%)');
                 };
             });
         }
