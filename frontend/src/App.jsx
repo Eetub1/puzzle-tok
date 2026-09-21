@@ -1,11 +1,10 @@
-import { useState } from 'react'
+import GetUserGames from './components/GetUserGames'
 import { ChessBoard } from './components/ChessBoard.jsx'
 
 function App() {
-	const [count, setCount] = useState(0)
-
 	return (
 		<div>
+			<GetUserGames/>
 			<ChessBoard/>
 		</div>
 	)

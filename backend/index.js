@@ -1,13 +1,19 @@
-const express = require("express")
+import express from "express"
+import cors from "cors"
 const app = express()
 const PORT = 3000
 
+import gamesRouter from "./routes/games.js"
+
 app.use(express.json())
+app.use(cors())
+
+app.use("/api/games", gamesRouter)
 
 app.get("/", (req, res) => {
-  res.send("Kaikki toimii")
+    res.send("Hello world!")
 })
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
+    console.log(`Server running on http://localhost:${PORT}`)
 })
