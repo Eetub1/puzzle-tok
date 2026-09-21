@@ -11,6 +11,9 @@ const GetUserGames = () => {
 
 		const result = await getUserGames({"lichess": lichessUsername, "chessCom": chessComUsername})
 		console.log(result)
+
+		setChessComUsername("")
+		setLichessUsername("")
 	}
 
 
