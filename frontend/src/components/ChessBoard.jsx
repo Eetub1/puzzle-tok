@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { Chessboard, defaultPieces } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import './ChessBoard.css';
 
@@ -7,6 +7,25 @@ export function ChessBoard() {
     const [game, setGame] = useState(() => new Chess());
     const [selectedSquare, setSelectedSquare] = useState(null);
     const [gameover, setGameover] = useState(false);
+    const [pendingPromotion, setPendingPromotion] = useState(null);
+
+    // Completes pawn promotion and make move
+    function completePromotion(promotionPiece) {
+       if (!pendingPromotion) return;
+       makeMove(pendingPromotion.from, pendingPromotion.to, promotionPiece);
+       setPendingPromotion(null);   
+    }
+
+    // Determines if the move is pawn promotion
+   function isPromotionMove(sourceSquare, targetSquare) {
+        const piece = game.get(sourceSquare);
+        if (!piece || piece.type !== 'p') {
+            return false; // Not pawn or piece doesn't exist
+        }
+        const targetRank = targetSquare[1]; // 1 is first target square.
+        // Is pawn moving last rank for its color
+        return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1'); 
+   }
 
     // Handles piece drop events
     function onPieceDrop({ sourceSquare, targetSquare }) {
@@ -15,7 +34,11 @@ export function ChessBoard() {
         if (!sourceSquare || !targetSquare) {
             return false;
         }
-
+        // Check if move is promotion move
+        if (isPromotionMove(sourceSquare, targetSquare)) {
+            setPendingPromotion({ from: sourceSquare, to: targetSquare, color: game.turn() });
+            return true;
+        }
         return makeMove(sourceSquare, targetSquare); // Try to make the move and return the result.
     }
 
@@ -39,6 +62,12 @@ export function ChessBoard() {
         // Clicked the same square -> remove selection
         if (selectedSquare === square) {
             setSelectedSquare(null);
+            return;
+        }
+
+        // Check if move is a promotion move
+        if (isPromotionMove(selectedSquare, square)) {
+            setPendingPromotion({ from: selectedSquare, to: square, color: game.turn() });
             return;
         }
 
@@ -66,7 +95,7 @@ export function ChessBoard() {
     }
     
     // Attempts to make a move and returns whether it was successful.
-    function makeMove(sourceSquare, targetSquare) {
+    function makeMove(sourceSquare, targetSquare, promotionPiece) {
 
         const gameCopy = new Chess(game.fen()); // Make copy of the current game
         
@@ -74,9 +103,9 @@ export function ChessBoard() {
             gameCopy.move({
                 from: sourceSquare,
                 to: targetSquare,
-                promotion: 'q', // Always promote to queen TODO: Add UI for promotion choice
+                promotion: promotionPiece, // Your chosen promotion piece ('q', 'r', 'b', 'n')
             });
-
+            setPendingPromotion(null);
             setGame(gameCopy);
             setSelectedSquare(null);
             if (gameCopy.isGameOver()) {
@@ -164,8 +193,6 @@ export function ChessBoard() {
         }
     }
 
-
-    
     return (
         //Render the chessboard with handlers.
         <div className="chessboard-container">
@@ -179,6 +206,15 @@ export function ChessBoard() {
                     squareStyles: getSquareStyles(), // Apply styles to squares
                 }}  
             />
+            {pendingPromotion ? ( // Show promotion chooser 
+                <div className="promotion-picker">
+                    {['q', 'r', 'b', 'n'].map((piece) => ( 
+                        <button key={piece} onClick={() => completePromotion(piece)}>
+                            {defaultPieces[`w${piece.toUpperCase()}`]()}
+                        </button> 
+                    ))}
+                </div>
+            ) : null}
         </div>
         
     );
