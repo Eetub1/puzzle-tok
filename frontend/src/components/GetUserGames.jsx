@@ -9,7 +9,7 @@ const GetUserGames = () => {
 		event.preventDefault()
 		console.log({ lichessUsername, chessComUsername })
 
-		const result = await getUserGames({"lichess": lichessUsername, "chessCom": chessComUsername})
+		const result = await getUserGames({"lichessUsername": lichessUsername, "chessComUsername": chessComUsername})
 		console.log(result)
 
 		setChessComUsername("")
@@ -20,6 +20,7 @@ const GetUserGames = () => {
 	return (
 		<div className="getUserGamesTestSection" >
 			<p>Get usergames testsection (in the real app move this to a more logical place)</p>
+			<p>Check console to see the result</p>
 			<form onSubmit={handleSubmit}>
 				<div>
 					<div>
