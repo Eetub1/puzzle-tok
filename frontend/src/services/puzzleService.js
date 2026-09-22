@@ -13,4 +13,10 @@ const getDaily = async (response) => {
 	}
 }
 
-export {getDaily}
+const getPuzzle = async () => {
+	const response = await fetch(`${backendURL}/api/puzzle`)
+	console.log('Hello')
+	return response.json()
+}
+
+export {getPuzzle, getDaily}

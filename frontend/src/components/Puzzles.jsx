@@ -8,12 +8,18 @@ const Puzzles = ({dailyPuzzle}) => {
 		console.log('daily puzzle result:', result)
 		dailyPuzzle(result) 
 	}
+	const handleClick = async event => {
+		event.preventDefault()
+		console.log('helo')
+	}
 
 	return (
 		<div className="puzzleTest" >
 			<p>Get a puzzle</p>
 			<p>Check console to see the result</p>
+
 			<button onClick={(e)=>handleDaily(e)}>Get daily puzzle </button>
+			<button onClick={handleClick}> </button>
 		</div>
 	)
 }
