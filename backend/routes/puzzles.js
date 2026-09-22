@@ -10,13 +10,30 @@ puzzlesRouter.get('/daily', async (req,res) => {
     res.send(await response.json())
 })
 
-puzzlesRouter.get('/puzzle/next', async (req,res) => {
+puzzlesRouter.get('/next', async (req,res) => {
 
     console.log("Sending next puzzle")
-    console.log(req.cookies)
+    console.log('Token:', req.cookies['Token'])
+    console.log('Body: ',req.body)
+
     let response = fetch(`${base_url}/api/puzzle/next`,{   
     headers: {
-        Authorization: `Bearer ${req.cookies['Token']}`
+        Authorization: `Bearer ${req.cookies['Token']}`    //TODO: Let's talk whether to save tokens in local storage/ setthem as cookies, this works with right cookie
+    }
+    });
+
+    res.send(await response.json())
+})
+
+puzzlesRouter.get('/batch', async (req,res) => {
+
+    console.log("Sending multiple puzzles")
+    console.log('Token:', req.cookies['Token'])
+    console.log('Body: ',req.body)
+
+    let response = fetch(`${base_url}/api/puzzle/batch/mix`,{   //TODO: In the future possibility to filter with theme/opening
+    headers: {
+        Authorization: `Bearer ${req.cookies['Token']}`    //TODO: Let's talk whether to save tokens in local storage/ setthem as cookies, this works with right cookie
     }
     });
 

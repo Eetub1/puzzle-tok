@@ -4,23 +4,9 @@ const base_url = `https://lichess.org`
 const CLIENT_ID = 'puzzle-tok'
 const BACKEND_URL = 'http://localhost:3000' // TODO: move
 const token_url = `${BACKEND_URL}/api/auth/token`
-import {createHash} from 'node:crypto'
+import {createHash, randomBytes} from 'node:crypto'
 
-const string = `
-//<![CDATA[
-var theForm = document.forms['ctl00'];
-if (!theForm) {
-    theForm = document.ctl00;
-}
-function __doPostBack(eventTarget, eventArgument) {
-    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
-        theForm.__EVENTTARGET.value = eventTarget;
-        theForm.__EVENTARGUMENT.value = eventArgument;
-        theForm.submit();
-    }
-}
-//]]>`
-const challenge = 'kissa123trololol1234512345123451111111111111111111111111111111111111111111111111111111'
+const challenge = 'kissa123trololol1234512345123451111111111111111111111111111111111111111111111111111111' //TODO: auto gen
 
 function generateCodeChallenge(code_verifier) {
     return (createHash('sha256'))
