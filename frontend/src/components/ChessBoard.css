@@ -1,4 +1,6 @@
 .chessboard-container {
+    position: relative;
+
     --color-last-move: #c8d67a;
     --color-selected: rgba(255, 255, 0, 0.5);
     --color-check: rgba(255, 0, 0, 0.4);
@@ -10,9 +12,15 @@
 }
 
 .promotion-picker {
-    position: relative;
+    position: absolute;
     display: flex;  
     flex-direction: column;
     width: 12.5%;
-    height: 12.5%;
+    height: 50%;
+}
+
+.promotion-picker button {
+    width: 100%;
+    height: 25%;
+    padding: 0;
 }

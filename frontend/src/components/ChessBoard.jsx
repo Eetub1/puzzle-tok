@@ -17,7 +17,7 @@ export function ChessBoard() {
     }
 
     // Determines if the move is pawn promotion
-   function isPromotionMove(sourceSquare, targetSquare) {
+    function isPromotionMove(sourceSquare, targetSquare) {
         const piece = game.get(sourceSquare);
         if (!piece || piece.type !== 'p') {
             return false; // Not pawn or piece doesn't exist
@@ -25,17 +25,22 @@ export function ChessBoard() {
         const targetRank = targetSquare[1]; // 1 is first target square.
         // Is pawn moving last rank for its color
         return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1'); 
-   }
+    }
+
+    // Is move legal
+    function isLegalMove(sourceSquare, targetSquare) {
+        const legalMoves = game.moves({ square: sourceSquare, verbose: true });
+        return legalMoves.some(({ to }) => to === targetSquare);
+    }
 
     // Handles piece drop events
     function onPieceDrop({ sourceSquare, targetSquare }) {
-
         // If the piece was not dropped on square, the move is not accepted.
-        if (!sourceSquare || !targetSquare) {
+        if (!sourceSquare || !targetSquare || pendingPromotion) {
             return false;
         }
-        // Check if move is promotion move
-        if (isPromotionMove(sourceSquare, targetSquare)) {
+        // Check if move is promotion move and if it is legal
+        if (isPromotionMove(sourceSquare, targetSquare) && isLegalMove(sourceSquare, targetSquare)) {
             setPendingPromotion({ from: sourceSquare, to: targetSquare, color: game.turn() });
             return true;
         }
@@ -44,7 +49,7 @@ export function ChessBoard() {
 
     // Handles square click events
     function onSquareClick({ square }) {
-        if(gameover) {
+        if(gameover || pendingPromotion) {
             return;
         }
         // No square is selected yet -> select this one
@@ -65,8 +70,8 @@ export function ChessBoard() {
             return;
         }
 
-        // Check if move is a promotion move
-        if (isPromotionMove(selectedSquare, square)) {
+        // Check if move is a promotion move and if it is legal
+        if (isPromotionMove(selectedSquare, square) && isLegalMove(selectedSquare, square)) {
             setPendingPromotion({ from: selectedSquare, to: square, color: game.turn() });
             return;
         }
@@ -121,7 +126,7 @@ export function ChessBoard() {
     // Determines if a piece can be dragged from the given square
     function canDragPiece({ square }) {
         const piece = game.get(square);
-        if(gameover) {
+        if(gameover || pendingPromotion) {
             return false;
         }
         return piece && piece.color === game.turn();
@@ -193,6 +198,15 @@ export function ChessBoard() {
         }
     }
 
+    // Calculate position for promotion chooser
+    let promotionPosition = {};
+    if (pendingPromotion) {
+        promotionPosition = {
+            left: `${(pendingPromotion.to.charCodeAt(0) - 'a'.charCodeAt(0)) * 12.5}%`,
+            top: `${(8 - Number(pendingPromotion.to[1])) * 12.5}%`,
+        }
+    }
+
     return (
         //Render the chessboard with handlers.
         <div className="chessboard-container">
@@ -207,10 +221,10 @@ export function ChessBoard() {
                 }}  
             />
             {pendingPromotion ? ( // Show promotion chooser 
-                <div className="promotion-picker">
+                <div className="promotion-picker" style={promotionPosition}>
                     {['q', 'r', 'b', 'n'].map((piece) => ( 
                         <button key={piece} onClick={() => completePromotion(piece)}>
-                            {defaultPieces[game.turn() === 'w' ? `w${piece.toUpperCase()}` : `b${piece.toUpperCase()}`]()}
+                            {defaultPieces[`${pendingPromotion.color}${piece.toUpperCase()}`]()}
                         </button> // Render button for each promotion piece
                     ))}
                 </div>
