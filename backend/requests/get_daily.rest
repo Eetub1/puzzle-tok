@@ -1,0 +1,2 @@
+GET https://lichess.org/api/puzzle/daily
+Content-Type: application/json
