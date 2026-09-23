@@ -8,12 +8,12 @@ import { getSquareStyles } from './SquareStyles.jsx';
 
 // PuzzleBoard component that renders chessboard for given puzzle
 export function PuzzleBoard({puzzle}) {
-    const [game, setGame] = useState(() => new Chess(puzzle?.fen));
+    const [game, setGame] = useState(() => new Chess(puzzle.fen));
     const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0);
     const [puzzleStatus, setPuzzleStatus] = useState('playing');
 
     const puzzleMoves = puzzle.moves.split(' ') ?? [];
-    const fenTurn = puzzle.fen.split(' ')[1]; 
+    const fenTurn = puzzle.fen.split(' ')[1] ?? 'w'; 
     const playerColor = fenTurn === 'w' ? 'b' : 'w'; // Player color based on FEN turn
 
     const [selectedSquare, setSelectedSquare] = useState(null);
@@ -33,10 +33,10 @@ export function PuzzleBoard({puzzle}) {
             const gameCopy = new Chess(game.fen());
             try {
                 gameCopy.move({
-                from: nextMove.slice(0, 2),
-                to: nextMove.slice(2, 4),
-                promotion: nextMove.slice(4) || undefined,
-            });
+                    from: nextMove.slice(0, 2),
+                    to: nextMove.slice(2, 4),
+                    promotion: nextMove.slice(4) || undefined,
+                });
                 setGame(gameCopy);
                 setPuzzleMoveIndex(puzzleMoveIndex + 1);
             } catch (error){
@@ -73,7 +73,6 @@ export function PuzzleBoard({puzzle}) {
 
     // Handles piece drop events
     function onPieceDrop({ sourceSquare, targetSquare }) {
-        // If the piece was not dropped on square, the move is not accepted.
         if (!sourceSquare || !targetSquare || pendingPromotion || puzzleStatus === 'solved') {
             return false;
         }
@@ -98,7 +97,6 @@ export function PuzzleBoard({puzzle}) {
             if (piece && piece.color === game.turn()) {
                 setSelectedSquare(square);
             }
-
             return;
         }
 
@@ -114,11 +112,8 @@ export function PuzzleBoard({puzzle}) {
             return;
         }
 
-        
         const moveSuccessful = makeMove(selectedSquare, square);
         
-        
-
         // If the move was not successful, check if another piece of the same color was selected
         if (!moveSuccessful) {
             const piece = game.get(square);
@@ -144,7 +139,6 @@ export function PuzzleBoard({puzzle}) {
         const move = sourceSquare + targetSquare + (promotionPiece ?? ''); 
         const gameCopy = new Chess(game.fen()); // Make copy of the current game
         
-
         try {
             gameCopy.move({
                 from: sourceSquare,
@@ -161,7 +155,7 @@ export function PuzzleBoard({puzzle}) {
             setGame(gameCopy);
             setSelectedSquare(null);
 
-            
+            // Update puzzle move index and check if puzzle is solved
             const nextIndex = puzzleMoveIndex + 1;
             setPuzzleMoveIndex(nextIndex);
             if (nextIndex >= puzzleMoves.length) {
