@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Chessboard, defaultPieces } from 'react-chessboard';
+import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import './ChessBoard.css';
+import { PromotionChooser } from './PromotionChooser.jsx';
+import './SquareStyles.css';
+import { getSquareStyles } from './SquareStyles.jsx';
 
+// ChessBoard component, renders the chessboard and handles game logic
 export function ChessBoard() {
     const [game, setGame] = useState(() => new Chess());
     const [selectedSquare, setSelectedSquare] = useState(null);
@@ -13,7 +17,6 @@ export function ChessBoard() {
     function completePromotion(promotionPiece) {
        if (!pendingPromotion) return;
        makeMove(pendingPromotion.from, pendingPromotion.to, promotionPiece);
-       setPendingPromotion(null);   
     }
 
     // Determines if the move is pawn promotion
@@ -132,81 +135,6 @@ export function ChessBoard() {
         return piece && piece.color === game.turn();
     }
 
-    // Returns the styles for each square 
-    function getSquareStyles() {
-        const styles = {}; // Object to hold styles for each square
-        const history = game.history({ verbose: true }); // Get the move history in object format
-        if(history.length > 0) {
-            const lastMove =history[history.length - 1];
-            addSquareStyles(styles, lastMove.from, 'var(--color-last-move)');
-            addSquareStyles(styles, lastMove.to, 'var(--color-last-move)');
-        }
-            
-        
-        // Highlight king in check
-        if (game.isCheck()) {
-            // Find the king
-            const [kingSquare] = game.findPiece({ type: 'k', color: game.turn() });
-            if (kingSquare) 
-            {
-                addSquareStyles(styles, kingSquare, 'radial-gradient(circle, var(--color-check) 50%, transparent 90%)');
-            }
-            // Highlight selected square differently if king is in check
-            if(selectedSquare){
-                if(selectedSquare === kingSquare) {
-                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, transparent 40%, var(--color-selected) 100%)');
-                } else{
-                    addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, var(--color-selected) 100%, var(--color-selected) 100%)');
-                }
-            }
-            
-        }
-        
-        if(selectedSquare) {
-            // Highlight the selected square if not in check
-            if (!game.isCheck()) {
-                addSquareStyles(styles, selectedSquare, 'radial-gradient(circle, var(--color-selected) 100%, var(--color-selected) 100%)');
-            }
-            // Get all possible moves from the selected square
-            const moves = game.moves({
-                square: selectedSquare,
-                verbose: true, //moves in object format
-            });
-            // Highlight all possible target squares for selected piece
-            moves.forEach((move) => {
-                // If possible move captures piece, highlight with different style
-                if(move.captured) {
-                    addSquareStyles(styles, move.to, 'radial-gradient(circle, transparent 80%, var(--color-capture) 80%)');
-                } else { 
-                    addSquareStyles(styles, move.to, 'radial-gradient(circle, var(--color-legal-move) 20%, transparent 21%)');
-                };
-            });
-        }
-
-        return styles;
-    }
-
-    // Adds background style for given square in styles object
-    function addSquareStyles(styles, square, background) {
-        // If square already has style, combine new background with existing one
-        if(styles[square]) {
-            const existing = styles[square].background;
-            styles[square] = { background: `${background}, ${existing}` };
-        }
-        else {
-            styles[square] = { background };
-        }
-    }
-
-    // Calculate position for promotion chooser
-    let promotionPosition = {};
-    if (pendingPromotion) {
-        promotionPosition = {
-            left: `${(pendingPromotion.to.charCodeAt(0) - 'a'.charCodeAt(0)) * 12.5}%`,
-            top: `${(8 - Number(pendingPromotion.to[1])) * 12.5}%`,
-        }
-    }
-
     return (
         //Render the chessboard with handlers.
         <div className="chessboard-container">
@@ -217,18 +145,13 @@ export function ChessBoard() {
                     onPieceDrop,  // Handle piece drop events
                     onSquareClick, // Handle square click events
                     canDragPiece,  // Determine if piece can be dragged
-                    squareStyles: getSquareStyles(), // Apply styles to squares
+                    squareStyles: getSquareStyles(game, selectedSquare), // Apply styles to squares
                 }}  
             />
-            {pendingPromotion ? ( // Show promotion chooser 
-                <div className="promotion-picker" style={promotionPosition}>
-                    {['q', 'r', 'b', 'n'].map((piece) => ( 
-                        <button key={piece} onClick={() => completePromotion(piece)}>
-                            {defaultPieces[`${pendingPromotion.color}${piece.toUpperCase()}`]()}
-                        </button> // Render button for each promotion piece
-                    ))}
-                </div>
-            ) : null}
+            <PromotionChooser
+                pendingPromotion={pendingPromotion}
+                onSelect={completePromotion}
+            />
         </div>
         
     );
