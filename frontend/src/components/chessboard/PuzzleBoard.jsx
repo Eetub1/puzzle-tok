@@ -12,22 +12,24 @@ export function PuzzleBoard({puzzle}) {
     const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0);
     const [puzzleStatus, setPuzzleStatus] = useState('playing');
 
-    const puzzleMoves = puzzle?.moves?.split(' ') ?? [];
-    const fenTurn = puzzle?.fen?.split(' ')[1];
-    const playerColor = fenTurn === 'w' ? 'b' : 'w';
+    const puzzleMoves = puzzle.moves.split(' ') ?? [];
+    const fenTurn = puzzle.fen.split(' ')[1]; 
+    const playerColor = fenTurn === 'w' ? 'b' : 'w'; // Player color based on FEN turn
 
     const [selectedSquare, setSelectedSquare] = useState(null);
     const [gameover, setGameover] = useState(false);
     const [pendingPromotion, setPendingPromotion] = useState(null);
 
-    
+    // Use effect to handle computer moves based on puzzle solution
     useEffect(() => {
-        if (!puzzle || game.turn() === playerColor) {
+        if (game.turn() === playerColor) {
             return;
         }
-
         const nextMove = puzzleMoves[puzzleMoveIndex];
-        if(nextMove) {
+        if(!nextMove) {
+            return;
+        }
+        setTimeout(() => {
             const gameCopy = new Chess(game.fen());
             try {
                 gameCopy.move({
@@ -40,7 +42,7 @@ export function PuzzleBoard({puzzle}) {
             } catch (error){
                 console.error('Computer move failed:', error);
             }
-        }
+        }, 700); // Delay computer move
     
     }, [game, puzzleMoveIndex, playerColor]);
 
@@ -149,6 +151,7 @@ export function PuzzleBoard({puzzle}) {
                 to: targetSquare,
                 promotion: promotionPiece, // Your chosen promotion piece ('q', 'r', 'b', 'n')
             });
+            // Check if move matches puzzle solution
             if (move !== puzzleMoves[puzzleMoveIndex]) {
                 setPuzzleStatus('wrong');
                 return false;
