@@ -2,6 +2,8 @@ import { Chess } from 'chess.js'
 import GetUserGames from './components/GetUserGames'
 import { PuzzleBoard } from './components/chessboard/PuzzleBoard.jsx'
 import { ChessBoard } from './components/chessboard/ChessBoard.jsx'
+import Puzzles from './components/Puzzles.jsx'
+
 
 function App() {
 
@@ -17,6 +19,8 @@ function App() {
 		<div>
 			<GetUserGames/>
 			<PuzzleBoard puzzle={puzzle} />
+			<Puzzles/>
+			<ChessBoard/>
 		</div>
 	)
 }
