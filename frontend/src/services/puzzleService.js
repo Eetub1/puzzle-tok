@@ -8,6 +8,7 @@ const getDaily = async (response) => {
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
 		moves : data.puzzle.solution.join(" ") ,
+		lastMove : data.puzzle.lastMove,
 		rating : data.puzzle.rating,
 		themes : data.puzzle.themes
 	}

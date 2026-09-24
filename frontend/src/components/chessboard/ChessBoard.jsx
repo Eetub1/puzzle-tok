@@ -145,7 +145,7 @@ export function ChessBoard() {
                     onPieceDrop,  // Handle piece drop events
                     onSquareClick, // Handle square click events
                     canDragPiece,  // Determine if piece can be dragged
-                    squareStyles: getSquareStyles(game, selectedSquare), // Apply styles to squares
+                    squareStyles: getSquareStyles(game, selectedSquare, undefined), // Apply styles to squares
                 }}  
             />
             <PromotionChooser

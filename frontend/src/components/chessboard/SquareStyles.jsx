@@ -1,5 +1,5 @@
 // Returns the CSS styles for each square based on game state.
-export function getSquareStyles(game, selectedSquare) {
+export function getSquareStyles(game, selectedSquare, firstMove) {
     const styles = {};
     const history = game.history({ verbose: true });
 
@@ -7,6 +7,9 @@ export function getSquareStyles(game, selectedSquare) {
         const lastMove = history[history.length - 1];
         addSquareStyles(styles, lastMove.from, 'var(--color-last-move)');
         addSquareStyles(styles, lastMove.to, 'var(--color-last-move)');
+    } else if(firstMove) {
+        addSquareStyles(styles, firstMove.slice(0, 2), 'var(--color-last-move)');
+        addSquareStyles(styles, firstMove.slice(2, 4), 'var(--color-last-move)');
     }
 
     let kingSquare;

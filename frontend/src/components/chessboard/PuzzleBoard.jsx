@@ -11,14 +11,14 @@ export function PuzzleBoard({puzzle}) {
     const [game, setGame] = useState(() => new Chess(puzzle.fen));
     const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0);
     const [puzzleStatus, setPuzzleStatus] = useState('playing');
-
-    const puzzleMoves = puzzle.moves.split(' ') ?? [];
-    const fenTurn = puzzle.fen.split(' ')[1] ?? 'w'; 
-    const playerColor = fenTurn === 'w' ? 'b' : 'w'; // Player color based on FEN turn
-
     const [selectedSquare, setSelectedSquare] = useState(null);
     const [gameover, setGameover] = useState(false);
     const [pendingPromotion, setPendingPromotion] = useState(null);
+
+    const puzzleMoves = puzzle.moves.split(' ') ?? [];
+    const playerColor = puzzle.fen.split(' ')[1] ?? 'w'; 
+    
+    
 
     // Use effect to handle computer moves based on puzzle solution
     useEffect(() => {
@@ -187,11 +187,12 @@ export function PuzzleBoard({puzzle}) {
             <Chessboard
                 options={{
                     position: game.fen(), // FEN representing current game state
+                    boardOrientation: playerColor === 'w' ? 'white' : 'black', // Board orientation based on player's color
                     onPieceDrag, // Handle piece drag events
                     onPieceDrop,  // Handle piece drop events
                     onSquareClick, // Handle square click events
                     canDragPiece,  // Determine if piece can be dragged
-                    squareStyles: getSquareStyles(game, selectedSquare), // Apply styles to squares
+                    squareStyles: getSquareStyles(game, selectedSquare, puzzle?.lastMove), // Apply styles to squares
                 }}  
             />
             <p>
