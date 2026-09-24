@@ -1,0 +1,20 @@
+.chessboard-container {
+    position: relative;
+
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.promotion-picker {
+    position: absolute;
+    display: flex;  
+    flex-direction: column;
+    width: 12.5%;
+    height: 50%;
+}
+
+.promotion-picker button {
+    width: 100%;
+    height: 25%;
+    padding: 0;
+}

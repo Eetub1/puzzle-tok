@@ -1,12 +1,12 @@
 import { getDaily } from "../services/puzzleService"
 
-const Puzzles = () => {
+const Puzzles = ({dailyPuzzle}) => {
 
 	const handleDaily = async event => {
 		event.preventDefault()
 		const result = await getDaily()
-		console.log('hello')
-		console.log(result)
+		console.log('daily puzzle result:', result)
+		dailyPuzzle(result) 
 	}
 
 	return (

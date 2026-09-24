@@ -1,13 +1,21 @@
+import { useState, useEffect } from 'react';
 import GetUserGames from './components/GetUserGames'
-import { ChessBoard } from './components/ChessBoard.jsx'
+import { PuzzleBoard } from './components/chessboard/PuzzleBoard.jsx'
+import { ChessBoard } from './components/chessboard/ChessBoard.jsx'
 import Puzzles from './components/Puzzles.jsx'
 
+
+
 function App() {
+	const [puzzle, setPuzzle] = useState(null);
+
+	
+
 	return (
 		<div>
 			<GetUserGames/>
-			<Puzzles/>
-			<ChessBoard/>
+			<Puzzles dailyPuzzle={setPuzzle} />
+			{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
 		</div>
 	)
 }
