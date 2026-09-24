@@ -1,8 +1,8 @@
-const backendURL = "http://localhost:3000" //TO DO: MOVE
+//const backendURL = "http://localhost:3000" //TO DO: MOVE
+//const backendURL = ''
 
 const getDaily = async (response) => {
-	response = await fetch(`${backendURL}/api/puzzles/daily`)
-	console.log('daily puzzle !')
+	response = await fetch(`/api/puzzles/daily`)
 	const data = await response.json() 
 	console.log('daily puzzle data:', data)
 	return { // Return puzzle data for structure:
@@ -14,4 +14,10 @@ const getDaily = async (response) => {
 	}
 }
 
-export {getDaily}
+const getNextPuzzle = async (response) => {
+	response = await fetch(`/api/puzzles/next`)  //TODO: make move, no fen in data
+	const data = await response.json()
+	return data
+}
+
+export {getNextPuzzle, getDaily}
