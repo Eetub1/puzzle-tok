@@ -1,0 +1,154 @@
+/* Chess Reels (Page shell and theme variables) */
+.chess-reels {
+  --bg: #000000;
+  --text: #f2f2f2;
+  --accent: #50a3a6;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+html,
+body,
+#root { /* Probably a smarter way to do full background, but I'm not smart */
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100dvh;
+  background: #000;
+}
+
+/* Top Bar (Dropdown header and profile button) */
+.top-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+}
+
+.top-bar .dropdown-menu {
+  position: static;
+  display: flex !important;
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--text);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.top-bar .dropdown-item {
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.top-bar .dropdown-item:hover,
+.top-bar .dropdown-item:focus {
+  background: var(--accent);
+  color: #10140f;
+}
+
+/* Content Row (Väliä ja scrolli) */
+.content-row {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.scroll-controls {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Bottom Bar (Vinkki/Ratkaisu ja askeleet) */
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 18px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.hint-btn,
+.solution-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--text);
+  border-radius: 20px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.step-controls {
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+}
+
+/* Icon Buttons (Jaetut ympyrät napeille) */
+.profile-btn,
+.scroll-controls button,
+.step-controls button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.profile-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-controls button {
+  color: var(--text);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-controls button {
+  color: var(--text);
+  font-size: 16px;
+}
+
+/* Accent Highlight */
+.hint-btn:hover,
+.hint-btn:active,
+.solution-btn:hover,
+.solution-btn:active {
+  background: var(--accent);
+  color: #10140f;
+}
