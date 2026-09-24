@@ -14,7 +14,7 @@ function App() {
 	return (
 		<div>
 			<GetUserGames/>
-			<Puzzles dailyPuzzle={setPuzzle} />
+			<Puzzles setPuzzle={setPuzzle} />
 			{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
 		</div>
 	)

@@ -1,8 +1,8 @@
-const backendURL = "http://localhost:3000" // TODO: move this
+//const backendURL = ''
 
 const getAccessToken = async (response) => {
-	response = await fetch(`${backendURL}/api/auth/getAuth`)
-	console.log('here !')
+	response = await fetch(`/api/auth/getAuth`)
+	console.log('auth result', response)
 	return response.json()
 }
 
