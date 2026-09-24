@@ -21,7 +21,7 @@ const getLichessGames = async username => {
 		throw new Error(`Lichess request failed: ${response.status}`)
 	}
 
-    // Need to use a different method if max is a larger number
+    // Apparently need to use a different method if max is a larger number
     const text = await response.text()
 
     // Split result, remove empty lines
@@ -50,7 +50,7 @@ const getChessComActiveMonths = async username => {
 	}
 
     const { archives } = await response.json()
-    return archives // can be empty if no games played
+    return archives
 }
 
 
@@ -58,7 +58,6 @@ const getChessComGames = async username => {
     // The chess.com API works a bit differently than the lichess one
     // First we need to retrieve what months the user has games on chess.com
     const archives = await getChessComActiveMonths(username)
-
     const lastMonth = archives[archives.length - 1] // https://api.chess.com/pub/player/{username}/games/{VVVV}/{KK}
 
     const firstPart = `https://api.chess.com/pub/player/${username}/`
@@ -76,8 +75,7 @@ const getChessComGames = async username => {
 
 
 gamesRouter.get("/", async (req, res) => {
-    // Can unpack other websites here if or when we add support to other sites
-    const { chessComUsername, lichessUsername} = req.query
+    const { chessComUsername, lichessUsername} = req.query // Can unpack other websites here if or when we add support to other sites
 
     if (!chessComUsername && !lichessUsername) {
         return res.status(400).json({ error: "At least one username is required" })

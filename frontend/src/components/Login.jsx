@@ -6,11 +6,12 @@ const Login = () => {
     const [password, setPassword] = useState("")
 
     const handleSubmit = event => {
-        
+        event.preventDefault()
+        console.log(event)
     }
 
     return (
-        <div className="testDiv" >
+        <div className="testSection" >
             <form onSubmit={handleSubmit}>
                 <div>
                     <div>

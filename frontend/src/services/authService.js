@@ -1,11 +1,18 @@
 const backendURL = "http://localhost:3000"
 
 const signup = async credentials => {
-    const response = await fetch(`${backendURL}/api/login`, {
+    const response = await fetch(`${backendURL}/api/auth/signup`, {
         method: "POST",
-        body: JSON.stringify(credentials)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
     })
-    return response.data
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(`Signup failed: ${data.error}`)
+    }
+
+    return data
 }
 
 export {

@@ -18,7 +18,7 @@ const GetUserGames = () => {
 
 
     return (
-        <div className="testDiv" >
+        <div className="testSection" >
             <p>Get usergames testsection (in the real app move this to a more logical place)</p>
             <p>Check console to see the result</p>
             <form onSubmit={handleSubmit}>

@@ -1,11 +1,12 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { signup } from "../services/authService"
 
-const Signup = () => {
+const Signup = ({ setMessage }) => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const navigate = useNavigate()
 
     const handleSubmit = async event => {
         event.preventDefault()
@@ -14,14 +15,19 @@ const Signup = () => {
             const user = await signup({ username, password })
             setUsername("")
             setPassword("")
+            navigate("/login")
             console.log(user)
+            setMessage("Signup was succesful!")
+            setTimeout(() => {
+                setMessage("")
+            }, 4000)
         } catch (error) {
             console.log("Error with signup: ", error)
         }
     }
 
     return (
-        <div className="testDiv" >
+        <div className="testSection" >
             <form onSubmit={handleSubmit}>
                 <div>
                     <div>
