@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import pool from "./db/db.js"
 const app = express()
 const PORT = 3000
 
@@ -18,6 +19,14 @@ app.use("/api/puzzles", puzzlesRouter)
 app.get("/", (req, res) => {
     res.send("Hello world!")
 })
+
+try {
+    await pool.query("SELECT 1")
+    console.log("Connected to database")
+} catch (error) {
+    console.log("Could not connect to database:", error.message)
+    process.exit(1) // End with a failure because couldn't reach database
+}
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
