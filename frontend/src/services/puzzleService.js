@@ -23,8 +23,8 @@ const getBatch = async (response) => {
 	return data
 }
 
-const getPuzzleById = async (response) => {
-	response = await fetch(`/api/puzzles/puzzlebyid`)
+const getPuzzleById = async id => {
+	let response = await fetch(`/api/puzzles/puzzleID/${id}`)
 	const data = await response.json()
 	console.log('here data: ', data)
 	return { // Return puzzle data for structure:

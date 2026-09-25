@@ -1,7 +1,8 @@
+import { useState } from "react"
 import { getDaily, getNextPuzzle, getBatch, getPuzzleById} from "../services/puzzleService"
 
 const Puzzles = ({setPuzzle}) => {
-
+	const [puzzleId, setPuzzleId] = useState("")
 
 	const handleNext = async event => {
 		event.preventDefault()
@@ -14,9 +15,12 @@ const Puzzles = ({setPuzzle}) => {
 	const handlePuzzleById = async event => {
 		event.preventDefault()
 
-		const result = await getPuzzleById()
-		console.log('puzzle with id:', result)
+		const result = await getPuzzleById(puzzleId)
+		console.log(result)
+
 		setPuzzle(result) 
+
+		setPuzzleId("")
 	}
 
 	const handleBatch = async event => {
@@ -42,7 +46,16 @@ const Puzzles = ({setPuzzle}) => {
 			<button onClick={(e)=>handleDaily(e)}>Get daily puzzle </button>
 			<button onClick={(e)=>handleNext(e)}>Get next puzzle </button>
 			<button onClick={(e)=>handleBatch(e)}>Get batch of puzzles </button>
-			<button onClick={(e)=>handlePuzzleById(e)}>Get puzzle by id </button>
+
+			<form onSubmit={handlePuzzleById}>
+				<div>
+					<label htmlFor="puzzleId">Puzzle id: </label>
+					<input id="puzzleId" type="text"
+						onChange={(event) => setPuzzleId(event.target.value)}
+						value={puzzleId}/>
+				</div>
+				<button type="submit">Get puzzle by id</button>
+			</form>
 		</div>
 	)
 }
