@@ -26,17 +26,43 @@ puzzlesRouter.get('/next', async (req,res) => {
     res.send(await response.json())
 })
 
+puzzlesRouter.get('/puzzlebyid', async (req,res) => {
+
+    let id = 'y14HH'
+    console.log("Sending next by id")
+
+    let response = await fetch(`${base_url}/api/puzzle/${id}`)
+
+    if (!response.ok) {
+		throw new Error(`Lichess request failed: ${response.status}`)
+	}
+
+    console.log("puzzle", response)
+
+    res.send(await response.json())
+})
+
 puzzlesRouter.get('/batch', async (req,res) => {
 
+    const query = new URLSearchParams({
+        "difficulty": "normal",
+        "nb": 5,
+        "color": "white"
+	})
+
     console.log("Sending multiple puzzles")
-    console.log('Token:', req.cookie['Token'])
+    console.log('Token:', req.cookies.Token)
     console.log('Body: ',req.body)
 
-    let response = await fetch(`${base_url}/api/puzzle/batch/mix`,{   //TODO: In the future possibility to filter with theme/opening
+    let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`,{   //TODO: In the future possibility to filter with theme/opening
     headers: {
-        Authorization: `Bearer ${req.cookie['Token']}`
+        Authorization: `Bearer ${req.cookies.Token}`
     }
     });
+
+    if (!response.ok) {
+		throw new Error(`Lichess request failed: ${response.status}`)
+	}
 
     res.send(await response.json())
 })
