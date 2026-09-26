@@ -1,0 +1,3 @@
+GET https://lichess.org/api/puzzle/next
+Content-Type: application/json
+Authorization: Bearer token-here

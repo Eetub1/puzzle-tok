@@ -1,7 +1,7 @@
 import "./ChessReels.css";
 import Dropdown from "react-bootstrap/Dropdown";
 
-export default function ChessReels() {
+export default function ChessReels({ children }) {
   return (
     <div className="chess-reels">
       {/* Yläpalkki */}
@@ -13,9 +13,10 @@ export default function ChessReels() {
         </Dropdown.Menu>
         <button className="profile-btn" aria-label="Profile">👤</button>
       </div>
-
+      
        {/* Scrolli */}
        <div className="content-row">
+        {children}
           <div className="scroll-controls">
             <button aria-label="Previous puzzle">▲</button>
             <button aria-label="Next puzzle">▼</button>
