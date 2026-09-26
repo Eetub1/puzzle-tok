@@ -1,4 +1,3 @@
-/* Chess Reels (Page shell and theme variables) */
 .chess-reels {
   --bg: #000000;
   --text: #f2f2f2;
@@ -24,7 +23,7 @@ body,
   background: #000;
 }
 
-/* Top Bar (Dropdown header and profile button) */
+/* Top Bar (Dropdown header ja profiilinappi) */
 .top-bar {
   position: relative;
   display: flex;
