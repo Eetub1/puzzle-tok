@@ -8,7 +8,6 @@ import Puzzles from './components/Puzzles.jsx'
 
 
 
-
 function App() {
 	const [puzzle, setPuzzle] = useState(null)
 
@@ -21,7 +20,6 @@ function App() {
 				<Puzzles setPuzzle={setPuzzle} />
 				{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
 			</ChessReels>		
-			
 		</div>
 	)
 }
