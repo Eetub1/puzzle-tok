@@ -1,7 +1,7 @@
-const Message = ({ message, isError = false}) => {
+const Message = ({ data }) => {
     return (
         <div className="message">
-            <p className={isError ? "messageError message" : "messageSuccess message"}>{message}</p>
+            <p className={data.isError ? "messageError message" : "messageSuccess message"}>{data.message}</p>
         </div>
     )
 }

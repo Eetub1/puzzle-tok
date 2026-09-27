@@ -1,13 +1,27 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { login } from "../services/authService"
 
-const Login = () => {
+const Login = ({ setMessage, setUser }) => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
-    const handleSubmit = event => {
+    const handleSubmit = async event => {
         event.preventDefault()
-        console.log(event)
+
+        try {
+            const data = await login({ username, password })
+            console.log(data)
+            setUser(data)
+            setUsername("")
+            setPassword("")
+            setMessage({ message: "Login succesful!", isError: false })
+            setTimeout(() => {
+                setMessage(null)
+            }, 4000)
+        } catch (error) {
+            console.log("Error with login: ", error)
+        }
     }
 
     return (

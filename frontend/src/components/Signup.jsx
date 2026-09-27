@@ -12,14 +12,16 @@ const Signup = ({ setMessage }) => {
         event.preventDefault()
 
         try {
+            // Not doing anything useful with the user right now
             const user = await signup({ username, password })
+            console.log(user)
+            
             setUsername("")
             setPassword("")
             navigate("/login")
-            console.log(user)
-            setMessage("Signup was succesful!")
+            setMessage({ message: "Signup was succesful!", isError: false })
             setTimeout(() => {
-                setMessage("")
+                setMessage(null)
             }, 4000)
         } catch (error) {
             console.log("Error with signup: ", error)
