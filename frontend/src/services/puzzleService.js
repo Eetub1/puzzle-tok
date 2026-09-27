@@ -12,15 +12,28 @@ const getDaily = async (response) => {
 }
 
 const getNextPuzzle = async (response) => {
-	response = await fetch(`/api/puzzles/next`)  //TODO: make move, no fen in data
+	response = await fetch(`/api/puzzles/next`)  
 	const data = await response.json()
-	return data
+	return { // Return puzzle data for structure:
+		fen : data.puzzle.fen,
+		moves : data.puzzle.solution.join(" ") ,
+		lastMove : data.puzzle.lastMove,
+		rating : data.puzzle.rating,
+		themes : data.puzzle.themes
+	}
 }
 
 const getBatch = async (response) => {
 	response = await fetch(`/api/puzzles/batch`)
 	const data = await response.json()
-	return data
+	console.log('batch data:', data)
+	return data.puzzles.map(puzzles => ({ // Return puzzle data for structure:
+        fen: puzzles.puzzle.fen,
+        moves: puzzles.puzzle.solution.join(' '),
+        lastMove: puzzles.puzzle.lastMove,
+        rating: puzzles.puzzle.rating,
+        themes: puzzles.puzzle.themes
+	}))
 }
 
 const getPuzzleById = async id => {
@@ -30,6 +43,7 @@ const getPuzzleById = async id => {
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
 		moves : data.puzzle.solution.join(" ") ,
+		lastMove : data.puzzle.lastMove,
 		rating : data.puzzle.rating,
 		themes : data.puzzle.themes
 	}

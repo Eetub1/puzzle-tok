@@ -3,13 +3,14 @@ import { getDaily, getNextPuzzle, getBatch, getPuzzleById} from "../services/puz
 
 const Puzzles = ({setPuzzle}) => {
 	const [puzzleId, setPuzzleId] = useState("")
+	const [puzzleQueue, setPuzzleQueue] = useState([])
 
 	const handleNext = async event => {
 		event.preventDefault()
 
 		const result = await getNextPuzzle()
 		console.log('next result:', result)
-		//setPuzzle(result) 
+		setPuzzle(result) 
 	}
 
 	const handlePuzzleById = async event => {
@@ -25,10 +26,24 @@ const Puzzles = ({setPuzzle}) => {
 
 	const handleBatch = async event => {
 		event.preventDefault()
+		// If there are puzzles in queue, use the next one
+		if (puzzleQueue.length > 0) {
+			const [nextPuzzle, ...remainingPuzzles] = puzzleQueue
 
+			setPuzzle(nextPuzzle)
+			console.log('current puzzle:', nextPuzzle)
+			setPuzzleQueue(remainingPuzzles)
+			return
+    	}
+		// If no puzzles in queue, new batch
 		const result = await getBatch()
 		console.log('batch result:', result)
-		//setPuzzle(result) 
+		
+		const [firstPuzzle, ...remainingPuzzles] = result
+			
+		setPuzzle(firstPuzzle)
+		console.log('current puzzle:', firstPuzzle)
+		setPuzzleQueue(remainingPuzzles)
 	}
 
 	const handleDaily = async event => {

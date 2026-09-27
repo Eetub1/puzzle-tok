@@ -18,7 +18,7 @@ function App() {
 			<ChessReels>
 				<GetUserGames/>
 				<Puzzles setPuzzle={setPuzzle} />
-				{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
+				{puzzle ? <PuzzleBoard key={puzzle.fen} puzzle={puzzle} /> : <ChessBoard/>}
 			</ChessReels>		
 		</div>
 	)
