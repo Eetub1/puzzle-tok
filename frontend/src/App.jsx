@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ChessReels from './components/ChessReels';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import GetUserGames from './components/GetUserGames'
 import { PuzzleBoard } from './components/chessboard/PuzzleBoard.jsx'
 import { ChessBoard } from './components/chessboard/ChessBoard.jsx'
@@ -13,9 +15,11 @@ function App() {
 
 	return (
 		<div>
-			<GetUserGames/>
-			<Puzzles setPuzzle={setPuzzle} />
-			{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
+			<ChessReels>
+				<GetUserGames/>
+				<Puzzles setPuzzle={setPuzzle} />
+				{puzzle ? <PuzzleBoard puzzle={puzzle} /> : <ChessBoard/>}
+			</ChessReels>		
 		</div>
 	)
 }
