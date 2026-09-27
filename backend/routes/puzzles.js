@@ -91,7 +91,7 @@ puzzlesRouter.get('/batch', async (req,res) => {
     res.send(data)
 })
 
-// Function to add FEN to puzzle data
+// Function to add FEN and last move to puzzle data
 const addFen = puzzleData => {
     const game = new Chess()
 
