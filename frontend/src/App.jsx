@@ -1,47 +1,52 @@
 import { useState } from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
+import "bootstrap/dist/css/bootstrap.min.css"
 
-import GetUserGames from './components/GetUserGames'
-import { ChessBoard } from './components/ChessBoard.jsx'
-import Puzzles from './components/Puzzles.jsx'
-import Login from './components/Login.jsx'
-import Signup from './components/Signup.jsx'
+import ChessReels from "./components/ChessReels"
+import GetUserGames from "./components/GetUserGames"
+import { PuzzleBoard } from "./components/chessboard/PuzzleBoard.jsx"
+import { ChessBoard } from "./components/chessboard/ChessBoard.jsx"
+import Puzzles from "./components/Puzzles.jsx"
+import Login from "./components/Login.jsx"
+import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
 import { logout } from "./services/authService.js"
 
 function App() {
-    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
-    const [message, setMessage] = useState(null)
+	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
+	const [message, setMessage] = useState(null)
+	const [puzzle, setPuzzle] = useState(null)
 
-    const handleLogout = () => {
-        logout()
-        setUser(null)
-    }
+	const handleLogout = () => {
+		logout()
+		setUser(null)
+	}
 
-    return (
-        <>
-            {user &&
+	return (
+		<>
+			{user &&
             <div>
-                <button onClick={handleLogout}>Logout</button>
+            	<button onClick={handleLogout}>Logout</button>
             </div>}
 
-            {message && <Message data={message}/>}
-            <Routes>
-                <Route path="/" element={user ?
-                    <div>
-                        <GetUserGames/>
-                        <Puzzles/>
-                        <ChessBoard/>
-                    </div>
-                    : <Navigate to="/login"/>}>
-                </Route>
+			{message && <Message data={message}/>}
+			<Routes>
+				<Route path="/" element={user ?
+					<div>
+						<ChessReels>
+							<GetUserGames/>
+							<Puzzles setPuzzle={setPuzzle}/>
+							{puzzle ? <PuzzleBoard key={puzzle.fen} puzzle={puzzle}/> : <ChessBoard/>}
+						</ChessReels>
+					</div>
+					: <Navigate to="/login"/>}
+				/>
 
-                <Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
-                <Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
-
-            </Routes>
-        </>
-    )
+				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
+				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
+			</Routes>
+		</>
+	)
 }
 
 export default App

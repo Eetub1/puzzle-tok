@@ -1,0 +1,10 @@
+GET https://lichess.org/api/puzzle/batch/mix
+Content-Type: application/json
+Authorization: Bearer token-here
+
+
+{
+    "difficulty": "normal",
+    "nb": 10,
+    "color": "white"
+}

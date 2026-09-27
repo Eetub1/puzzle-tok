@@ -1,23 +1,29 @@
 import express from "express"
 import cors from "cors"
 import pool from "./db/db.js"
+import cookieParser from "cookie-parser" 
 const app = express()
 const PORT = 3000
 
 import gamesRouter from "./routes/games.js"
 import authRouter from "./routes/auth.js"
+import oauthRouter from "./routes/oauth.js"
 import puzzlesRouter from "./routes/puzzles.js"
 
 app.use(express.json())
 app.use(cors())
 
+app.use(cookieParser())
+
 app.use("/api/games", gamesRouter)
 app.use("/api/auth", authRouter)
 app.use("/api/puzzles", puzzlesRouter)
+app.use("/api/auth", oauthRouter)
 
 
 app.get("/", (req, res) => {
-    res.send("Hello world!")
+    //res.send("<a href='/api/auth/getAuth'>auth</a>")
+    res.send("Hello World")
 })
 
 try {
