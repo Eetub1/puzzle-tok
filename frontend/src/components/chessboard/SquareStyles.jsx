@@ -1,5 +1,5 @@
 // Returns the CSS styles for each square based on game state.
-export function getSquareStyles(game, selectedSquare, firstMove) {
+export function getSquareStyles(game, selectedSquare, firstMove, hintSquare) {
 	const styles = {}
 	const history = game.history({ verbose: true })
 
@@ -29,7 +29,7 @@ export function getSquareStyles(game, selectedSquare, firstMove) {
 	if (selectedSquare) {
 		const selectedBackground = selectedSquare === kingSquare
 			? 'radial-gradient(circle, transparent 40%, var(--color-selected) 100%)'
-			: 'radial-gradient(circle, var(--color-selected) 100%, var(--color-selected) 100%)'
+			: 'radial-gradient(var(--color-selected) 100%)'
 
 		addSquareStyles(styles, selectedSquare, selectedBackground)
 
@@ -45,6 +45,11 @@ export function getSquareStyles(game, selectedSquare, firstMove) {
 
 			addSquareStyles(styles, move.to, background)
 		})
+	}
+
+	if (hintSquare) {
+		const background = 'radial-gradient(var(--color-hint))'
+		addSquareStyles(styles, hintSquare, background)
 	}
 
 	return styles

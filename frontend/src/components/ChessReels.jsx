@@ -1,7 +1,7 @@
 import "./ChessReels.css"
 import Dropdown from "react-bootstrap/Dropdown"
 
-export default function ChessReels({ children }) {
+export default function ChessReels({ children, puzzleRef }) {
 	return (
 		<div className="chess-reels">
 			{/* Yläpalkki */}
@@ -26,13 +26,13 @@ export default function ChessReels({ children }) {
 			{ /* Alajutskat */}
 			<div className="bottom-bar">
 				<div className="action-buttons">
-					<button className="hint-btn">Hint</button>
-					<button className="solution-btn">Solution</button>
+					<button onClick={() => puzzleRef?.current?.giveHint()} className="hint-btn">Hint</button>
+					<button onClick={() => puzzleRef?.current?.giveSolution()} className="solution-btn">Solution</button>
 				</div>
 
 				<div className="step-controls">
-					<button aria-label="Previous move">◀</button>
-					<button aria-label="Next move">▶</button>
+					<button onClick={() => puzzleRef?.current?.moveBack()} aria-label="Previous move">◀</button>
+					<button onClick={() => puzzleRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>
 			</div>
 		</div>

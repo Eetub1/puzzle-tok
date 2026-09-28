@@ -7,7 +7,7 @@ import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // ChessBoard component, renders the chessboard and handles game logic
-export function ChessBoard() {
+function ChessBoard() {
 	const [game, setGame] = useState(() => new Chess())
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [gameover, setGameover] = useState(false)
@@ -156,4 +156,4 @@ export function ChessBoard() {
         
 	)
 };
-
+export default ChessBoard
