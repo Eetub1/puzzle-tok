@@ -34,7 +34,7 @@ const Puzzles = ({setPuzzle}) => {
 			console.log('current puzzle:', nextPuzzle)
 			setPuzzleQueue(remainingPuzzles)
 			return
-    	}
+		}
 		// If no puzzles in queue, new batch
 		const result = await getBatch()
 		console.log('batch result:', result)

@@ -28,11 +28,11 @@ const getBatch = async (response) => {
 	const data = await response.json()
 	console.log('batch data:', data)
 	return data.puzzles.map(puzzles => ({ // Return puzzle data for structure:
-        fen: puzzles.puzzle.fen,
-        moves: puzzles.puzzle.solution.join(' '),
-        lastMove: puzzles.puzzle.lastMove,
-        rating: puzzles.puzzle.rating,
-        themes: puzzles.puzzle.themes
+		fen: puzzles.puzzle.fen,
+		moves: puzzles.puzzle.solution.join(' '),
+		lastMove: puzzles.puzzle.lastMove,
+		rating: puzzles.puzzle.rating,
+		themes: puzzles.puzzle.themes
 	}))
 }
 
