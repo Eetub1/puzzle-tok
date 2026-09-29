@@ -10,7 +10,7 @@ import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
 import { logout } from "./services/authService.js"
 import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
-import Chessboard from "./components/chessboard/Chessboard.jsx"
+import Chessboard from "./components/chessboard/ChessBoard.jsx"
 
 
 function App() {
