@@ -1,16 +1,18 @@
 import "./ChessReels.css"
 import Dropdown from "react-bootstrap/Dropdown"
 
-export default function ChessReels({ children, puzzleRef, handleNextPuzzle, handlePreviousPuzzle }) {
+export default function ChessReels({ children, puzzleRef, handleNextPuzzle, handlePreviousPuzzle, menuOpen, setMenuOpen}) {
+	
 
 	return (
 		<div className="chess-reels">
 			{/* Yläpalkki */}
 			<div className="top-bar">
 				<Dropdown.Menu show>
-					<Dropdown.Item>Your Matches</Dropdown.Item>
-					<Dropdown.Item>Puzzles</Dropdown.Item>
-					<Dropdown.Item>Openings</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "YourMatches"} onClick={() => setMenuOpen("YourMatches")}>Your Matches</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "Puzzles"} onClick={() => setMenuOpen("Puzzles")}>Puzzles</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => setMenuOpen("Openings")}>Openings</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => setMenuOpen("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
 				<button className="profile-btn" aria-label="Profile">👤</button>
 			</div>

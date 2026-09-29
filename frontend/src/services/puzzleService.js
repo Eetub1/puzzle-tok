@@ -1,5 +1,7 @@
-const getDaily = async (response) => {
-	response = await fetch(`/api/puzzles/daily`)
+const getDaily = async (signal) => {
+	const response = await fetch('/api/puzzles/daily', {
+        signal // Pass AbortController signal to fetch 
+    })
 	const data = await response.json() 
 	console.log('daily puzzle data:', data)
 	return { // Return puzzle data for structure:

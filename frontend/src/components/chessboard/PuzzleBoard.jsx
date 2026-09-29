@@ -242,8 +242,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
             
 			return true
 
-		} catch (error){
-            console.error('Move failed', error)
+		} catch (error) {
 			return false
 		}
 	}
