@@ -1,9 +1,35 @@
-import { useState } from "react"
+/*
+import { useState, useEffect } from "react"
 import { getDaily, getNextPuzzle, getBatch, getPuzzleById} from "../services/puzzleService"
 
-const Puzzles = ({setPuzzle}) => {
+const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 	const [puzzleId, setPuzzleId] = useState("")
-	const [puzzleQueue, setPuzzleQueue] = useState([])
+
+	// Fetch a batch of puzzles when the queue is empty
+	useEffect(() => {
+		if (puzzleQueue.length !== 0) {
+			return
+		}
+		// Create AbortController to cancel fetch because strict mode calls useEffect twice in development
+		const controller = new AbortController() 
+		const puzzleBatch = async () => {
+			try {
+				const result = await getBatch(controller.signal) 
+				// Only set batch if fetch was not aborted
+				if (!controller.signal.aborted) {
+					setBatch(result)
+				}
+			} catch (error) {
+				if (error.name !== 'AbortError') { // Ignore abort errors
+					console.error(error)
+				}
+			}
+		}
+		puzzleBatch()
+		return () => {
+			controller.abort() // Abort fetch if new batch is requested 
+		}
+	}, [puzzleQueue.length, setBatch])
 
 	const handleNext = async event => {
 		event.preventDefault()
@@ -24,27 +50,13 @@ const Puzzles = ({setPuzzle}) => {
 		setPuzzleId("")
 	}
 
+	
 	const handleBatch = async event => {
 		event.preventDefault()
-		// If there are puzzles in queue, use the next one
-		if (puzzleQueue.length > 0) {
-			const [nextPuzzle, ...remainingPuzzles] = puzzleQueue
-
-			setPuzzle(nextPuzzle)
-			console.log('current puzzle:', nextPuzzle)
-			setPuzzleQueue(remainingPuzzles)
-			return
-		}
-		// If no puzzles in queue, new batch
 		const result = await getBatch()
-		console.log('batch result:', result)
-		
-		const [firstPuzzle, ...remainingPuzzles] = result
-			
-		setPuzzle(firstPuzzle)
-		console.log('current puzzle:', firstPuzzle)
-		setPuzzleQueue(remainingPuzzles)
+		setBatch(result)
 	}
+	
 
 	const handleDaily = async event => {
 		event.preventDefault()
@@ -54,6 +66,8 @@ const Puzzles = ({setPuzzle}) => {
 	}
 
 	return (
+		null
+		
 		<div className="puzzleTest" >
 			<p>Get a puzzle</p>
 			<p>Check console to see the result</p>
@@ -72,7 +86,9 @@ const Puzzles = ({setPuzzle}) => {
 				<button type="submit">Get puzzle by id</button>
 			</form>
 		</div>
+		
 	)
 }
 
 export default Puzzles
+*/

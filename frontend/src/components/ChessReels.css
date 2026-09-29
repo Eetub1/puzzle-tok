@@ -61,7 +61,6 @@ body,
 /* Content Row (Väliä ja scrolli) */
 .content-row {
   position: relative;
-  flex: 1;
   min-height: 0;
 }
 

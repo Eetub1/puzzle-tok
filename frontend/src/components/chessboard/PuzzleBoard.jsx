@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
@@ -7,22 +7,29 @@ import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-export function PuzzleBoard({puzzle}) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 	const [game, setGame] = useState(() => new Chess(puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
 	const [puzzleStatus, setPuzzleStatus] = useState('playing')
 	const [selectedSquare, setSelectedSquare] = useState(null)
-	const [gameover, setGameover] = useState(false)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
-
+    const[lastMove, setLastMove] = useState(puzzle.lastMove)
+    const [hintSquare, setHintSquare] = useState(null)
+    const [moveFeedback, setMoveFeedback] = useState(null)
+    const [positions, setPositions] = useState([
+        {
+            fen: puzzle.fen,
+            lastMove: puzzle.lastMove
+        }
+    ])
+    
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
 	const playerColor = puzzle.fen.split(' ')[1] ?? 'w' 
-    
-    
 
-	// Use effect to handle computer moves based on puzzle solution
+
+    // Use effect to handle computer moves based on puzzle solution
 	useEffect(() => {
-		if (game.turn() === playerColor) {
+		if (game.turn() === playerColor || puzzleStatus !== 'playing') {
 			return
 		}
 		const nextMove = puzzleMoves[puzzleMoveIndex]
@@ -30,21 +37,84 @@ export function PuzzleBoard({puzzle}) {
 			return
 		}
 		setTimeout(() => {
-			const gameCopy = new Chess(game.fen())
-			try {
-				gameCopy.move({
-					from: nextMove.slice(0, 2),
-					to: nextMove.slice(2, 4),
-					promotion: nextMove.slice(4) || undefined,
-				})
-				setGame(gameCopy)
-				setPuzzleMoveIndex(puzzleMoveIndex + 1)
-			} catch (error){
-				console.error('Computer move failed:', error)
-			}
+			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
     
 	}, [game, puzzleMoveIndex, playerColor])
+
+    // Move back in puzzle 
+    function moveBack() {
+        if (puzzleMoveIndex <= 0) {
+            return
+        }
+        const { fen, lastMove } = positions[puzzleMoveIndex - 1]
+        const gameCopy = new Chess(fen)
+        setLastMove(lastMove)
+        setGame(gameCopy)
+        setPuzzleMoveIndex(puzzleMoveIndex - 1)
+        setSelectedSquare(null)
+        setMoveFeedback(null)
+		if (puzzleStatus !== 'solved') {
+			setPuzzleStatus('viewing')
+		}
+    }
+
+    // Move forward in puzzle 
+    function moveForward() {
+        if (puzzleMoveIndex >= positions.length - 1) {
+            return
+        }
+        const { fen, lastMove } = positions[puzzleMoveIndex + 1]
+        const gameCopy = new Chess(fen)
+        setLastMove(lastMove)
+        setGame(gameCopy)
+        setPuzzleMoveIndex(puzzleMoveIndex + 1)
+        setSelectedSquare(null)
+        setMoveFeedback(null)
+        if (puzzleMoveIndex + 1 === positions.length - 1 && puzzleStatus !== 'solved') {
+            setPuzzleStatus('playing')
+        }
+    }
+
+    // Give hint for next move
+    function giveHint() {
+        if (puzzleStatus === 'solved') {   
+            return
+        }
+        const nextMove = puzzleMoves[puzzleMoveIndex]
+        if(!nextMove) {
+            return
+        }
+        const sourceSquare = nextMove.slice(0, 2) 
+        setHintSquare(sourceSquare)
+        setMoveFeedback(null)
+    }
+
+    // Give solution for next move
+    function giveSolution() {
+        if (puzzleStatus === 'solved') {
+            return
+        }
+        const nextMove = puzzleMoves[puzzleMoveIndex]
+        if(!nextMove) {
+            return
+        }
+        computerMove(nextMove, 'solution move failed')
+        setPuzzleStatus('playing')
+        if (puzzleMoveIndex + 1 >= puzzleMoves.length) {
+            setPuzzleStatus('solved')
+        }
+        setHintSquare(null)
+        setMoveFeedback(null)
+    }
+
+    // Expose methods to parent component: ChessReels
+    useImperativeHandle(ref, () => ({
+        moveBack,
+        moveForward,
+        giveHint,
+        giveSolution,
+    }))
 
 	// Completes pawn promotion and make move
 	function completePromotion(promotionPiece) {
@@ -73,7 +143,7 @@ export function PuzzleBoard({puzzle}) {
 
 	// Handles piece drop events
 	function onPieceDrop({ sourceSquare, targetSquare }) {
-		if (!sourceSquare || !targetSquare || pendingPromotion || puzzleStatus === 'solved') {
+		if (!sourceSquare || !targetSquare || pendingPromotion || puzzleStatus !== 'playing') {
 			return false
 		}
 		// Check if move is promotion move and if it is legal
@@ -86,7 +156,7 @@ export function PuzzleBoard({puzzle}) {
 
 	// Handles square click events
 	function onSquareClick({ square }) {
-		if(gameover || pendingPromotion || puzzleStatus === 'solved') {
+		if(game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
 			return
 		}
 		// No square is selected yet -> select this one
@@ -147,14 +217,14 @@ export function PuzzleBoard({puzzle}) {
 			})
 			// Check if move matches puzzle solution
 			if (move !== puzzleMoves[puzzleMoveIndex]) {
-				setPuzzleStatus('wrong')
+				setMoveFeedback('wrong')
 				return false
 			}
-			setPuzzleStatus('playing')
+			setMoveFeedback('right')
 			setPendingPromotion(null)
 			setGame(gameCopy)
 			setSelectedSquare(null)
-
+            setHintSquare(null)
 			// Update puzzle move index and check if puzzle is solved
 			const nextIndex = puzzleMoveIndex + 1
 			setPuzzleMoveIndex(nextIndex)
@@ -162,20 +232,48 @@ export function PuzzleBoard({puzzle}) {
 				setPuzzleStatus('solved')
 			}
             
-			if (gameCopy.isGameOver()) {
-				setGameover(true)
-			}
+            setPositions([
+                ...positions,
+                {
+                    fen: gameCopy.fen(),
+                    lastMove: move,
+                }
+            ])
+            
 			return true
 
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}
 
+    // Handles computer move based on puzzle solution
+    function computerMove(nextMove, errorText) {
+        const gameCopy = new Chess(game.fen())
+        try {
+            gameCopy.move({
+                from: nextMove.slice(0, 2),
+                to: nextMove.slice(2, 4),
+                promotion: nextMove.slice(4) || undefined,
+            })
+            setGame(gameCopy)
+            setPuzzleMoveIndex(puzzleMoveIndex + 1)
+            setPositions([
+                ...positions,
+                {
+                    fen: gameCopy.fen(),
+                    lastMove: nextMove
+                }
+            ])
+        } catch (error){
+            console.error(errorText, error)
+        }
+    }
+
 	// Determines if a piece can be dragged from the given square
 	function canDragPiece({ square }) {
 		const piece = game.get(square)
-		if(gameover || pendingPromotion || puzzleStatus === 'solved') {
+		if(game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
 			return false
 		}
 		return piece && piece.color === game.turn()
@@ -192,12 +290,14 @@ export function PuzzleBoard({puzzle}) {
 					onPieceDrop,  // Handle piece drop events
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
-					squareStyles: getSquareStyles(game, selectedSquare, puzzle?.lastMove), // Apply styles to squares
+					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare), // Apply styles to squares
 				}}  
 			/>
 			<p>
-				{puzzleStatus === 'wrong' && 'Väärä siirto'}
-				{puzzleStatus === 'solved' && 'Puzzle ratkaistu'}
+				    {puzzleStatus === "solved" ? "Puzzle ratkaistu" 
+                            : moveFeedback === "right" ? "Hyvä siirto" 
+                            : moveFeedback === "wrong" ? "Väärä siirto" 
+                            : null}
 			</p>
 			<PromotionChooser
 				pendingPromotion={pendingPromotion}
@@ -206,5 +306,6 @@ export function PuzzleBoard({puzzle}) {
 		</div>
         
 	)
-};
+}) 
+export default PuzzleBoard
 
