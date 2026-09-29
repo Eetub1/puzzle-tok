@@ -23,17 +23,19 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (response) => {
-	response = await fetch(`/api/puzzles/batch`)
-	const data = await response.json()
-	console.log('batch data:', data)
-	return data.puzzles.map(puzzles => ({ // Return puzzle data for structure:
-		fen: puzzles.puzzle.fen,
-		moves: puzzles.puzzle.solution.join(' '),
-		lastMove: puzzles.puzzle.lastMove,
-		rating: puzzles.puzzle.rating,
-		themes: puzzles.puzzle.themes
-	}))
+const getBatch = async (signal) => {
+    const response = await fetch('/api/puzzles/batch', {
+        signal // Pass AbortController signal to fetch 
+    })
+    const data = await response.json()
+    console.log('batch data:', data)
+    return data.puzzles.map(puzzles => ({
+        fen: puzzles.puzzle.fen,
+        moves: puzzles.puzzle.solution.join(' '),
+        lastMove: puzzles.puzzle.lastMove,
+        rating: puzzles.puzzle.rating,
+        themes: puzzles.puzzle.themes
+    }))
 }
 
 const getPuzzleById = async id => {

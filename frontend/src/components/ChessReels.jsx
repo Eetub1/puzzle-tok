@@ -1,7 +1,8 @@
 import "./ChessReels.css"
 import Dropdown from "react-bootstrap/Dropdown"
 
-export default function ChessReels({ children, puzzleRef }) {
+export default function ChessReels({ children, puzzleRef, handleNextPuzzle, handlePreviousPuzzle }) {
+
 	return (
 		<div className="chess-reels">
 			{/* Yläpalkki */}
@@ -18,8 +19,8 @@ export default function ChessReels({ children, puzzleRef }) {
 			<div className="content-row">
 				{children}
 				<div className="scroll-controls">
-					<button aria-label="Previous puzzle">▲</button>
-					<button aria-label="Next puzzle">▼</button>
+					<button onClick={() => handlePreviousPuzzle()} aria-label="Previous puzzle">▲</button>					
+					<button onClick={() => handleNextPuzzle()} aria-label="Next puzzle">▼</button>
 				</div>
 			</div>
 
