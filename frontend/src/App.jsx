@@ -9,7 +9,7 @@ import { logout } from "./services/authService.js"
 import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
 import VerifyEmail from "./components/VerifyEmail.jsx"
 import ProfilePage from "./pages/ProfilePage.jsx"
-
+import Preferences from "./components/Preferences.jsx"
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
@@ -49,6 +49,7 @@ function App() {
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
 			</Routes>
+			<Preferences/>
 		</>
 	)
 }

@@ -3,10 +3,6 @@ import { Chess } from "chess.js"
 const puzzlesRouter = express.Router()
 const base_url = `https://lichess.org`
 
-
-
-
-
 // Retrieve a puzzle by id
 const getGameById = async id => {
 
