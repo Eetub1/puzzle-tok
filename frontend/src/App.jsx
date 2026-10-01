@@ -11,12 +11,12 @@ import Message from "./components/Message.jsx"
 import { logout } from "./services/authService.js"
 import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
 import Chessboard from "./components/chessboard/ChessBoard.jsx"
-
+import Preferences from "./components/Preferences.jsx"
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
-	const [menuOpen, setMenuOpen] = useState("DailyPuzzle") 
+	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const puzzleBoardRef = useRef(null) // Ref for PuzzleBoard to call methods in ChessReels
 	const {puzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen}) // Custom hook to puzzle queue, memory and current puzzle
 
@@ -50,6 +50,7 @@ function App() {
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
 			</Routes>
+			<Preferences/>
 		</>
 	)
 }
