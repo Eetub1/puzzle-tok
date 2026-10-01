@@ -27,7 +27,7 @@ function ChessBoard() {
 		}
 		const targetRank = targetSquare[1] // 1 is first target square.
 		// Is pawn moving last rank for its color
-		return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1') 
+		return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1')
 	}
 
 	// Is move legal
@@ -101,12 +101,12 @@ function ChessBoard() {
 			setSelectedSquare(square)
 		}
 	}
-    
+
 	// Attempts to make a move and returns whether it was successful.
 	function makeMove(sourceSquare, targetSquare, promotionPiece) {
 
 		const gameCopy = new Chess(game.fen()) // Make copy of the current game
-        
+
 		try {
 			gameCopy.move({
 				from: sourceSquare,
@@ -146,14 +146,14 @@ function ChessBoard() {
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
 					squareStyles: getSquareStyles(game, selectedSquare, undefined), // Apply styles to squares
-				}}  
+				}}
 			/>
 			<PromotionChooser
 				pendingPromotion={pendingPromotion}
 				onSelect={completePromotion}
 			/>
 		</div>
-        
+
 	)
 };
 export default ChessBoard

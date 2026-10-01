@@ -15,7 +15,7 @@ const Signup = ({ setMessage }) => {
 			// Not doing anything useful with the user right now
 			const user = await signup({ username, password })
 			console.log(user)
-            
+
 			setUsername("")
 			setPassword("")
 			navigate("/login")
