@@ -9,6 +9,7 @@ import authRouter from "./routes/auth.js"
 import oauthRouter from "./routes/oauth.js"
 import puzzlesRouter from "./routes/puzzles.js"
 import userRouter from "./routes/user.js"
+import prefRouter from "./routes/preferences.js"
 
 app.use(express.json())
 app.use(cors())
@@ -18,6 +19,7 @@ app.use("/api/auth", authRouter)
 app.use("/api/puzzles", puzzlesRouter)
 app.use("/api/auth", oauthRouter)
 app.use("/api/user", userRouter)
+app.use("/api/user/preferences", prefRouter)
 
 app.get("/", (req, res) => {
     //res.send("<a href='/api/auth/getAuth'>auth</a>")
