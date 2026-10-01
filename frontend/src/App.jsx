@@ -7,8 +7,9 @@ import Login from "./components/Login.jsx"
 import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
 import VerifyEmail from "./components/VerifyEmail.jsx"
-
 import { logout } from "./services/authService.js"
+import ProfilePage from "./pages/ProfilePage.jsx"
+import Preferences from "./components/Preferences.jsx"
 
 const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
@@ -35,6 +36,7 @@ const App = () => {
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
 			</Routes>
+			<Preferences/>
 		</>
 	)
 }
