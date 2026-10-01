@@ -5,6 +5,7 @@ import { signup } from "../services/authService"
 
 const Signup = ({ setMessage }) => {
 	const [username, setUsername] = useState("")
+	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const navigate = useNavigate()
 
@@ -13,9 +14,9 @@ const Signup = ({ setMessage }) => {
 
 		try {
 			// Not doing anything useful with the user right now
-			const user = await signup({ username, password })
+			const user = await signup({ username, email, password })
 			console.log(user)
-            
+
 			setUsername("")
 			setPassword("")
 			navigate("/login")
@@ -35,6 +36,11 @@ const Signup = ({ setMessage }) => {
 					<div>
 						<label htmlFor="username">Username: </label>
 						<input id="username" type="text" onChange={(event) => setUsername(event.target.value)} value={username}/>
+					</div>
+
+					<div>
+						<label htmlFor="email">Email: </label>
+						<input id="password" type="email" onChange={(event) => setEmail(event.target.value)} value={email} />
 					</div>
 
 					<div>
