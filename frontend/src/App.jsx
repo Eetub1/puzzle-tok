@@ -12,6 +12,7 @@ import { logout } from "./services/authService.js"
 import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
 import Chessboard from "./components/chessboard/ChessBoard.jsx"
 import VerifyEmail from "./components/VerifyEmail.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx"
 
 
 function App() {
@@ -28,11 +29,7 @@ function App() {
 
 	return (
 		<>
-			{user &&
-            <div>
-            	<button onClick={handleLogout}>Logout</button>
-            </div>}
-
+			{user && <div><button onClick={handleLogout}>Logout</button></div>}
 			{message && <Message data={message}/>}
 			<Routes>
 				<Route path="/" element={user ?
@@ -48,6 +45,7 @@ function App() {
 					: <Navigate to="/login"/>}
 				/>
 
+				<Route path="/profile" element={user ? <ProfilePage user={user}/> : <Login setMessage={setMessage} setUser={setUser}/>}/>
 				<Route path="/verify-email" element={<VerifyEmail/>}/>
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>

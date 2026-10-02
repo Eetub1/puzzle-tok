@@ -105,7 +105,7 @@ authRouter.post("/login", async (req, res) => {
 
     try {
         const result = await pool.query(
-            "SELECT id, username, password_hash FROM users WHERE lower(username) = lower($1)",
+            "SELECT id, email, username, password_hash FROM users WHERE lower(username) = lower($1)",
             [username.trim()],
         )
         const user = result.rows[0]
@@ -127,6 +127,7 @@ authRouter.post("/login", async (req, res) => {
         const resultObject = {
             token: token,
             id: user.id,
+            email: user.email,
             username: user.username
         }
 
