@@ -13,21 +13,21 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 	const [puzzleStatus, setPuzzleStatus] = useState('playing')
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
-    const[lastMove, setLastMove] = useState(puzzle.lastMove)
-    const [hintSquare, setHintSquare] = useState(null)
-    const [moveFeedback, setMoveFeedback] = useState(null)
-    const [positions, setPositions] = useState([
-        {
-            fen: puzzle.fen,
-            lastMove: puzzle.lastMove
-        }
-    ])
-    
+	const[lastMove, setLastMove] = useState(puzzle.lastMove)
+	const [hintSquare, setHintSquare] = useState(null)
+	const [moveFeedback, setMoveFeedback] = useState(null)
+	const [positions, setPositions] = useState([
+		{
+			fen: puzzle.fen,
+			lastMove: puzzle.lastMove
+		}
+	])
+
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
-	const playerColor = puzzle.fen.split(' ')[1] ?? 'w' 
+	const playerColor = puzzle.fen.split(' ')[1] ?? 'w'
 
 
-    // Use effect to handle computer moves based on puzzle solution
+	// Use effect to handle computer moves based on puzzle solution
 	useEffect(() => {
 		if (game.turn() === playerColor || puzzleStatus !== 'playing') {
 			return
@@ -39,88 +39,88 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 		setTimeout(() => {
 			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
-    
+
 	}, [game, puzzleMoveIndex, playerColor])
 
-    // Move back in puzzle 
-    function moveBack() {
-        if (puzzleMoveIndex <= 0) {
-            return
-        }
-        const { fen, lastMove } = positions[puzzleMoveIndex - 1]
-        const gameCopy = new Chess(fen)
-        setLastMove(lastMove)
-        setGame(gameCopy)
-        setPuzzleMoveIndex(puzzleMoveIndex - 1)
-        setSelectedSquare(null)
-        setMoveFeedback(null)
+	// Move back in puzzle
+	function moveBack() {
+		if (puzzleMoveIndex <= 0) {
+			return
+		}
+		const { fen, lastMove } = positions[puzzleMoveIndex - 1]
+		const gameCopy = new Chess(fen)
+		setLastMove(lastMove)
+		setGame(gameCopy)
+		setPuzzleMoveIndex(puzzleMoveIndex - 1)
+		setSelectedSquare(null)
+		setMoveFeedback(null)
 		if (puzzleStatus !== 'solved') {
 			setPuzzleStatus('viewing')
 		}
-    }
+	}
 
-    // Move forward in puzzle 
-    function moveForward() {
-        if (puzzleMoveIndex >= positions.length - 1) {
-            return
-        }
-        const { fen, lastMove } = positions[puzzleMoveIndex + 1]
-        const gameCopy = new Chess(fen)
-        setLastMove(lastMove)
-        setGame(gameCopy)
-        setPuzzleMoveIndex(puzzleMoveIndex + 1)
-        setSelectedSquare(null)
-        setMoveFeedback(null)
-        if (puzzleMoveIndex + 1 === positions.length - 1 && puzzleStatus !== 'solved') {
-            setPuzzleStatus('playing')
-        }
-    }
+	// Move forward in puzzle
+	function moveForward() {
+		if (puzzleMoveIndex >= positions.length - 1) {
+			return
+		}
+		const { fen, lastMove } = positions[puzzleMoveIndex + 1]
+		const gameCopy = new Chess(fen)
+		setLastMove(lastMove)
+		setGame(gameCopy)
+		setPuzzleMoveIndex(puzzleMoveIndex + 1)
+		setSelectedSquare(null)
+		setMoveFeedback(null)
+		if (puzzleMoveIndex + 1 === positions.length - 1 && puzzleStatus !== 'solved') {
+			setPuzzleStatus('playing')
+		}
+	}
 
-    // Give hint for next move
-    function giveHint() {
-        if (puzzleStatus === 'solved') {   
-            return
-        }
-        const nextMove = puzzleMoves[puzzleMoveIndex]
-        if(!nextMove) {
-            return
-        }
-        const sourceSquare = nextMove.slice(0, 2) 
-        setHintSquare(sourceSquare)
-        setMoveFeedback(null)
-    }
+	// Give hint for next move
+	function giveHint() {
+		if (puzzleStatus === 'solved') {
+			return
+		}
+		const nextMove = puzzleMoves[puzzleMoveIndex]
+		if(!nextMove) {
+			return
+		}
+		const sourceSquare = nextMove.slice(0, 2)
+		setHintSquare(sourceSquare)
+		setMoveFeedback(null)
+	}
 
-    // Give solution for next move
-    function giveSolution() {
-        if (puzzleStatus === 'solved') {
-            return
-        }
-        const nextMove = puzzleMoves[puzzleMoveIndex]
-        if(!nextMove) {
-            return
-        }
-        computerMove(nextMove, 'solution move failed')
-        setPuzzleStatus('playing')
-        if (puzzleMoveIndex + 1 >= puzzleMoves.length) {
-            setPuzzleStatus('solved')
-        }
-        setHintSquare(null)
-        setMoveFeedback(null)
-    }
+	// Give solution for next move
+	function giveSolution() {
+		if (puzzleStatus === 'solved') {
+			return
+		}
+		const nextMove = puzzleMoves[puzzleMoveIndex]
+		if(!nextMove) {
+			return
+		}
+		computerMove(nextMove, 'solution move failed')
+		setPuzzleStatus('playing')
+		if (puzzleMoveIndex + 1 >= puzzleMoves.length) {
+			setPuzzleStatus('solved')
+		}
+		setHintSquare(null)
+		setMoveFeedback(null)
+	}
 
-    // Expose methods to parent component: ChessReels
-    useImperativeHandle(ref, () => ({
-        moveBack,
-        moveForward,
-        giveHint,
-        giveSolution,
-    }))
+	// Expose methods to parent component: ChessReels
+	useImperativeHandle(ref, () => ({
+		moveBack,
+		moveForward,
+		giveHint,
+		giveSolution,
+	}))
 
 	// Completes pawn promotion and make move
 	function completePromotion(promotionPiece) {
 		if (!pendingPromotion) return
 		if(!makeMove(pendingPromotion.from, pendingPromotion.to, promotionPiece)) {
-			setPendingPromotion(null) 
+			setPendingPromotion(null)
 		}
 	}
 
@@ -132,7 +132,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 		}
 		const targetRank = targetSquare[1] // 1 is first target square.
 		// Is pawn moving last rank for its color
-		return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1') 
+		return (piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1')
 	}
 
 	// Is move legal
@@ -183,7 +183,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 		}
 
 		const moveSuccessful = makeMove(selectedSquare, square)
-        
+
 		// If the move was not successful, check if another piece of the same color was selected
 		if (!moveSuccessful) {
 			const piece = game.get(square)
@@ -203,12 +203,12 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 			setSelectedSquare(square)
 		}
 	}
-    
+
 	// Attempts to make a move and returns whether it was successful.
 	function makeMove(sourceSquare, targetSquare, promotionPiece) {
-		const move = sourceSquare + targetSquare + (promotionPiece ?? '') 
+		const move = sourceSquare + targetSquare + (promotionPiece ?? '')
 		const gameCopy = new Chess(game.fen()) // Make copy of the current game
-        
+
 		try {
 			gameCopy.move({
 				from: sourceSquare,
@@ -224,22 +224,22 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 			setPendingPromotion(null)
 			setGame(gameCopy)
 			setSelectedSquare(null)
-            setHintSquare(null)
+			setHintSquare(null)
 			// Update puzzle move index and check if puzzle is solved
 			const nextIndex = puzzleMoveIndex + 1
 			setPuzzleMoveIndex(nextIndex)
 			if (nextIndex >= puzzleMoves.length) {
 				setPuzzleStatus('solved')
 			}
-            
-            setPositions([
-                ...positions,
-                {
-                    fen: gameCopy.fen(),
-                    lastMove: move,
-                }
-            ])
-            
+
+			setPositions([
+				...positions,
+				{
+					fen: gameCopy.fen(),
+					lastMove: move,
+				}
+			])
+
 			return true
 
 		} catch (error) {
@@ -247,28 +247,28 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 		}
 	}
 
-    // Handles computer move based on puzzle solution
-    function computerMove(nextMove, errorText) {
-        const gameCopy = new Chess(game.fen())
-        try {
-            gameCopy.move({
-                from: nextMove.slice(0, 2),
-                to: nextMove.slice(2, 4),
-                promotion: nextMove.slice(4) || undefined,
-            })
-            setGame(gameCopy)
-            setPuzzleMoveIndex(puzzleMoveIndex + 1)
-            setPositions([
-                ...positions,
-                {
-                    fen: gameCopy.fen(),
-                    lastMove: nextMove
-                }
-            ])
-        } catch (error){
-            console.error(errorText, error)
-        }
-    }
+	// Handles computer move based on puzzle solution
+	function computerMove(nextMove, errorText) {
+		const gameCopy = new Chess(game.fen())
+		try {
+			gameCopy.move({
+				from: nextMove.slice(0, 2),
+				to: nextMove.slice(2, 4),
+				promotion: nextMove.slice(4) || undefined,
+			})
+			setGame(gameCopy)
+			setPuzzleMoveIndex(puzzleMoveIndex + 1)
+			setPositions([
+				...positions,
+				{
+					fen: gameCopy.fen(),
+					lastMove: nextMove
+				}
+			])
+		} catch (error){
+			console.error(errorText, error)
+		}
+	}
 
 	// Determines if a piece can be dragged from the given square
 	function canDragPiece({ square }) {
@@ -291,21 +291,21 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
 					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare), // Apply styles to squares
-				}}  
+				}}
 			/>
 			<p>
-				    {puzzleStatus === "solved" ? "Puzzle ratkaistu" 
-                            : moveFeedback === "right" ? "Hyvä siirto" 
-                            : moveFeedback === "wrong" ? "Väärä siirto" 
-                            : null}
+				{puzzleStatus === "solved" ? "Puzzle ratkaistu"
+					: moveFeedback === "right" ? "Hyvä siirto"
+						: moveFeedback === "wrong" ? "Väärä siirto"
+							: null}
 			</p>
 			<PromotionChooser
 				pendingPromotion={pendingPromotion}
 				onSelect={completePromotion}
 			/>
 		</div>
-        
+
 	)
-}) 
+})
 export default PuzzleBoard
 

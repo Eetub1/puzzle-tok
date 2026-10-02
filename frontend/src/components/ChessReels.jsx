@@ -1,8 +1,9 @@
 import "./ChessReels.css"
 import Dropdown from "react-bootstrap/Dropdown"
+import { useNavigate } from "react-router-dom"
 
 export default function ChessReels({ children, puzzleRef, handleNextPuzzle, handlePreviousPuzzle, menuOpen, setMenuOpen}) {
-	
+	const navigate = useNavigate()
 
 	return (
 		<div className="chess-reels">
@@ -14,14 +15,14 @@ export default function ChessReels({ children, puzzleRef, handleNextPuzzle, hand
 					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => setMenuOpen("Openings")}>Openings</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => setMenuOpen("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
-				<button className="profile-btn" aria-label="Profile">👤</button>
+				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
-      
+
 			{/* Scrolli */}
 			<div className="content-row">
 				{children}
 				<div className="scroll-controls">
-					<button onClick={() => handlePreviousPuzzle()} aria-label="Previous puzzle">▲</button>					
+					<button onClick={() => handlePreviousPuzzle()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => handleNextPuzzle()} aria-label="Next puzzle">▼</button>
 				</div>
 			</div>

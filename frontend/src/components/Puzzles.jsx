@@ -11,10 +11,10 @@ const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 			return
 		}
 		// Create AbortController to cancel fetch because strict mode calls useEffect twice in development
-		const controller = new AbortController() 
+		const controller = new AbortController()
 		const puzzleBatch = async () => {
 			try {
-				const result = await getBatch(controller.signal) 
+				const result = await getBatch(controller.signal)
 				// Only set batch if fetch was not aborted
 				if (!controller.signal.aborted) {
 					setBatch(result)
@@ -27,7 +27,7 @@ const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 		}
 		puzzleBatch()
 		return () => {
-			controller.abort() // Abort fetch if new batch is requested 
+			controller.abort() // Abort fetch if new batch is requested
 		}
 	}, [puzzleQueue.length, setBatch])
 
@@ -36,7 +36,7 @@ const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 
 		const result = await getNextPuzzle()
 		console.log('next result:', result)
-		setPuzzle(result) 
+		setPuzzle(result)
 	}
 
 	const handlePuzzleById = async event => {
@@ -45,29 +45,29 @@ const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 		const result = await getPuzzleById(puzzleId)
 		console.log(result)
 
-		setPuzzle(result) 
+		setPuzzle(result)
 
 		setPuzzleId("")
 	}
 
-	
+
 	const handleBatch = async event => {
 		event.preventDefault()
 		const result = await getBatch()
 		setBatch(result)
 	}
-	
+
 
 	const handleDaily = async event => {
 		event.preventDefault()
 		const result = await getDaily()
 		console.log('daily puzzle result:', result)
-		setPuzzle(result) 
+		setPuzzle(result)
 	}
 
 	return (
 		null
-		
+
 		<div className="puzzleTest" >
 			<p>Get a puzzle</p>
 			<p>Check console to see the result</p>
@@ -86,7 +86,7 @@ const Puzzles = ({ setPuzzle, setBatch, puzzleQueue }) => {
 				<button type="submit">Get puzzle by id</button>
 			</form>
 		</div>
-		
+
 	)
 }
 
