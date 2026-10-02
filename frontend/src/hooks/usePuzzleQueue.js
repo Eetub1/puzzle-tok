@@ -3,11 +3,11 @@ import { getBatch, getDaily } from "../services/puzzleService"
 
 
 export function usePuzzleQueue({ menuOpen }) {
-	const [puzzle, setPuzzle] = useState(null) 
+	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
 	const [dailyPuzzle, setDailyPuzzle] = useState(null)
-	
+
 	// Set batch of puzzles in queue, or set first puzzle if !puzzle
 	function setBatch(puzzles) {
 		if (!puzzle) {
@@ -44,7 +44,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			puzzleDaily()
 
 			return () => {
-				controller.abort() // Abort fetch if new batch is requested 
+				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
 
@@ -57,7 +57,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			const puzzleBatch = async () => {
 				try {
 					const result = await getBatch(controller.signal)
-					// Only set batch if fetch was not aborted					
+					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
 						setBatch(result)
 					}
@@ -69,7 +69,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			}
 			puzzleBatch()
 			return () => {
-				controller.abort() // Abort fetch if new batch is requested 
+				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
 	}, [puzzleQueue.length, menuOpen, dailyPuzzle])
@@ -115,7 +115,7 @@ export function usePuzzleQueue({ menuOpen }) {
 	const currentPuzzle = menuOpen === "DailyPuzzle" ? dailyPuzzle : puzzle
 	const previousPuzzle = puzzleMemory[puzzleMemory.length - 1] ?? null
 	const nextPuzzle = puzzleQueue[0] ?? null
-	
+
 	return {
 		currentPuzzle,
 		previousPuzzle,

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState} from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
 
@@ -35,6 +35,7 @@ function App() {
 					<div>
 						<GetUserGames />
 						<ChessReels
+							key={menuOpen}
 							handleNextPuzzle={handleNextPuzzle}
 							handlePreviousPuzzle={handlePreviousPuzzle}
 							menuOpen={menuOpen}
