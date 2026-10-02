@@ -1,9 +1,7 @@
 import { useState} from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
-
 import ChessReels from "./components/ChessReels"
-import GetUserGames from "./components/GetUserGames"
 import Login from "./components/Login.jsx"
 import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
@@ -26,14 +24,13 @@ function App() {
 
 	return (
 		<>
-			{user && <div><button onClick={handleLogout}>Logout</button></div>}
-			{message && <Message data={message}/>}
 			<Routes>
 				<Route path="/" element={user ?
 					<div>
-						<GetUserGames />
+						{message && <Message data={message}/>}
 						<ChessReels
 							key={menuOpen}
+							handleLogout={handleLogout}
 							handleNextPuzzle={handleNextPuzzle}
 							handlePreviousPuzzle={handlePreviousPuzzle}
 							menuOpen={menuOpen}

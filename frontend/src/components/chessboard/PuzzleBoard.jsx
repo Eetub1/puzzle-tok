@@ -3,7 +3,6 @@ import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
-import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
@@ -15,6 +14,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 	const [pendingPromotion, setPendingPromotion] = useState(null)
 	const[lastMove, setLastMove] = useState(puzzle.lastMove)
 	const [hintSquare, setHintSquare] = useState(null)
+	const [hoveredSquare, setHoveredSquare] = useState(null)
+	const [isDragging, setIsDragging] = useState(false)
 	const [moveFeedback, setMoveFeedback] = useState(null)
 	const [positions, setPositions] = useState([
 		{
@@ -143,6 +144,9 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 
 	// Handles piece drop events
 	function onPieceDrop({ sourceSquare, targetSquare }) {
+		setIsDragging(false)
+		setHoveredSquare(null)
+
 		if (preview || !sourceSquare || !targetSquare || pendingPromotion || puzzleStatus !== 'playing') {
 			return false
 		}
@@ -200,8 +204,24 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 	function onPieceDrag({ square }) {
 		const piece = game.get(square)
 		if (piece && piece.color === game.turn()) {
+			setIsDragging(true)
+			setHoveredSquare(null)
 			setSelectedSquare(square)
 		}
+	}
+
+	// Handles mouse over square events
+	function onMouseOverSquare({ square }) {
+		if (!isDragging || !selectedSquare) {
+			return
+		}
+		setHoveredSquare(isLegalMove(selectedSquare, square) ? square : null)
+	}
+
+	// Handles piece drag end events
+	function onPieceDragEnd() {
+		setIsDragging(false)
+		setHoveredSquare(null)
 	}
 
 	// Attempts to make a move and returns whether it was successful.
@@ -287,10 +307,13 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 					position: game.fen(), // FEN representing current game state
 					boardOrientation: playerColor === 'w' ? 'white' : 'black', // Board orientation based on player's color
 					onPieceDrag, // Handle piece drag events
+					onPieceDragEnd, // Handle piece drag end events
+					onMouseOverSquare, // Handle mouse over square events
 					onPieceDrop,  // Handle piece drop events
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
-					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare), // Apply styles to squares
+					dropSquareStyle: {boxShadow: 'none'}, // Remove default style
+					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
 				}}
 			/>
 			<p>

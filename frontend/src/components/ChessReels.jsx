@@ -7,6 +7,7 @@ import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { useNavigate } from "react-router-dom"
 
 export default function ChessReels({
+	handleLogout,
 	handleNextPuzzle,
 	handlePreviousPuzzle,
 	menuOpen,
@@ -32,6 +33,7 @@ export default function ChessReels({
 	return (
 		<div className="chess-reels">
 			<div className="top-bar">
+				<button onClick={handleLogout} className="logout-btn">Logout</button>
 				<Dropdown.Menu show>
 					<Dropdown.Item active={menuOpen === "YourMatches"} onClick={() => setMenuOpen("YourMatches")}>Your Matches</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "Puzzles"} onClick={() => setMenuOpen("Puzzles")}>Puzzles</Dropdown.Item>
