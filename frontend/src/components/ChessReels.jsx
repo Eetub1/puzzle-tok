@@ -2,7 +2,7 @@ import "./ChessReels.css"
 import Dropdown from "react-bootstrap/Dropdown"
 
 export default function ChessReels({ children, puzzleRef, handleNextPuzzle, handlePreviousPuzzle, menuOpen, setMenuOpen}) {
-	
+
 
 	return (
 		<div className="chess-reels">
@@ -16,12 +16,12 @@ export default function ChessReels({ children, puzzleRef, handleNextPuzzle, hand
 				</Dropdown.Menu>
 				<button className="profile-btn" aria-label="Profile">👤</button>
 			</div>
-      
+
 			{/* Scrolli */}
 			<div className="content-row">
 				{children}
 				<div className="scroll-controls">
-					<button onClick={() => handlePreviousPuzzle()} aria-label="Previous puzzle">▲</button>					
+					<button onClick={() => handlePreviousPuzzle()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => handleNextPuzzle()} aria-label="Next puzzle">▼</button>
 				</div>
 			</div>

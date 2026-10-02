@@ -20,7 +20,7 @@ const Signup = ({ setMessage }) => {
 			setUsername("")
 			setPassword("")
 			navigate("/login")
-			setMessage({ message: "Signup was succesful!", isError: false })
+			setMessage({ message: "Account created! Check your email to verify your address", isError: false })
 			setTimeout(() => {
 				setMessage(null)
 			}, 4000)

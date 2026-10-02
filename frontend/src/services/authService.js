@@ -1,3 +1,19 @@
+const verifyEmail = async token => {
+	const response = await fetch("/api/auth/verify-email", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ token }),
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Verification failed: ${data.error}`)
+	}
+
+	return data
+}
+
+
 const signup = async credentials => {
 	const response = await fetch(`/api/auth/signup`, {
 		method: "POST",
@@ -48,5 +64,6 @@ export {
 	signup,
 	login,
 	logout,
-	getAccessToken
+	getAccessToken,
+	verifyEmail
 }
