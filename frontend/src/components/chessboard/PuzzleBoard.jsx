@@ -40,7 +40,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
 
-	}, [puzzleMoveIndex])
+	}, [game, puzzleMoveIndex, playerColor])
 
 	// Move back in puzzle
 	function moveBack() {

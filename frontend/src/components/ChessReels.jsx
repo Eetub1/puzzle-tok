@@ -4,6 +4,7 @@ import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import "./ChessReels.css"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
+import { useNavigate } from "react-router-dom"
 
 export default function ChessReels({
 	handleNextPuzzle,
@@ -16,6 +17,7 @@ export default function ChessReels({
 }) {
 
 	const puzzleBoardRef = useRef(null)
+	const navigate = useNavigate()
 
 	const {
 		isPuzzlesMenu,
@@ -36,7 +38,7 @@ export default function ChessReels({
 					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => setMenuOpen("Openings")}>Openings</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => setMenuOpen("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
-				<button className="profile-btn" aria-label="Profile">👤</button>
+				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
 
 			<div className="content-row">
