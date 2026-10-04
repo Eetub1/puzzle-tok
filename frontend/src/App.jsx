@@ -25,10 +25,23 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={user
 					?
-					<>
+					<div>
 						{message && <Message data={message}/>}
-						<ChessReels handleLogout={handleLogout} setMessage={setMessage}></ChessReels>
-					</>
+						<ChessReels
+							key={menuOpen}
+							handleLogout={handleLogout}
+							handleNextPuzzle={handleNextPuzzle}
+							handlePreviousPuzzle={handlePreviousPuzzle}
+							menuOpen={menuOpen}
+							setMenuOpen={setMenuOpen}
+							setMessage={setMessage}
+							currentPuzzle={currentPuzzle}
+							previousPuzzle={previousPuzzle}
+							nextPuzzle={nextPuzzle}
+						>
+						</ChessReels>
+						<Preferences user_id={user.id}/>
+					</div>
 					: <Navigate to="/login"/>}
 				/>
 
@@ -36,7 +49,6 @@ const App = () => {
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
 			</Routes>
-			<Preferences/>
 		</>
 	)
 }
