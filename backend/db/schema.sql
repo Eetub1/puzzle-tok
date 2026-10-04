@@ -20,3 +20,8 @@ CREATE TABLE email_verification_tokens (
     used_at    timestamptz,
     created_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE preferences (
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    color      text        NOT NULL
+);

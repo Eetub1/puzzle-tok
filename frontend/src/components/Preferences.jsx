@@ -1,14 +1,16 @@
 import { useState } from "react"
 import { prefChange } from "../services/preferenceService"
 
-const Preferences = () => {
+const Preferences = ({user_id}) => {
 	const [color, setColor] = useState("both")
 
 	const handleSubmit = async event => {
 		event.preventDefault()
 
+		console.log('here user id',user_id)
+
 		try {
-			const data = await prefChange({ color })
+			const data = await prefChange({ color, user_id })
 			console.log(data)
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
