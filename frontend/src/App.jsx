@@ -44,7 +44,7 @@ function App() {
 					: <Navigate to="/login"/>}
 				/>
 
-				<Route path="/profile" element={user ? <ProfilePage user={user}/> : <Login setMessage={setMessage} setUser={setUser}/>}/>
+				<Route path="/profile" element={user ? <ProfilePage user={user} setMessage={setMessage}/> : <Login setMessage={setMessage} setUser={setUser}/>}/>
 				<Route path="/verify-email" element={<VerifyEmail/>}/>
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>
