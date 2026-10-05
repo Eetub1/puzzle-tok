@@ -1,31 +1,39 @@
-import { useState, useEffect} from "react"
+import { useState, useEffect } from "react"
 import { getBatch, getDaily } from "../services/puzzleService"
 
 
-export function usePuzzleQueue({menuOpen}) {
+export function usePuzzleQueue({ menuOpen }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
 	const [dailyPuzzle, setDailyPuzzle] = useState(null)
 
+	// Set batch of puzzles in queue, or set first puzzle if !puzzle
+	function setBatch(puzzles) {
+		if (!puzzle) {
+			const [firstPuzzle, ...remainingPuzzles] = puzzles
+			setPuzzle(firstPuzzle)
+			console.log('current puzzle:', firstPuzzle)
+			setPuzzleQueue(remainingPuzzles)
+			return
+		}
+		setPuzzleQueue([...puzzleQueue, ...puzzles])
+	}
+
 	// Fetch puzzles when menuOpen is "Puzzles" and queue is empty, or fetch daily puzzle when menuOpen is "DailyPuzzle"
 	useEffect(() => {
 		if (menuOpen === "DailyPuzzle") {
-			if(dailyPuzzle) {
-				setPuzzle(dailyPuzzle)
-				console.log('current puzzle:', dailyPuzzle)
+			if (dailyPuzzle) {
 				return
 			}
-			setPuzzle(null)
-			const controller = new AbortController()
+			const controller = new AbortController() //
 			const puzzleDaily = async () => {
 				try {
 					const result = await getDaily(controller.signal)
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setPuzzle(result)
 						setDailyPuzzle(result)
-						console.log('current puzzle:', result)
+						console.log('daily puzzle:', result)
 					}
 				} catch (error) {
 					if (error.name !== 'AbortError') { // Ignore abort errors
@@ -39,8 +47,9 @@ export function usePuzzleQueue({menuOpen}) {
 				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
+
 		if (menuOpen === "Puzzles") {
-			if (puzzleQueue.length !== 0) {
+			if (puzzleQueue.length > 1) {
 				return
 			}
 			// Create AbortController to cancel fetch because strict mode calls useEffect twice in development
@@ -63,25 +72,11 @@ export function usePuzzleQueue({menuOpen}) {
 				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
-
-	}, [puzzleQueue.length, menuOpen])
-
-	// Set batch of puzzles and update the current puzzle and queue
-	function setBatch(puzzles) {
-		const [firstPuzzle, ...remainingPuzzles] = puzzles
-		if(puzzle !== dailyPuzzle) {
-			console.log('current puzzle:', puzzle)
-			setPuzzleQueue(puzzles)
-		} else {
-			setPuzzle(firstPuzzle)
-			console.log('current puzzle:', firstPuzzle)
-			setPuzzleQueue(remainingPuzzles)
-		}
-	}
+	}, [puzzleQueue.length, menuOpen, dailyPuzzle])
 
 	// Handle moving to next puzzle in queue
 	function handleNextPuzzle() {
-		if (!puzzle || puzzleQueue.length === 0 || menuOpen === "DailyPuzzle") {
+		if (!puzzle || puzzleQueue.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
 
@@ -91,8 +86,9 @@ export function usePuzzleQueue({menuOpen}) {
 			...puzzleMemory,
 			puzzle,
 		])
-		if (puzzleMemory.length > 10) {
+		if(puzzleMemory.length > 10) {
 			setPuzzleMemory(puzzleMemory.slice(-10))
+			console.log('puzzle memory over 10, trimming to last 10 puzzles')
 		}
 		setPuzzle(nextPuzzle)
 		console.log('current puzzle:', nextPuzzle)
@@ -101,7 +97,7 @@ export function usePuzzleQueue({menuOpen}) {
 
 	// Handle moving to previous puzzle in memory
 	function handlePreviousPuzzle() {
-		if (!puzzle || puzzleMemory.length === 0 || menuOpen === "DailyPuzzle") {
+		if (!puzzle || puzzleMemory.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
 
@@ -116,8 +112,14 @@ export function usePuzzleQueue({menuOpen}) {
 		setPuzzleMemory(puzzleMemory.slice(0, -1))
 	}
 
+	const currentPuzzle = menuOpen === "DailyPuzzle" ? dailyPuzzle : puzzle
+	const previousPuzzle = puzzleMemory[puzzleMemory.length - 1] ?? null
+	const nextPuzzle = puzzleQueue[0] ?? null
+
 	return {
-		puzzle,
+		currentPuzzle,
+		previousPuzzle,
+		nextPuzzle,
 		handleNextPuzzle,
 		handlePreviousPuzzle,
 	}

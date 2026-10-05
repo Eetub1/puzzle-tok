@@ -5,4 +5,5 @@
     --color-legal-move: rgba(0, 0, 0, 0.35);
     --color-capture: rgba(255, 255, 0, 0.5);
     --color-hint: rgba(0, 255, 255, 0.5);
+    --color-drag-hover: rgba(0, 0, 0, 0.35);
 }

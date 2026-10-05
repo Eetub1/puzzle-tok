@@ -3,11 +3,10 @@ import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
-import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
 	const [game, setGame] = useState(() => new Chess(puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
 	const [puzzleStatus, setPuzzleStatus] = useState('playing')
@@ -15,6 +14,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 	const [pendingPromotion, setPendingPromotion] = useState(null)
 	const[lastMove, setLastMove] = useState(puzzle.lastMove)
 	const [hintSquare, setHintSquare] = useState(null)
+	const [hoveredSquare, setHoveredSquare] = useState(null)
+	const [isDragging, setIsDragging] = useState(false)
 	const [moveFeedback, setMoveFeedback] = useState(null)
 	const [positions, setPositions] = useState([
 		{
@@ -29,7 +30,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 
 	// Use effect to handle computer moves based on puzzle solution
 	useEffect(() => {
-		if (game.turn() === playerColor || puzzleStatus !== 'playing') {
+		if (preview || game.turn() === playerColor || puzzleStatus !== 'playing') {
 			return
 		}
 		const nextMove = puzzleMoves[puzzleMoveIndex]
@@ -143,7 +144,10 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 
 	// Handles piece drop events
 	function onPieceDrop({ sourceSquare, targetSquare }) {
-		if (!sourceSquare || !targetSquare || pendingPromotion || puzzleStatus !== 'playing') {
+		setIsDragging(false)
+		setHoveredSquare(null)
+
+		if (preview || !sourceSquare || !targetSquare || pendingPromotion || puzzleStatus !== 'playing') {
 			return false
 		}
 		// Check if move is promotion move and if it is legal
@@ -156,7 +160,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 
 	// Handles square click events
 	function onSquareClick({ square }) {
-		if(game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
+		if (preview || game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
 			return
 		}
 		// No square is selected yet -> select this one
@@ -200,8 +204,24 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 	function onPieceDrag({ square }) {
 		const piece = game.get(square)
 		if (piece && piece.color === game.turn()) {
+			setIsDragging(true)
+			setHoveredSquare(null)
 			setSelectedSquare(square)
 		}
+	}
+
+	// Handles mouse over square events
+	function onMouseOverSquare({ square }) {
+		if (!isDragging || !selectedSquare) {
+			return
+		}
+		setHoveredSquare(isLegalMove(selectedSquare, square) ? square : null)
+	}
+
+	// Handles piece drag end events
+	function onPieceDragEnd() {
+		setIsDragging(false)
+		setHoveredSquare(null)
 	}
 
 	// Attempts to make a move and returns whether it was successful.
@@ -242,7 +262,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 
 			return true
 
-		} catch (error) {
+		} catch  {
 			return false
 		}
 	}
@@ -273,7 +293,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 	// Determines if a piece can be dragged from the given square
 	function canDragPiece({ square }) {
 		const piece = game.get(square)
-		if(game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
+		if (preview || game.isGameOver() || pendingPromotion || puzzleStatus !== 'playing') {
 			return false
 		}
 		return piece && piece.color === game.turn()
@@ -287,10 +307,13 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle}, ref) {
 					position: game.fen(), // FEN representing current game state
 					boardOrientation: playerColor === 'w' ? 'white' : 'black', // Board orientation based on player's color
 					onPieceDrag, // Handle piece drag events
+					onPieceDragEnd, // Handle piece drag end events
+					onMouseOverSquare, // Handle mouse over square events
 					onPieceDrop,  // Handle piece drop events
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
-					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare), // Apply styles to squares
+					dropSquareStyle: {boxShadow: 'none'}, // Remove default style
+					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
 				}}
 			/>
 			<p>
