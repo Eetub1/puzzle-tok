@@ -2,11 +2,7 @@ import { useState, useEffect } from "react"
 import { getBatch, getDaily, getPuzzleById } from "../services/puzzleService"
 import { getFailedPuzzles } from "../services/failedPuzzleService"
 
-function shuffle(puzzles) {
-	return [...puzzles].sort(() => Math.random() - 0.5)
-}
-
-export function usePuzzleQueue({ menuOpen }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -62,7 +58,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			const puzzleBatch = async () => {
 				try {
 					const [batch, failedPuzzleIds] = await Promise.all([
-						getBatch(controller.signal),
+						getBatch(controller.signal, difficulty, color)
 						getFailedPuzzles(controller.signal),
 					])
 					const failedPuzzles = await Promise.all(
