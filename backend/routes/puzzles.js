@@ -66,13 +66,15 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     const query = new URLSearchParams({ //TODO: add possibility to filter
         "difficulty": "normal",
-        "nb": 5,
-        //"color": "white"
+        "nb": 1,
+        "color": "white"
 	})
 
     console.log("Sending multiple puzzles")
 
     let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`)  //TODO: In the future possibility to filter with theme/opening
+
+    console.log(response)
 
     if (!response.ok) {
 		throw new Error(`Lichess request failed: ${response.status}`)

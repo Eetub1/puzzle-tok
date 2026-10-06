@@ -22,6 +22,8 @@ CREATE TABLE email_verification_tokens (
 );
 
 CREATE TABLE preferences (
-    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    color      text        NOT NULL
+    user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    color      text        NOT NULL,
+    difficulty text        NOT NULL,
+    PRIMARY KEY (user_id)
 );
