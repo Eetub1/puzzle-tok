@@ -16,8 +16,8 @@ function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 	const {difficulty, color, setDifficulty, setColor} = usePreference()
+	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen,difficulty, color})
 
 	const handleLogout = () => {
 		logout()

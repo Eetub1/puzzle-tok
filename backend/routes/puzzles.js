@@ -64,15 +64,18 @@ puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
 // Route for retrieving many puzzles
 puzzlesRouter.get('/batch', async (req,res) => {
 
-    const query = new URLSearchParams({ //TODO: add possibility to filter
-        "difficulty": "normal",
-        "nb": 1,
-        "color": "white"
+    //console.log('params', req.params)
+    //console.log('QUERY HERE', req.query)
+
+    const query = new URLSearchParams({
+        "difficulty": req.query.difficulty,
+        "nb": 5,
+        "color": req.query.color
 	})
 
     console.log("Sending multiple puzzles")
 
-    let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`)  //TODO: In the future possibility to filter with theme/opening
+    let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`)
 
     console.log(response)
 

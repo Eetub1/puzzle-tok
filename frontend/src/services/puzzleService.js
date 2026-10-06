@@ -25,10 +25,18 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal) => {
-	const response = await fetch('/api/puzzles/batch', {
-		signal // Pass AbortController signal to fetch
+const getBatch = async (signal, difficulty, color) => {
+
+	const query = new URLSearchParams({
+		"difficulty": difficulty,
+		"nb": 5,
+		"color": color
 	})
+
+	const response = await fetch(`/api/puzzles/batch?${query}`, {
+		signal, // Pass AbortController signal to fetch
+	})
+
 	const data = await response.json()
 	console.log('batch data:', data)
 	return data.puzzles.map(puzzles => ({

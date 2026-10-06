@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
 import { getBatch, getDaily } from "../services/puzzleService"
 
-
-export function usePuzzleQueue({ menuOpen }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -56,7 +55,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			const controller = new AbortController()
 			const puzzleBatch = async () => {
 				try {
-					const result = await getBatch(controller.signal)
+					const result = await getBatch(controller.signal, difficulty, color)
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
 						setBatch(result)
