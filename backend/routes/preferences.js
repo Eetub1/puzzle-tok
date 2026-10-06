@@ -42,7 +42,7 @@ prefRouter.get("/", async (req, res) => {
     const z = await pool.query(
         'SELECT * FROM preferences;'
     )
-    res.status(200).json(JSON.stringify(z.rows))
+    res.status(200).json(JSON.stringify(z.rows[0]))
 })
 
 prefRouter.post("/", (req, res) => {
@@ -50,7 +50,7 @@ prefRouter.post("/", (req, res) => {
     console.log('changed color for id',user_id, "color:", color)
     changeColorPreference(user_id, color, difficulty)
     changeDifficultyPreference(user_id, color, difficulty)
-    return res.status(201).json({ color: color })
+    return res.status(201).json({ color: color, difficulty: difficulty })
 })
 
 export default prefRouter
