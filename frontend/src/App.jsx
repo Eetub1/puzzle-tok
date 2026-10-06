@@ -6,6 +6,9 @@ import ChessReels from "./components/ChessReels"
 import Login from "./components/Login.jsx"
 import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
+import { logout } from "./services/authService.js"
+import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
+import { usePreference } from "./hooks/usePreference.js"
 import VerifyEmail from "./components/VerifyEmail.jsx"
 import { logout } from "./services/authService.js"
 import ProfilePage from "./pages/ProfilePage.jsx"
@@ -14,6 +17,9 @@ import Preferences from "./components/Preferences.jsx"
 const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
+	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
+	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
+	const {difficulty, color, setDifficulty, setColor} = usePreference()
 
 	const handleLogout = () => {
 		logout()
@@ -40,7 +46,7 @@ const App = () => {
 							nextPuzzle={nextPuzzle}
 						>
 						</ChessReels>
-						<Preferences user_id={user.id}/>
+						<Preferences user_id={user.id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>
 					</div>
 					: <Navigate to="/login"/>}
 				/>
