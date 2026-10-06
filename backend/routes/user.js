@@ -24,13 +24,55 @@ userRouter.post("/chess-accounts", async (req, res) => {
     }
 
     try {
-        await pool.query(
-            `UPDATE users SET lichess_username = $1, chesscom_username = $2 WHERE id = $3`,
+        const result = await pool.query(
+            `UPDATE users 
+             SET lichess_username = $1, 
+             chesscom_username = $2 
+             WHERE id = $3
+             RETURNING lichess_username, chesscom_username`,
             [lichess, chessCom, req.user.id],
         )
-        return res.status(200).json({ message: "Chess accounts updated successfully" })
+        const accounts = result.rows[0]
+
+        if (!accounts) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        return res.json({
+            lichess: accounts.lichess_username,
+            chessCom: accounts.chesscom_username,
+        })
     } catch (error) {
         console.error("Error updating chess accounts:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+userRouter.get("/profile", async (req, res) => {
+    const user = req.user // The user is set into the req object in the middleware
+
+    try {
+        const result = await pool.query(`
+            SELECT email, email_verified_at, username, lichess_username, chesscom_username
+            FROM users
+            WHERE id = $1`, 
+            [user.id]
+        )
+        const profile = result.rows[0]
+        
+        if (!profile) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        return res.json({
+            email: profile.email_verified_at ? profile.email : null, // Only return email if it has been verified
+            username: profile.username,
+            lichess: profile.lichess_username,
+            chessCom: profile.chesscom_username,
+        })
+    } catch (error) {
+        console.log("Error retrieving user profile:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })
