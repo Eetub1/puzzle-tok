@@ -53,6 +53,13 @@ const logout = () => {
 }
 
 
+// Gets the token generated on login from localStorage
+const getToken = () => {
+	const session = JSON.parse(localStorage.getItem("puzzleTokUser"))
+	return session?.token ?? null
+}
+
+
 const getAccessToken = async (response) => {
 	response = await fetch(`/api/auth/getAuth`)
 	console.log('auth result', response)
@@ -65,5 +72,6 @@ export {
 	login,
 	logout,
 	getAccessToken,
-	verifyEmail
+	verifyEmail,
+	getToken,
 }

@@ -1,5 +1,10 @@
 import express from "express"
+import pool from "../db/db.js"
+import { authenticateToken } from "../middleware/auth.js"
+
 const userRouter = express.Router()
+
+userRouter.use(authenticateToken) // All routes in this router require authentication
 
 userRouter.post("/chess-accounts", async (req, res) => {
     const { usernames } = req.body ?? {}
@@ -12,6 +17,10 @@ userRouter.post("/chess-accounts", async (req, res) => {
 
     if (typeof lichess !== "string" || typeof chessCom !== "string") {
         return res.status(400).json({ error: "Lichess and Chess.com usernames must be strings" })
+    }
+
+    if (lichess === "" && chessCom === "") {
+        return res.status(400).json({ error: "At least one of Lichess or Chess.com username must be provided" })
     }
 
     try {
