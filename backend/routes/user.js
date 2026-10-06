@@ -2,6 +2,8 @@ import express from "express"
 import pool from "../db/db.js"
 import { authenticateToken } from "../middleware/auth.js"
 
+MAX_GAMES_PER_SITE = 50
+
 const userRouter = express.Router()
 
 userRouter.use(authenticateToken) // All routes in this router require authentication
@@ -73,6 +75,36 @@ userRouter.get("/profile", async (req, res) => {
         })
     } catch (error) {
         console.log("Error retrieving user profile:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+userRouter.get("/games", async (req, res) => {
+    const user = req.user
+    let limit = parseInt(req.query.limit) || 10 // Default limit is 10
+    if (limit > MAX_GAMES_PER_SITE) limit = MAX_GAMES_PER_SITE
+    if (limit < 1) limit = 1
+
+    try {
+        const result = await pool.query(`
+            SELECT lichess_username, chesscom_username
+            FROM users
+            WHERE id = $1`, 
+            [user.id]
+        )
+        const accounts = result.rows[0]
+
+        if (!accounts) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        const { lichess_username, chesscom_username } = accounts
+
+        // TODO: GET GAMES HERE
+        return res.json({})
+    } catch (error) {
+        console.error("Error retrieving user games:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })

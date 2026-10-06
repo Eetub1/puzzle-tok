@@ -33,7 +33,25 @@ const getUserProfile = async () => {
 	return data
 }
 
+
+const getUserGames = async (limit = 10) => {
+	const response = await fetch(`/api/user/games?limit=${limit}`, {
+		method: "GET",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't get user games: ${data.error}`)
+	}
+
+	return data
+}
+
+
 export {
 	updateUserChessAccounts,
-	getUserProfile
+	getUserProfile,
+	getUserGames,
 }

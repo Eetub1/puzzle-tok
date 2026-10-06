@@ -37,14 +37,6 @@ const getChessComActiveMonths = async username => {
     const url = `https://api.chess.com/pub/player/${username}/games/archives`
     const response = await fetch(url)
 
-    // The response is an object of the following format:
-    /*  {"archives": [
-            "https://api.chess.com/pub/player/hikaru/games/2014/01",
-            "https://api.chess.com/pub/player/hikaru/games/2014/02",
-            "...",
-            "https://api.chess.com/pub/player/hikaru/games/2026/09"
-        ]}*/
-
     if (!response.ok) {
 		throw new Error(`Chess.com months request failed: ${response.status}`)
 	}
@@ -75,7 +67,7 @@ const getChessComGames = async username => {
 
 
 gamesRouter.get("/", async (req, res) => {
-    const { chessComUsername, lichessUsername} = req.query // Can unpack other websites here if or when we add support to other sites
+    const { chessComUsername, lichessUsername} = req.query
 
     if (!chessComUsername && !lichessUsername) {
         return res.status(400).json({ error: "At least one username is required" })

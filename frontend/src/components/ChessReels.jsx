@@ -7,8 +7,9 @@ import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 
-export default function ChessReels({ handleLogout }) {
+import Matches from "./Matches.jsx"
 
+const ChessReels = ({ handleLogout }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 
@@ -63,7 +64,7 @@ export default function ChessReels({ handleLogout }) {
 				) : (
 					<div className = "other-content">
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
-						{menuOpen === "YourMatches" && <p>Here will be your matches</p>}
+						{menuOpen === "YourMatches" && <Matches/>}
 						{menuOpen === "Openings" && <ChessBoard/>}
 					</div>
 				)}
@@ -88,3 +89,5 @@ export default function ChessReels({ handleLogout }) {
 		</div>
 	)
 }
+
+export default ChessReels
