@@ -1,21 +1,16 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import Dropdown from "react-bootstrap/Dropdown"
 import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import "./ChessReels.css"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { useNavigate } from "react-router-dom"
+import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 
-export default function ChessReels({
-	handleLogout,
-	handleNextPuzzle,
-	handlePreviousPuzzle,
-	menuOpen,
-	setMenuOpen,
-	previousPuzzle,
-	nextPuzzle,
-	currentPuzzle,
-}) {
+export default function ChessReels({ handleLogout }) {
+
+	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
+	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 
 	const puzzleBoardRef = useRef(null)
 	const navigate = useNavigate()

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import Button from "react-bootstrap/Button"
 import { useNavigate } from "react-router-dom"
+import Button from "react-bootstrap/Button"
 import "./ProfilePages.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 
