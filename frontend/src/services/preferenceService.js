@@ -19,4 +19,14 @@ const prefChange = async preferences => {
 	return data
 }
 
-export {prefChange}
+const getInitialPreferences = async (response) => {
+	response = await fetch(`/api/user/preferences`)
+	const data = JSON.parse(await response.json())
+	console.log('service data: ',data, data["color"])
+	return {
+		color : data.color,
+		difficulty : data.difficulty
+	}
+}
+
+export {prefChange, getInitialPreferences}

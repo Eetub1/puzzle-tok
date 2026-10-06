@@ -1,9 +1,6 @@
-import { useState } from "react"
-import { prefChange } from "../services/preferenceService"
+import { prefChange} from "../services/preferenceService"
 
-const Preferences = ({user_id}) => {
-	const [color, setColor] = useState("both")
-	const [difficulty, setDifficulty] = useState("normal")
+const Preferences = ({user_id, difficulty, color, setDifficulty, setColor}) => {
 
 	const handleSubmit = async event => {
 		event.preventDefault()
