@@ -15,16 +15,16 @@ userRouter.post("/failed", async (req, res) => {
     }
     try {
         const result = await pool.query(
-            "INSERT INTO failed_puzzles (user_id, puzzle_id) VALUES ($1, $2) RETURNING id",
+            "INSERT INTO failed_puzzles (user_id, puzzle_id) VALUES ($1, $2) ON CONFLICT (user_id, puzzle_id) DO NOTHING RETURNING id",
             [req.user.id, puzzleId]
         )
-        console.log("Puzzle:", puzzleId, " marked as failed for user:", req.user.id)
-        res.json({ id: result.rows[0].id, user_id: req.user.id, puzzle_id: puzzleId })
-    } catch (error) {
-        if (error.code === "23505") { 
-            console.warn("Puzzle:", puzzleId, "already marked as failed for user:", req.user.id)
-            return res.status(409).json({ error: "Puzzle already saved to failed" })
+        if(result.rows.length === 0) {
+            console.log("Puzzle:", puzzleId, " already marked as failed for user:", req.user.id)
+            return res.status(200).json({message: "Puzzle already marked as failed"})
         }
+        console.log("Puzzle:", puzzleId, " marked as failed for user:", req.user.id)
+        res.json({ message: "Puzzle:" + puzzleId + " marked as failed" })
+    } catch (error) {
         console.error("Error saving puzzle to failed puzzles:", error)
         res.status(500).json({ error: "Server error" })
     }

@@ -9,7 +9,6 @@ import { logout } from "./services/authService.js"
 import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
 import VerifyEmail from "./components/VerifyEmail.jsx"
 import ProfilePage from "./pages/ProfilePage.jsx"
-import { setFailedPuzzle, getFailedPuzzles } from "./services/failedPuzzleService.js"
 
 
 function App() {
@@ -22,34 +21,6 @@ function App() {
 		logout()
 		setUser(null)
 	}
-
-	const handleFailedPuzzle = async () => {
-		if (!currentPuzzle || !user) {
-			return
-		}
-		console.log('marking puzzle as failed:', currentPuzzle.id, 'for user:', user.id)
-		
-		try {
-			const failedPuzzle = await setFailedPuzzle(currentPuzzle.id)
-			console.log('failed puzzle saved:', failedPuzzle)
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
-	const handleGetFailedPuzzle = async () => {
-		if (!user) {
-			return
-		}
-		try {
-			const failedPuzzles = await getFailedPuzzles()
-			console.log('retrieved failed puzzle:', failedPuzzles)
-		} catch (error) {
-			console.error('Error retrieving failed puzzle:', error)
-		}
-
-	}
-
 
 	return (
 		<>
@@ -69,10 +40,6 @@ function App() {
 							nextPuzzle={nextPuzzle}
 						>
 						</ChessReels>
-						<div>
-							<button onClick={handleFailedPuzzle}>Failed puzzle</button>
-							<button onClick={handleGetFailedPuzzle}>Get Failed puzzle</button>
-						</div>
 					</div>
 					
 					: <Navigate to="/login"/>}

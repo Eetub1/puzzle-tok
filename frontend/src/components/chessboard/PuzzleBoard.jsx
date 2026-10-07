@@ -1,9 +1,10 @@
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
+import { setFailedPuzzle } from "../../services/failedPuzzleService.js"
 
 // PuzzleBoard component that renders chessboard for given puzzle
 const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
@@ -23,7 +24,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			lastMove: puzzle.lastMove
 		}
 	])
-
+	const failedPuzzle = useRef(false)
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
 	const playerColor = puzzle.fen.split(' ')[1] ?? 'w'
 
@@ -102,6 +103,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		}
 		computerMove(nextMove, 'solution move failed')
 		setPuzzleStatus('playing')
+		if(!failedPuzzle.current) {
+			setFailedPuzzle(puzzle.id).then((result) => {
+			console.log(result.message)
+			}).catch((error) => {
+				console.error(error)
+			})
+			failedPuzzle.current = true
+		}
 		if (puzzleMoveIndex + 1 >= puzzleMoves.length) {
 			setPuzzleStatus('solved')
 		}
@@ -238,6 +247,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			// Check if move matches puzzle solution
 			if (move !== puzzleMoves[puzzleMoveIndex]) {
 				setMoveFeedback('wrong')
+				if(!failedPuzzle.current) {
+					setFailedPuzzle(puzzle.id).then((result) => {
+					console.log(result.message)
+					}).catch((error) => {
+						console.error(error)
+					})
+					failedPuzzle.current = true
+				}
 				return false
 			}
 			setMoveFeedback('right')
