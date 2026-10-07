@@ -67,11 +67,6 @@ body,
   min-height: 0;
 }
 
-.chessboard-container{
-  width: 70dvh;
-  height: 70dvh;
-}
-
 .other-content {
   position: relative;
   display: flex;

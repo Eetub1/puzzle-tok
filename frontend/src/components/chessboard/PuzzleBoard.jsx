@@ -312,6 +312,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 					onPieceDrop,  // Handle piece drop events
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
+					dragActivationDistance : { distance: 0}, // No drag activation distance
 					dropSquareStyle: {boxShadow: 'none'}, // Remove default style
 					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
 				}}
