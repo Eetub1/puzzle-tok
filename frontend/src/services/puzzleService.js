@@ -29,7 +29,6 @@ const getBatch = async (signal, difficulty, color) => {
 
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
-		"nb": 5,
 		"color": color
 	})
 

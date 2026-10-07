@@ -3,7 +3,7 @@ const prefChange = async preferences => {
 
 	//console.log('user id is service',preferences.user_id)
 	//console.log('color is service', preferences.color)
-	console.log('difficulty is service', preferences.difficulty)
+	//console.log('difficulty is service', preferences.difficulty)
 
 	const response = await fetch(`/api/user/preferences`, {
 		method: "POST",
@@ -21,7 +21,12 @@ const prefChange = async preferences => {
 
 const getInitialPreferences = async (response) => {
 	response = await fetch(`/api/user/preferences`)
-	const data = JSON.parse(await response.json())
+	if (!response.ok) {
+		throw new Error("Failed to fetch preferences")
+	}
+	const json = await response.json()
+	console.log("jason:", json)
+	const data = JSON.parse(json)
 	console.log('service data: ',data, data["color"])
 	return {
 		color : data.color,

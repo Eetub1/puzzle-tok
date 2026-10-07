@@ -64,12 +64,11 @@ puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
 // Route for retrieving many puzzles
 puzzlesRouter.get('/batch', async (req,res) => {
 
-    //console.log('params', req.params)
     //console.log('QUERY HERE', req.query)
 
     const query = new URLSearchParams({
         "difficulty": req.query.difficulty,
-        "nb": 5,
+        "nb": 1, 
         "color": req.query.color
 	})
 
