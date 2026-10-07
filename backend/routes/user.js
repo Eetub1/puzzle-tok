@@ -22,7 +22,6 @@ userRouter.post("/failed", async (req, res) => {
             console.log("Puzzle:", puzzleId, " already marked as failed for user:", req.user.id)
             return res.status(200).json({message: "Puzzle already marked as failed"})
         }
-        console.log("Puzzle:", puzzleId, " marked as failed for user:", req.user.id)
         res.json({ message: "Puzzle:" + puzzleId + " marked as failed" })
     } catch (error) {
         console.error("Error saving puzzle to failed puzzles:", error)
@@ -41,6 +40,24 @@ userRouter.get("/failed", async (req, res) => {
         res.json(result.rows.map(row => row.puzzle_id))
     } catch (error) {
         console.error("Error retrieving failed puzzles:", error)
+        res.status(500).json({ error: "Server error" })
+    }
+})
+
+// Route for removing failed puzzle
+userRouter.delete("/failed/:puzzleId", async (req, res) => {
+    const { puzzleId } = req.params
+    try {
+        const result = await pool.query(
+            "DELETE FROM failed_puzzles WHERE user_id = $1 AND puzzle_id = $2 RETURNING id",
+            [req.user.id, puzzleId]
+        )
+        if (result.rows.length === 0) {
+            return res.status(200).json({ message: "Puzzle not found in failed puzzles" })
+        }
+        res.json({ message: "Puzzle: " + puzzleId + " removed from failed puzzles" })
+    } catch (error) {
+        console.error("Error removing puzzle from failed puzzles:", error)
         res.status(500).json({ error: "Server error" })
     }
 })

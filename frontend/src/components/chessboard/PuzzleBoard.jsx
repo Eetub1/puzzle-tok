@@ -4,7 +4,7 @@ import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
-import { setFailedPuzzle } from "../../services/failedPuzzleService.js"
+import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
 
 // PuzzleBoard component that renders chessboard for given puzzle
 const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
@@ -267,6 +267,13 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			setPuzzleMoveIndex(nextIndex)
 			if (nextIndex >= puzzleMoves.length) {
 				setPuzzleStatus('solved')
+				if(!failedPuzzle.current) {
+					removeFailedPuzzle(puzzle.id).then((result) => {
+						console.log(result.message)
+					}).catch((error) => {
+						console.error(error)
+					})
+				}
 			}
 
 			setPositions([

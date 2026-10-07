@@ -20,8 +20,7 @@ const setFailedPuzzle = async (puzzleId) => {
 const getFailedPuzzles = async () => {
     const response = await fetch(`/api/user/failed`, {
         method: "GET",
-        headers: { 
-            "Content-Type": "application/json",
+        headers: {
             "Authorization": `Bearer ${getToken()}` 
         },
     })
@@ -33,4 +32,18 @@ const getFailedPuzzles = async () => {
     return data
 }   
 
-export { setFailedPuzzle, getFailedPuzzles }
+const removeFailedPuzzle = async (puzzleId) => {
+    const response = await fetch(`/api/user/failed/${puzzleId}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${getToken()}` 
+        },
+    })
+    const data = await response.json()  
+    if (!response.ok) {
+        throw new Error(data.error)
+    }
+    return data
+}
+
+export { setFailedPuzzle, getFailedPuzzles, removeFailedPuzzle }
