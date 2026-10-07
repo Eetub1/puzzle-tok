@@ -52,6 +52,10 @@ const logout = () => {
 	localStorage.removeItem("puzzleTokUser")
 }
 
+const getToken = () => {
+	const session = JSON.parse(localStorage.getItem("puzzleTokUser"))
+	return session?.token ?? null
+}
 
 const getAccessToken = async (response) => {
 	response = await fetch(`/api/auth/getAuth`)
@@ -65,5 +69,6 @@ export {
 	login,
 	logout,
 	getAccessToken,
-	verifyEmail
+	verifyEmail,
+	getToken
 }
