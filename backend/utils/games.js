@@ -1,3 +1,42 @@
+const parsePGN = pgn => {
+    console.log("TODO")
+}
+
+
+// TODO: parse pgn
+const normalizeLichessGame = game => ({
+    id: game.id,
+    source: "lichess",
+    url: `https://lichess.org/${game.id}`,
+    pgn: game.pgn,
+    white: game.players.white.user?.name ?? "Computer",
+    black: game.players.black.user?.name ?? "Computer",
+    result: game.winner ?? "draw",
+    timeClass: game.speed,
+    playedAt: game.lastMoveAt, // milliseconds
+})
+
+
+const getChessComResult = game => {
+    if (game.white.result === "win") return "white"
+    if (game.black.result === "win") return "black"
+    return "draw"
+}
+
+// TODO: parse pgn
+const normalizeChessComGame = game => ({
+    id: game.uuid,
+    source: "chesscom",
+    url: game.url,
+    pgn: game.pgn,
+    white: game.white.username,
+    black: game.black.username,
+    result: getChessComResult(game),
+    timeClass: game.time_class,
+    playedAt: game.end_time * 1000, // Chess.com uses seconds, convert to milliseconds
+})
+
+
 const getLichessGames = async (username, limit) => {
     const query = new URLSearchParams({
 		max: limit,
@@ -6,27 +45,24 @@ const getLichessGames = async (username, limit) => {
 		pgnInJson: true, // contains portable game notation of the game
 	})
 
-    // Name can contain special symbols, needs to be encoded
 	const url = `https://lichess.org/api/games/user/${encodeURIComponent(username)}?${query}`
 
 	const response = await fetch(url, {
-		headers: { Accept: "application/x-ndjson" }, // With this header, the API gives a single JSON object per line
+		headers: { Accept: "application/x-ndjson" }, // one JSON object per line
 	})
 
     if (!response.ok) {
 		throw new Error(`Lichess request failed: ${response.status}`)
 	}
 
-    // Apparently need to use a different method if max is a larger number
     const text = await response.text()
 
     // Split result, remove empty lines
     const games = text
 		.split("\n")
 		.filter(line => line.trim() !== "")
-
-        // Right now this is pointless, but in the future we might want to do some processing here
         .map(line => JSON.parse(line)) // parse line into javascript object
+        .map(normalizeLichessGame) // normalize the game object to a more useful format
     return games
 }
 
@@ -49,10 +85,7 @@ const getChessComGames = async (username, limit) => {
     // First we need to retrieve what months the user has games on chess.com
     const archives = await getChessComActiveMonths(username)
     const lastMonth = archives[archives.length - 1] // https://api.chess.com/pub/player/{username}/games/{VVVV}/{KK}
-
-    const firstPart = `https://api.chess.com/pub/player/${username}/`
-    const secondPart = lastMonth.split("/games/")[1] // string is of the form: {VVVV}/{KK}
-    const gamesUrl = firstPart.concat("games/", secondPart)
+    const gamesUrl = `https://api.chess.com/pub/player/${username}/`.concat("games/", lastMonth.split("/games/")[1])
 
     const response = await fetch(gamesUrl)
 
@@ -60,7 +93,10 @@ const getChessComGames = async (username, limit) => {
 		throw new Error(`Chess.com games request failed: ${response.status}`)
 	}
     
-    return await response.json()
+    const data = await response.json()
+
+    console.log(data.games)
+    return data.games.slice(0, limit).map(normalizeChessComGame)
 }
 
 export { getLichessGames, getChessComGames }

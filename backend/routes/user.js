@@ -84,7 +84,6 @@ userRouter.get("/profile", async (req, res) => {
 userRouter.get("/games", async (req, res) => {
     const user = req.user
     let limit = parseInt(req.query.limit) || 10 // Default limit is 10
-    if (isNaN(limit)) limit = 10
     if (limit > MAX_GAMES_PER_SITE) limit = MAX_GAMES_PER_SITE
     if (limit < 1) limit = 1
 
@@ -104,27 +103,27 @@ userRouter.get("/games", async (req, res) => {
         // rename variables
         const { lichess_username: lichessUsername, chesscom_username: chessComUsername } = accounts
 
-        const resultObject = {}
+        const games = []
 
         if (lichessUsername) {
             try {
                 const lichessGames = await getLichessGames(lichessUsername, limit)
-                resultObject.lichessGames = lichessGames
+                games.push(...lichessGames)
             } catch (error) {
-                res.status(502).json({ error: error.message })
+                return res.status(502).json({ error: error.message })
             }
         }
 
         if (chessComUsername) {
             try {
                 const chessComGames = await getChessComGames(chessComUsername, limit)
-                resultObject.chessComGames = chessComGames
+                games.push(...chessComGames)
             } catch (error) {
-                res.status(502).json({ error: error.message })
+                return res.status(502).json({ error: error.message })
             }
         }
 
-        return res.json(resultObject)
+        return res.json(games)
     } catch (error) {
         console.error("Error retrieving user games:", error)
         return res.status(500).json({ error: "Internal server error" })

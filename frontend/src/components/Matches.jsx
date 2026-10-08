@@ -12,8 +12,9 @@ const Matches = () => {
 	useEffect(() => {
 		const fetchMatches = async () => {
 			try {
-				const data = await getUserGames(GAMES_PER_SITE)
-				setMatches(data)
+				const games = await getUserGames(GAMES_PER_SITE)
+				console.log("Fetched matches:", games)
+				setMatches(games)
 			} catch (error) {
 				console.error("Error fetching matches:", error)
 			}
