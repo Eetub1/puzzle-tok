@@ -16,7 +16,6 @@ app.use(cookieParser())
 
 app.use("/api/auth", authRouter)
 app.use("/api/puzzles", puzzlesRouter)
-app.use("/api/user", userRouter)
 app.use("/api/auth", oauthRouter)
 app.use("/api/user", userRouter)
 
