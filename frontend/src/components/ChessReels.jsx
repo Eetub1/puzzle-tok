@@ -1,21 +1,17 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import Dropdown from "react-bootstrap/Dropdown"
 import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import "./ChessReels.css"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { useNavigate } from "react-router-dom"
+import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 
-export default function ChessReels({
-	handleLogout,
-	handleNextPuzzle,
-	handlePreviousPuzzle,
-	menuOpen,
-	setMenuOpen,
-	previousPuzzle,
-	nextPuzzle,
-	currentPuzzle,
-}) {
+import Matches from "./Matches.jsx"
+
+const ChessReels = ({ handleLogout }) => {
+	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
+	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 
 	const puzzleBoardRef = useRef(null)
 	const navigate = useNavigate()
@@ -68,7 +64,7 @@ export default function ChessReels({
 				) : (
 					<div className = "other-content">
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
-						{menuOpen === "YourMatches" && <p>Here will be your matches</p>}
+						{menuOpen === "YourMatches" && <Matches/>}
 						{menuOpen === "Openings" && <ChessBoard/>}
 					</div>
 				)}
@@ -93,3 +89,5 @@ export default function ChessReels({
 		</div>
 	)
 }
+
+export default ChessReels

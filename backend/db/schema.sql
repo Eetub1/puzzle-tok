@@ -5,6 +5,8 @@ CREATE TABLE users (
     username          varchar(30)  NOT NULL,
     password_hash     text         NOT NULL,
     created_at        timestamptz  NOT NULL DEFAULT now(),
+    lichess_username  varchar(30),
+    chesscom_username varchar(30),
 
     CONSTRAINT users_username_min_length CHECK (char_length(username) >= 3)
 );
