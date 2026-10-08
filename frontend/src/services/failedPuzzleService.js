@@ -17,12 +17,13 @@ const setFailedPuzzle = async (puzzleId) => {
     return data
 }
 
-const getFailedPuzzles = async () => {
+const getFailedPuzzles = async (signal) => {
     const response = await fetch(`/api/user/failed`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${getToken()}` 
         },
+        signal
     })
     const data = await response.json()
 

@@ -42,9 +42,9 @@ const getBatch = async (signal) => {
 		themes: puzzles.puzzle.themes
 	}))
 }
-
-const getPuzzleById = async id => {
-	let response = await fetch(`/api/puzzles/puzzleID/${id}`)
+	
+const getPuzzleById = async (id, signal) => {
+	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()
 	console.log('here data: ', data)
 	return { // Return puzzle data for structure:
