@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser"
 const app = express()
 const PORT = 3000
 
-import gamesRouter from "./routes/games.js"
 import authRouter from "./routes/auth.js"
 import oauthRouter from "./routes/oauth.js"
 import puzzlesRouter from "./routes/puzzles.js"
@@ -13,15 +12,13 @@ import userRouter from "./routes/user.js"
 
 app.use(express.json())
 app.use(cors())
-
 app.use(cookieParser())
 
-app.use("/api/games", gamesRouter)
 app.use("/api/auth", authRouter)
 app.use("/api/puzzles", puzzlesRouter)
 app.use("/api/user", userRouter)
 app.use("/api/auth", oauthRouter)
-
+app.use("/api/user", userRouter)
 
 app.get("/", (req, res) => {
     //res.send("<a href='/api/auth/getAuth'>auth</a>")
