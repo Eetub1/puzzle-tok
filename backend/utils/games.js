@@ -1,10 +1,6 @@
-import express, { json } from "express"
-const gamesRouter = express.Router()
-
-
-const getLichessGames = async username => {
+const getLichessGames = async (username, limit) => {
     const query = new URLSearchParams({
-		max: 5, // set this to a low value because the query can be slow
+		max: limit,
 		clocks: true, // info about game clocks
 		rated: true,
 		pgnInJson: true, // contains portable game notation of the game
@@ -28,6 +24,8 @@ const getLichessGames = async username => {
     const games = text
 		.split("\n")
 		.filter(line => line.trim() !== "")
+
+        // Right now this is pointless, but in the future we might want to do some processing here
         .map(line => JSON.parse(line)) // parse line into javascript object
     return games
 }
@@ -46,7 +44,7 @@ const getChessComActiveMonths = async username => {
 }
 
 
-const getChessComGames = async username => {
+const getChessComGames = async (username, limit) => {
     // The chess.com API works a bit differently than the lichess one
     // First we need to retrieve what months the user has games on chess.com
     const archives = await getChessComActiveMonths(username)
@@ -65,36 +63,4 @@ const getChessComGames = async username => {
     return await response.json()
 }
 
-
-gamesRouter.get("/", async (req, res) => {
-    const { chessComUsername, lichessUsername} = req.query
-
-    if (!chessComUsername && !lichessUsername) {
-        return res.status(400).json({ error: "At least one username is required" })
-    }
-
-    const resultObject = {}
-
-    if (lichessUsername) {
-        try {
-            const lichessGames = await getLichessGames(lichessUsername)
-            resultObject.lichessGames = lichessGames
-        } catch (error) {
-            res.status(502).json({ error: error.message })
-        }
-    }
-
-    if (chessComUsername) {
-        try {
-            const chessComGames = await getChessComGames(chessComUsername)
-            resultObject.chessComGames = chessComGames
-        } catch (error) {
-            res.status(502).json({ error: error.message })
-        }
-    }
-
-    return res.json(resultObject)
-})
-
-
-export default gamesRouter
+export { getLichessGames, getChessComGames }
