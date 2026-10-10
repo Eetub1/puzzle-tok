@@ -72,12 +72,20 @@ body,
   height: 70dvh;
 }
 
-.other-content {
+/*.other-content {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
+}*/
+
+.other-content {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .reels-container {
