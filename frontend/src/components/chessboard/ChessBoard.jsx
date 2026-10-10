@@ -141,10 +141,13 @@ function ChessBoard() {
 			<Chessboard
 				options={{
 					position: game.fen(), // FEN representing current game state
+					alphaNotationStyle: {fontSize: '1.2rem'}, // Font size for square notation
+					boardStyle: { borderRadius: '10px'}, // Board style with rounded corners
 					onPieceDrag, // Handle piece drag events
 					onPieceDrop,  // Handle piece drop events
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
+					numericNotationStyle: {fontSize: '1.2rem'}, // Font size for numeric notation
 					squareStyles: getSquareStyles(game, selectedSquare, undefined), // Apply styles to squares
 				}}
 			/>
