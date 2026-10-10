@@ -1,5 +1,20 @@
-.yourMatches {
-    border: 1px solid red;
+.your-matches {
+    width: 100%;
+}
+
+#matches-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#matches-wrapper {
+    margin-left: 10rem;
+    margin-right: 10rem;
+}
+
+#matches-container {
+    display: grid;
 }
 
 .match {

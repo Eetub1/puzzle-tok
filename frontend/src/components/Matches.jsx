@@ -28,23 +28,28 @@ const Matches = () => {
 		fetchMatches()
 	}, [matches.length])
 
-	matches.sort((a, b) => new Date(b.playedAt) - new Date(a.playedAt)) // Sort matches in descending order by date
-
 	return (
-		<div className="yourMatches">
-			<h2>Your Matches</h2>
-			<p>Amount of matches found: {matches.length}</p>
-			<div>
-				{matches.map((match) => (
-					<div key={match.id} className="match">
-						<p>Match ID: {match.id}</p>
-						<p>Played: {new Date(match.playedAt).toLocaleString("fi-FI")}</p>
-						<p>TimeClass: {match.timeClass}</p>
-						<p>White: {match.white}</p>
-						<p>Black: {match.black}</p>
-						<p>URL: <a href={match.url} target="_blank" rel="noopener noreferrer">View Game</a></p>
-					</div>
-				))}
+		<div className="your-matches">
+			<div id="matches-header">
+				<h2>Your Matches</h2>
+				<p>Amount of matches fetched: {matches.length}</p>
+			</div>
+
+			<div id="matches-wrapper">
+				<div id="matches-container">
+					{matches.map((match) => (
+						<div key={match.id} className="match">
+							<p>Match ID: {match.id}</p>
+							<p>Played: {new Date(match.playedAt).toLocaleString("fi-FI")}</p>
+							<p>TimeClass: {match.timeClass}</p>
+							<p>White: {match.white}</p>
+							<p>Black: {match.black}</p>
+							<p>Winner: {match.result}</p>
+							<p>Played on: {match.source}</p>
+							<p>URL: <a href={match.url} target="_blank" rel="noopener noreferrer">View Game on {match.source}</a></p>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	)

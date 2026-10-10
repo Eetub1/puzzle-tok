@@ -50,6 +50,7 @@ const login = async credentials => {
 
 const logout = () => {
 	localStorage.removeItem("puzzleTokUser")
+	localStorage.removeItem("userGames") // Clear user games from local storage on logout
 }
 
 

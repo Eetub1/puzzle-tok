@@ -25,10 +25,10 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={user
 					?
-					<div>
+					<>
 						{message && <Message data={message}/>}
 						<ChessReels handleLogout={handleLogout}></ChessReels>
-					</div>
+					</>
 					: <Navigate to="/login"/>}
 				/>
 
