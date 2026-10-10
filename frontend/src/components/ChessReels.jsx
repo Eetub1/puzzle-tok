@@ -12,6 +12,8 @@ import Matches from "./Matches.jsx"
 const ChessReels = ({ handleLogout }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
+	const [showBottomBar, setShowBottomBar] = useState(true)
+	const [showScrollControls, setShowScrollControls] = useState(true)
 
 	const puzzleBoardRef = useRef(null)
 	const navigate = useNavigate()
@@ -26,15 +28,41 @@ const ChessReels = ({ handleLogout }) => {
 		handleWheel,
 	} = usePuzzleReels({ menuOpen, handleNextPuzzle, handlePreviousPuzzle })
 
+	const handleMenuClick = (clickedOption) => {
+		setMenuOpen(clickedOption)
+
+		switch (clickedOption) {
+			case "YourMatches":
+				setShowBottomBar(false)
+				setShowScrollControls(false)
+				break
+			case "Puzzles":
+				setShowBottomBar(true)
+				setShowScrollControls(true)
+				break
+			case "Openings":
+				setShowBottomBar(false)
+				setShowScrollControls(false)
+				break
+			case "DailyPuzzle":
+				setShowBottomBar(true)
+				setShowScrollControls(true)
+				break
+			default:
+				setShowBottomBar(false)
+				setShowScrollControls(false)
+		}
+	}
+
 	return (
 		<div className="chess-reels">
 			<div className="top-bar">
 				<button onClick={handleLogout} className="logout-btn">Logout</button>
 				<Dropdown.Menu show>
-					<Dropdown.Item active={menuOpen === "YourMatches"} onClick={() => setMenuOpen("YourMatches")}>Your Matches</Dropdown.Item>
-					<Dropdown.Item active={menuOpen === "Puzzles"} onClick={() => setMenuOpen("Puzzles")}>Puzzles</Dropdown.Item>
-					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => setMenuOpen("Openings")}>Openings</Dropdown.Item>
-					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => setMenuOpen("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "YourMatches"} onClick={() => handleMenuClick("YourMatches")}>Your Matches</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "Puzzles"} onClick={() => handleMenuClick("Puzzles")}>Puzzles</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => handleMenuClick("Openings")}>Openings</Dropdown.Item>
+					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => handleMenuClick("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
 				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
@@ -69,13 +97,13 @@ const ChessReels = ({ handleLogout }) => {
 					</div>
 				)}
 
-				<div className="scroll-controls">
+				{showScrollControls && <div className="scroll-controls">
 					<button onClick={() => goPrev()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
-				</div>
+				</div>}
 			</div>
 
-			<div className="bottom-bar">
+			{showBottomBar && <div className="bottom-bar">
 				<div className="action-buttons">
 					<button onClick={() => puzzleBoardRef?.current?.giveHint()} className="hint-btn">Hint</button>
 					<button onClick={() => puzzleBoardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
@@ -85,7 +113,7 @@ const ChessReels = ({ handleLogout }) => {
 					<button onClick={() => puzzleBoardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
 					<button onClick={() => puzzleBoardRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>
-			</div>
+			</div>}
 		</div>
 	)
 }

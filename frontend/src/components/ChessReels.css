@@ -11,7 +11,7 @@
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, sans-serif;
-  overflow: hidden;
+  overflow: auto; /* changed this to auto so that you can scroll down in your matches page */
 }
 
 html,
