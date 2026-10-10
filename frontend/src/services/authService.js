@@ -53,7 +53,6 @@ const logout = () => {
 	localStorage.removeItem("userGames") // Clear user games from local storage on logout
 }
 
-
 // Gets the token generated on login from localStorage
 const getToken = () => {
 	const session = JSON.parse(localStorage.getItem("puzzleTokUser"))

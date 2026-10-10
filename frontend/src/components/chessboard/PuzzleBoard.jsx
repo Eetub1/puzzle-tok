@@ -1,9 +1,10 @@
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
+import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
 
 // PuzzleBoard component that renders chessboard for given puzzle
 const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
@@ -17,13 +18,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 	const [hoveredSquare, setHoveredSquare] = useState(null)
 	const [isDragging, setIsDragging] = useState(false)
 	const [moveFeedback, setMoveFeedback] = useState(null)
+	const [feedbackMark, setFeedbackMark] = useState(null)
 	const [positions, setPositions] = useState([
 		{
 			fen: puzzle.fen,
 			lastMove: puzzle.lastMove
 		}
 	])
-
+	const failedPuzzle = useRef(false)
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
 	const playerColor = puzzle.fen.split(' ')[1] ?? 'w'
 
@@ -41,7 +43,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
 
-	}, [game, puzzleMoveIndex, playerColor])
+		
+	}, [game, puzzleMoveIndex, playerColor, puzzleStatus])
 
 	// Move back in puzzle
 	function moveBack() {
@@ -82,6 +85,11 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		if (puzzleStatus === 'solved') {
 			return
 		}
+		if(hintSquare) {
+			setHintSquare(null)
+			setMoveFeedback(null)
+			return
+		}
 		const nextMove = puzzleMoves[puzzleMoveIndex]
 		if(!nextMove) {
 			return
@@ -102,6 +110,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		}
 		computerMove(nextMove, 'solution move failed')
 		setPuzzleStatus('playing')
+		if(!failedPuzzle.current) {
+			setFailedPuzzle(puzzle.id).then((result) => {
+			console.log(result.message)
+			}).catch((error) => {
+				console.error(error)
+			})
+			failedPuzzle.current = true
+		}
 		if (puzzleMoveIndex + 1 >= puzzleMoves.length) {
 			setPuzzleStatus('solved')
 		}
@@ -237,10 +253,44 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			})
 			// Check if move matches puzzle solution
 			if (move !== puzzleMoves[puzzleMoveIndex]) {
+				setPuzzleStatus('viewing')
 				setMoveFeedback('wrong')
+				setFeedbackMark({
+					square: targetSquare,
+					type: 'wrong'
+				})
+				setGame(gameCopy)
+				setSelectedSquare(null)
+				setTimeout(() => {
+					gameCopy.undo()
+					setGame(gameCopy)
+					setSelectedSquare(null)
+					setHintSquare(null)
+					setMoveFeedback(null)
+					setFeedbackMark(null)
+					setPuzzleStatus('playing')
+				}, 1000)
+				if(!failedPuzzle.current) {
+					setFailedPuzzle(puzzle.id).then((result) => {
+					console.log(result.message)
+					}).catch((error) => {
+						console.error(error)
+					})
+					failedPuzzle.current = true
+				}
 				return false
 			}
+
 			setMoveFeedback('right')
+			setFeedbackMark({
+    			square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
+    			type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
+			})
+			if (!gameCopy.isCheckmate()) {
+				setTimeout(() => {
+				setFeedbackMark(null)
+				},700)
+			}
 			setPendingPromotion(null)
 			setGame(gameCopy)
 			setSelectedSquare(null)
@@ -250,6 +300,13 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			setPuzzleMoveIndex(nextIndex)
 			if (nextIndex >= puzzleMoves.length) {
 				setPuzzleStatus('solved')
+				if(!failedPuzzle.current) {
+					removeFailedPuzzle(puzzle.id).then((result) => {
+						console.log(result.message)
+					}).catch((error) => {
+						console.error(error)
+					})
+				}
 			}
 
 			setPositions([
@@ -299,29 +356,54 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		return piece && piece.color === game.turn()
 	}
 
+
+	// Get position for feedback mark
+	function getMarkPosition(square) {
+		if(playerColor === 'b') {
+			return {
+				left: `${(7 - (square.charCodeAt(0) - 'a'.charCodeAt(0))) * 12.5}%`,
+				top: `${((Number(square[1]) - 1) * 12.5)}%`,
+			}
+		}
+
+		return {
+			left: `${(square.charCodeAt(0) - 'a'.charCodeAt(0)) * 12.5}%`,
+			top: `${((8 - Number(square[1])) * 12.5)}%`,
+		}
+	}
+	
+
 	return (
 	//Render the chessboard with handlers.
 		<div className="chessboard-container">
-			<Chessboard
-				options={{
-					position: game.fen(), // FEN representing current game state
-					boardOrientation: playerColor === 'w' ? 'white' : 'black', // Board orientation based on player's color
-					onPieceDrag, // Handle piece drag events
-					onPieceDragEnd, // Handle piece drag end events
-					onMouseOverSquare, // Handle mouse over square events
-					onPieceDrop,  // Handle piece drop events
-					onSquareClick, // Handle square click events
-					canDragPiece,  // Determine if piece can be dragged
-					dropSquareStyle: {boxShadow: 'none'}, // Remove default style
-					squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
-				}}
-			/>
-			<p>
-				{puzzleStatus === "solved" ? "Puzzle ratkaistu"
-					: moveFeedback === "right" ? "Hyvä siirto"
-						: moveFeedback === "wrong" ? "Väärä siirto"
-							: null}
-			</p>
+			<div className= "board-wrapper">
+				<Chessboard
+					options={{
+						position: game.fen(), // FEN representing current game state
+						alphaNotationStyle: {fontSize: '1.2rem'}, // Font size for square notation
+						boardOrientation: playerColor === 'w' ? 'white' : 'black', // Board orientation based on player's color
+						boardStyle: { borderRadius: '10px'}, // Board style with rounded corners
+						onPieceDrag, // Handle piece drag events
+						onPieceDragEnd, // Handle piece drag end events
+						onMouseOverSquare, // Handle mouse over square events
+						onPieceDrop,  // Handle piece drop events
+						onSquareClick, // Handle square click events
+						canDragPiece,  // Determine if piece can be dragged
+						dragActivationDistance : { distance: 0}, // No drag activation distance
+						dropSquareStyle: {boxShadow: 'none'}, // Remove default style
+						numericNotationStyle: {fontSize: '1.2rem'}, // Font size for numeric notation
+						squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
+					}}
+				/>
+					{feedbackMark && (
+						<div className="feedback-mark-container" style={getMarkPosition(feedbackMark.square)}>
+							<div className={`feedback-mark-${feedbackMark.type}`}>
+								{feedbackMark.type === 'right' ? '✓' : feedbackMark.type === 'wrong' ? '✗' : '#'}
+							</div>
+						</div>
+					)}
+			</div>			
+			{puzzleStatus === "solved" ? <p>Puzzle ratkaistu</p> : null}
 			<PromotionChooser
 				pendingPromotion={pendingPromotion}
 				onSelect={completePromotion}

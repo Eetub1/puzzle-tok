@@ -2,12 +2,17 @@ import express from "express"
 import pool from "../db/db.js"
 import { authenticateToken } from "../middleware/auth.js"
 import { getLichessGames, getChessComGames } from "../utils/games.js"
-
-const MAX_GAMES_PER_SITE = 50
+import { saveFailedPuzzle, getFailedPuzzle, removeFailedPuzzle } from "../controllers/failedPuzzleController.js"
 
 const userRouter = express.Router()
 
-userRouter.use(authenticateToken) // All routes in this router require authentication
+const MAX_GAMES_PER_SITE = 50
+
+userRouter.use(authenticateToken)
+
+userRouter.post("/failed", saveFailedPuzzle)
+userRouter.get("/failed", getFailedPuzzle)
+userRouter.delete("/failed/:puzzleId", removeFailedPuzzle)
 
 userRouter.post("/chess-accounts", async (req, res) => {
     const { usernames } = req.body ?? {}

@@ -6,6 +6,7 @@ const getDaily = async (signal) => {
 	console.log('daily puzzle data:', data)
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
+		id: data.puzzle.id,
 		moves : data.puzzle.solution.join(" ") ,
 		lastMove : data.puzzle.lastMove,
 		rating : data.puzzle.rating,
@@ -18,6 +19,7 @@ const getNextPuzzle = async (response) => {
 	const data = await response.json()
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
+		id: data.puzzle.id,
 		moves : data.puzzle.solution.join(" ") ,
 		lastMove : data.puzzle.lastMove,
 		rating : data.puzzle.rating,
@@ -33,19 +35,21 @@ const getBatch = async (signal) => {
 	console.log('batch data:', data)
 	return data.puzzles.map(puzzles => ({
 		fen: puzzles.puzzle.fen,
+		id: puzzles.puzzle.id,
 		moves: puzzles.puzzle.solution.join(' '),
 		lastMove: puzzles.puzzle.lastMove,
 		rating: puzzles.puzzle.rating,
 		themes: puzzles.puzzle.themes
 	}))
 }
-
-const getPuzzleById = async id => {
-	let response = await fetch(`/api/puzzles/puzzleID/${id}`)
+	
+const getPuzzleById = async (id, signal) => {
+	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()
 	console.log('here data: ', data)
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
+		id: data.puzzle.id,
 		moves : data.puzzle.solution.join(" ") ,
 		lastMove : data.puzzle.lastMove,
 		rating : data.puzzle.rating,

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react"
-import { getBatch, getDaily } from "../services/puzzleService"
+import { getBatch, getDaily, getPuzzleById } from "../services/puzzleService"
+import { getFailedPuzzles } from "../services/failedPuzzleService"
 
+function shuffle(puzzles) {
+	return [...puzzles].sort(() => Math.random() - 0.5)
+}
 
 export function usePuzzleQueue({ menuOpen }) {
 	const [puzzle, setPuzzle] = useState(null)
@@ -15,6 +19,7 @@ export function usePuzzleQueue({ menuOpen }) {
 			setPuzzle(firstPuzzle)
 			console.log('current puzzle:', firstPuzzle)
 			setPuzzleQueue(remainingPuzzles)
+			console.log('puzzle queue:', remainingPuzzles)
 			return
 		}
 		setPuzzleQueue([...puzzleQueue, ...puzzles])
@@ -56,10 +61,16 @@ export function usePuzzleQueue({ menuOpen }) {
 			const controller = new AbortController()
 			const puzzleBatch = async () => {
 				try {
-					const result = await getBatch(controller.signal)
+					const [batch, failedPuzzleIds] = await Promise.all([
+						getBatch(controller.signal),
+						getFailedPuzzles(controller.signal),
+					])
+					const failedPuzzles = await Promise.all(
+						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId))
+					)
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setBatch(result)
+						setBatch(shuffle([...batch, ...failedPuzzles]))
 					}
 				} catch (error) {
 					if (error.name !== 'AbortError') { // Ignore abort errors
@@ -67,6 +78,7 @@ export function usePuzzleQueue({ menuOpen }) {
 					}
 				}
 			}
+
 			puzzleBatch()
 			return () => {
 				controller.abort() // Abort fetch if new batch is requested

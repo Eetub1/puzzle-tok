@@ -1,4 +1,4 @@
-import express, { response, Router } from "express"
+import express from "express"
 import { Chess } from "chess.js"
 const puzzlesRouter = express.Router()
 const base_url = `https://lichess.org`
@@ -17,8 +17,6 @@ const getGameById = async id => {
     if (!response.ok) {
 		throw new Error(`Lichess request failed: ${response.status}`)
 	}
-
-    console.log("puzzle", response)
 
     return response.json()
 }
@@ -48,9 +46,7 @@ puzzlesRouter.get('/next', async (req,res) => {
 // Route for retrieving puzzle by id
 puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
 
-    console.log("params: ", req.params.id)
     const id = req.params.id
-    console.log("Sending next by id")
 
     if (!id) {
         return res.status(400).json({ error: "Game with id not found" })

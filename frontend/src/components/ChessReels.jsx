@@ -13,7 +13,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 	const [showBottomBar, setShowBottomBar] = useState(true)
-	const [showScrollControls, setShowScrollControls] = useState(true)
+	const [showScrollControls, setShowScrollControls] = useState(false)
 
 	const puzzleBoardRef = useRef(null)
 
@@ -45,7 +45,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 				break
 			case "DailyPuzzle":
 				setShowBottomBar(true)
-				setShowScrollControls(true)
+				setShowScrollControls(false)
 				break
 			case "Profile":
 				setShowBottomBar(false)
@@ -93,7 +93,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 						</div>
 					</div>
 				) : (
-					<div className = "other-content">
+					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
 						{menuOpen === "YourMatches" && <Matches/>}
 						{menuOpen === "Openings" && <ChessBoard/>}

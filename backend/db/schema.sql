@@ -22,3 +22,12 @@ CREATE TABLE email_verification_tokens (
     used_at    timestamptz,
     created_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE failed_puzzles (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    puzzle_id  text        NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+
+    UNIQUE (user_id, puzzle_id)
+);
