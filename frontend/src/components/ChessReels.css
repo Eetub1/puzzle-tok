@@ -67,12 +67,25 @@ body,
   min-height: 0;
 }
 
-.other-content {
+.chessboard-container{
+  width: 70dvh;
+  height: 70dvh;
+}
+
+/*.other-content {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
+}*/
+
+.other-content {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .reels-container {

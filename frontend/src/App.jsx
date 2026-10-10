@@ -9,7 +9,6 @@ import Message from "./components/Message.jsx"
 import VerifyEmail from "./components/VerifyEmail.jsx"
 
 import { logout } from "./services/authService.js"
-import ProfilePage from "./pages/ProfilePage.jsx"
 
 const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
@@ -25,15 +24,13 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={user
 					?
-					<div>
+					<>
 						{message && <Message data={message}/>}
-						<ChessReels handleLogout={handleLogout}></ChessReels>
-					</div>
-					
+						<ChessReels handleLogout={handleLogout} setMessage={setMessage}></ChessReels>
+					</>
 					: <Navigate to="/login"/>}
 				/>
 
-				<Route path="/profile" element={user ? <ProfilePage setMessage={setMessage}/> : <Login setMessage={setMessage} setUser={setUser}/>}/>
 				<Route path="/verify-email" element={<VerifyEmail/>}/>
 				<Route path="/login" element={!user ? <Login setMessage={setMessage} setUser={setUser}/> : <Navigate to="/"/>}/>
 				<Route path="/signup" element={!user ? <Signup setMessage={setMessage}/> : <Navigate to="/"/>}/>

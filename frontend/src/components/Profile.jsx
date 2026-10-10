@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 import Button from "react-bootstrap/Button"
-import "./ProfilePages.css"
+import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 
 
@@ -27,8 +26,6 @@ const ProfilePage = ({ setMessage }) => {
 		fetchData()
 	}, [])
 
-	const navigate = useNavigate()
-
 	const verifyEmail = () => {
 		// This should send a new verification email to the user
 		console.log("TODO")
@@ -36,6 +33,7 @@ const ProfilePage = ({ setMessage }) => {
 
 	const handleSubmit = async event => {
 		event.preventDefault()
+		localStorage.removeItem("userGames") // Clear the cached games when the user updates their chess accounts
 
 		try {
 			await updateUserChessAccounts({ lichess, chessCom })
@@ -62,10 +60,16 @@ const ProfilePage = ({ setMessage }) => {
 		}
 	}
 
+	const handleAccountChanges = () => {
+		// need to reopen form with current values prefilled
+		setLichess(profile.lichess || "")
+		setChessCom(profile.chessCom || "")
+		setProfile({ ...profile, lichess: "", chessCom: "" })
+	}
+
 	return (
 		<div>
-			<Button onClick={() => navigate("/")}>Go to homepage</Button>
-			<h2>Welcome to your profile page!</h2>
+			<h2>Profile page</h2>
 
 			{(profile?.email) ?
 				<p>Email: {profile.email}</p>
@@ -73,7 +77,6 @@ const ProfilePage = ({ setMessage }) => {
 
 			{!profile?.lichess && !profile?.chessCom && !isLoading &&
 			<>
-				<p>You haven't connected any chess accounts yet.</p>
 				<div>
 					<form onSubmit={handleSubmit}>
 						<fieldset>Connect your accounts</fieldset>
@@ -101,6 +104,7 @@ const ProfilePage = ({ setMessage }) => {
 					{profile.lichess ? <li>Lichess: {profile.lichess}</li> : <li>Lichess: Not connected</li>}
 					{profile.chessCom ? <li>Chess.com: {profile.chessCom}</li> : <li>Chess.com: Not connected</li>}
 				</ul>
+				<Button onClick={handleAccountChanges}>Change accounts?</Button>
 			</>
 			}
 
