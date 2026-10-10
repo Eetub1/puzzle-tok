@@ -2,21 +2,20 @@ import { useRef, useState } from "react"
 import Dropdown from "react-bootstrap/Dropdown"
 import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
+import Profile from "./Profile.jsx"
 import "./ChessReels.css"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
-import { useNavigate } from "react-router-dom"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 
 import Matches from "./Matches.jsx"
 
-const ChessReels = ({ handleLogout }) => {
+const ChessReels = ({ handleLogout, setMessage }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(true)
 
 	const puzzleBoardRef = useRef(null)
-	const navigate = useNavigate()
 
 	const {
 		isPuzzlesMenu,
@@ -48,6 +47,10 @@ const ChessReels = ({ handleLogout }) => {
 				setShowBottomBar(true)
 				setShowScrollControls(true)
 				break
+			case "Profile":
+				setShowBottomBar(false)
+				setShowScrollControls(false)
+				break
 			default:
 				setShowBottomBar(false)
 				setShowScrollControls(false)
@@ -64,7 +67,7 @@ const ChessReels = ({ handleLogout }) => {
 					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => handleMenuClick("Openings")}>Openings</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => handleMenuClick("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
-				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
+				<button onClick={() => handleMenuClick("Profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
 
 			<div className="content-row">
@@ -94,6 +97,7 @@ const ChessReels = ({ handleLogout }) => {
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
 						{menuOpen === "YourMatches" && <Matches/>}
 						{menuOpen === "Openings" && <ChessBoard/>}
+						{menuOpen === "Profile" && <Profile setMessage={setMessage}></Profile>}
 					</div>
 				)}
 

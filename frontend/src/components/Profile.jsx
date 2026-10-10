@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 import Button from "react-bootstrap/Button"
-import "./ProfilePages.css"
+import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 
 
@@ -27,14 +26,10 @@ const ProfilePage = ({ setMessage }) => {
 		fetchData()
 	}, [])
 
-	const navigate = useNavigate()
-
-
 	const verifyEmail = () => {
 		// This should send a new verification email to the user
 		console.log("TODO")
 	}
-
 
 	const handleSubmit = async event => {
 		event.preventDefault()
@@ -65,7 +60,6 @@ const ProfilePage = ({ setMessage }) => {
 		}
 	}
 
-
 	const handleAccountChanges = () => {
 		// need to reopen form with current values prefilled
 		setLichess(profile.lichess || "")
@@ -75,7 +69,6 @@ const ProfilePage = ({ setMessage }) => {
 
 	return (
 		<div>
-			<Button onClick={() => navigate("/")}>Go to homepage</Button>
 			<h2>Profile page</h2>
 
 			{(profile?.email) ?
