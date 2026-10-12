@@ -1,9 +1,21 @@
-body {
-    margin: 0;
-    padding: 0;
-    color: white; /* text color */
+#profile-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
 }
 
-.get-user-games {
-    margin: 1.5rem;
+#account-card, #chess-accounts-card {
+    margin-top: 8px;
+    width: 500px;
+    background-color: #0f0f11;
+    color: white;
+}
+
+#logout-btn {
+    border-radius: 8px;
+    background: none;
+    border-color: red;
+    color: red
 }

@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react"
-import Button from "react-bootstrap/Button"
+import { Button, Card } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 
 
-const ProfilePage = ({ setMessage }) => {
+const ProfilePage = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
 	const [chessCom, setChessCom] = useState("")
 	const [profile, setProfile] = useState(null) // Contains username, lichess and chess.com usernames and email if it has been verified
 	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
-		// Need a helper to use async functions inside useEffect
 		const fetchData = async () => {
 			try {
 				const data = await getUserProfile()
@@ -68,12 +67,36 @@ const ProfilePage = ({ setMessage }) => {
 	}
 
 	return (
-		<div>
-			<h2>Profile page</h2>
+
+		<div id="profile-page">
+			<button id="logout-btn" onClick={handleLogout}>log out</button>
+
+			<Card id="account-card">
+				<Card.Header>Account</Card.Header>
+				<Card.Body>
+
+				</Card.Body>
+			</Card>
+			<Card id="chess-accounts-card">
+				<Card.Header>Chess Accounts</Card.Header>
+				<Card.Body>
+
+				</Card.Body>
+			</Card>
+		</div>
+
+
+
+		/*<div id="profile-page">
+			<h2>Your Profile</h2>
+
+			<Button onClick={handleLogout} className="logout-btn">Logout</Button>
+
+			<p>Username: {profile?.username}</p>
 
 			{(profile?.email) ?
 				<p>Email: {profile.email}</p>
-				: <><div>Email Not verified</div><Button onClick={verifyEmail}>Verify email</Button></>}
+				: <><p>Email: Not yet verified</p><Button onClick={verifyEmail}>Send confirmation email</Button></>}
 
 			{!profile?.lichess && !profile?.chessCom && !isLoading &&
 			<>
@@ -108,7 +131,7 @@ const ProfilePage = ({ setMessage }) => {
 			</>
 			}
 
-		</div>
+		</div>*/
 	)
 }
 

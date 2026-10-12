@@ -2,10 +2,12 @@ import { useState, useEffect } from "react"
 import "./Matches.css"
 
 import { getUserGames } from "../services/userService.js"
+import { getUserProfile } from "../services/userService.js"
 
 const GAMES_PER_SITE = 10
 
 const Matches = () => {
+	const [profile, setProfile] = useState(null) // Contains username, lichess and chess.com usernames and email if it has been verified
 	const [matches, setMatches] = useState(() => JSON.parse(localStorage.getItem("userGames")) ?? [])
 	console.log(matches)
 
@@ -28,11 +30,27 @@ const Matches = () => {
 		fetchMatches()
 	}, [matches.length])
 
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await getUserProfile()
+				console.log(data)
+				setProfile(data)
+			} catch (error) {
+				console.error("Failed to fetch user profile:", error)
+			}
+		}
+		fetchData()
+	}, [])
+
+	console.log("Profile:", profile)
+
 	return (
 		<div className="your-matches">
 			<div id="matches-header">
 				<h2>Your Matches</h2>
 				<p>Amount of matches fetched: {matches.length}</p>
+				{profile && !profile.lichess && !profile.chessCom && <p>To fetch matches, please add your Lichess or Chess.com username in your profile.</p>}
 			</div>
 
 			<div id="matches-wrapper">

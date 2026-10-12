@@ -60,7 +60,6 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 	return (
 		<div className="chess-reels">
 			<div className="top-bar">
-				<button onClick={handleLogout} className="logout-btn">Logout</button>
 				<Dropdown.Menu show>
 					<Dropdown.Item active={menuOpen === "YourMatches"} onClick={() => handleMenuClick("YourMatches")}>Your Matches</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "Puzzles"} onClick={() => handleMenuClick("Puzzles")}>Puzzles</Dropdown.Item>
@@ -97,7 +96,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
 						{menuOpen === "YourMatches" && <Matches/>}
 						{menuOpen === "Openings" && <ChessBoard/>}
-						{menuOpen === "Profile" && <Profile setMessage={setMessage}></Profile>}
+						{menuOpen === "Profile" && <Profile setMessage={setMessage} handleLogout={handleLogout}/>}
 					</div>
 				)}
 
