@@ -39,7 +39,7 @@
 
 .puzzle-retry-button {
     background-color: var(--status-row-failed-color);
-    color: white;
+    color: var(--status-row-text-color);
     border: none;
     border-radius: 1rem;
     padding: 0.25rem 0.5rem;
@@ -49,6 +49,14 @@
     cursor: pointer;
 }
 
-.puzzle-retry-button:hover {
-    background-color: #7a1c1c;
+#puzzle-retry-button:hover {
+    background-color: var(--status-row-retry-hover-color);
+}
+
+#puzzle-retry-button-solved {
+    background-color: var(--status-row-solved-color);
+}
+
+#puzzle-retry-button-solved:hover {
+    background-color: var(--status-row-retry-solved-hover-color);
 }

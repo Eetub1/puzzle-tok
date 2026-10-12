@@ -46,8 +46,11 @@ function StatusRow({ puzzle, game, playerColor, puzzleStatus, moveFeedback, atte
             {resultText && (
                 <span className={`puzzle-status-${resultStatus}`}>{resultText}</span>
             )}  
-            {attemptFailed && (
-                <button className='puzzle-retry-button' onClick={handleRetry}>↻ Retry</button>
+            {isSolved && (
+                <button id="puzzle-retry-button-solved" className='puzzle-retry-button' onClick={handleRetry}>↻ Again</button>
+            )}
+            {(!isSolved && attemptFailed) && (
+                <button id="puzzle-retry-button" className='puzzle-retry-button' onClick={handleRetry}>↻ Retry</button>
             )}
         </div>
     )

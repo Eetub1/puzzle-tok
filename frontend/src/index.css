@@ -3,6 +3,8 @@
     --status-row-text-color: white;
     --status-row-failed-color: #9b2929;
     --status-row-solved-color: #245c38;
+    --status-row-retry-hover-color: #7a1c1c;
+    --status-row-retry-solved-hover-color: #1c7a1c;
 
     --chessboard-color-last-move: #c8d67a;
     --chessboard-color-selected: rgba(255, 255, 0, 0.5);
