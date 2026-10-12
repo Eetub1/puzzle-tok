@@ -11,12 +11,23 @@ import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, setMessage }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
+	const puzzleQueue = usePuzzleQueue({menuOpen})
+	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
 	const [showMoveControls, setShowMoveControls] = useState(true)
 
 	const boardRef = useRef(null)
+
+
+	// Functions to handle navigate between puzzle and saving puzzle state 
+	function handleNextPuzzle() {
+    	puzzleQueue.handleNextPuzzle(boardRef.current?.getPuzzleState())
+	}
+
+	function handlePreviousPuzzle() {
+		puzzleQueue.handlePreviousPuzzle(boardRef.current?.getPuzzleState())
+	}
 
 	const {
 		isPuzzlesMenu,
@@ -29,6 +40,9 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 	} = usePuzzleReels({ menuOpen, handleNextPuzzle, handlePreviousPuzzle })
 
 	const handleMenuClick = (clickedOption) => {
+		if (menuOpen === "DailyPuzzle" && clickedOption !== menuOpen) { // Save puzzle state when leaving Daily Puzzle menu
+        	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
+    	}
 		setMenuOpen(clickedOption)
 
 		switch (clickedOption) {

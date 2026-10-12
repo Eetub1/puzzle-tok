@@ -1,3 +1,19 @@
+:root {
+    --status-row-neutral-color: #30363d;
+    --status-row-text-color: white;
+    --status-row-failed-color: #9b2929;
+    --status-row-solved-color: #245c38;
+
+    --chessboard-color-last-move: #c8d67a;
+    --chessboard-color-selected: rgba(255, 255, 0, 0.5);
+    --chessboard-color-check: rgba(255, 0, 0, 0.4);
+    --chessboard-color-legal-move: rgba(0, 0, 0, 0.35);
+    --chessboard-color-capture: rgba(255, 255, 0, 0.5);
+    --chessboard-color-hint: rgba(0, 255, 255, 0.5);
+    --chessboard-color-drag-hover: rgba(0, 0, 0, 0.35);
+}
+
+
 body {
     margin: 0;
     padding: 0;

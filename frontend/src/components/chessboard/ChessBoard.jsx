@@ -3,7 +3,6 @@ import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './ChessBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
-import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // ChessBoard component, renders the chessboard and handles game logic
@@ -11,7 +10,6 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 	const [game, setGame] = useState(() => new Chess())
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [lastMove, setLastMove] = useState(null)
-	const [gameover, setGameover] = useState(false)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
 	const [positions, setPositions] = useState([{
 		fen: new Chess().fen(),
@@ -168,7 +166,7 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 	// Determines if a piece can be dragged from the given square
 	function canDragPiece({ square }) {
 		const piece = game.get(square)
-		if(gameover || pendingPromotion) {
+		if(game.isGameOver() || pendingPromotion) {
 			return false
 		}
 		return piece && piece.color === game.turn()

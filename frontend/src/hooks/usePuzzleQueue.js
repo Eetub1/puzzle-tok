@@ -93,20 +93,26 @@ export function usePuzzleQueue({ menuOpen }) {
 	}, [puzzleQueue.length, menuOpen, dailyPuzzle])
 
 	// Handle moving to next puzzle in queue
-	function handleNextPuzzle() {
+	function handleNextPuzzle(savedState) {
 		if (!puzzle || puzzleQueue.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
 
 		const [nextPuzzle, ...remainingPuzzles] = puzzleQueue
 
-		setPuzzleMemory([
+		const updatedMemory = [
 			...puzzleMemory,
-			puzzle,
-		])
-		if(puzzleMemory.length > 10) {
-			setPuzzleMemory(puzzleMemory.slice(-10))
+			{
+				...puzzle,
+				savedState,
+			},
+		]
+		
+		if(updatedMemory.length > 10) {
+			setPuzzleMemory(updatedMemory.slice(-10))
 			console.log('puzzle memory over 10, trimming to last 10 puzzles')
+		} else {
+			setPuzzleMemory(updatedMemory)
 		}
 		setPuzzle(nextPuzzle)
 		console.log('current puzzle:', nextPuzzle)
@@ -114,7 +120,7 @@ export function usePuzzleQueue({ menuOpen }) {
 	}
 
 	// Handle moving to previous puzzle in memory
-	function handlePreviousPuzzle() {
+	function handlePreviousPuzzle(savedState) {
 		if (!puzzle || puzzleMemory.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
@@ -122,12 +128,19 @@ export function usePuzzleQueue({ menuOpen }) {
 		const previousPuzzle = puzzleMemory[puzzleMemory.length - 1]
 
 		setPuzzleQueue([
-			puzzle,
-			...puzzleQueue,
-		])
+        	{ 
+				...puzzle, 
+				savedState 
+			},
+        	...puzzleQueue,
+    	])
 		setPuzzle(previousPuzzle)
 		console.log('current puzzle:', previousPuzzle)
 		setPuzzleMemory(puzzleMemory.slice(0, -1))
+	}
+
+	function saveDailyPuzzleState(savedState) {
+		setDailyPuzzle(dailyPuzzle ? { ...dailyPuzzle, savedState } : dailyPuzzle)
 	}
 
 	const currentPuzzle = menuOpen === "DailyPuzzle" ? dailyPuzzle : puzzle
@@ -140,5 +153,6 @@ export function usePuzzleQueue({ menuOpen }) {
 		nextPuzzle,
 		handleNextPuzzle,
 		handlePreviousPuzzle,
+		saveDailyPuzzleState,
 	}
 }
