@@ -16,6 +16,16 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 	const [showScrollControls, setShowScrollControls] = useState(false)
 
 	const puzzleBoardRef = useRef(null)
+	const [streak, setStreak] = useState(0)
+	const solvedFens = useRef(new Set())
+
+	function handleSolved(puzzle) {
+		if (solvedFens.current.has(puzzle.fen)) return
+		solvedFens.current.add(puzzle.fen)
+		setStreak(s => s + 1)
+	}
+
+	const navigate = useNavigate()
 
 	const {
 		isPuzzlesMenu,
@@ -67,6 +77,8 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => handleMenuClick("Openings")}>Openings</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => handleMenuClick("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
+				<span className="streak">🔥 {streak}</span>
+				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
 				<button onClick={() => handleMenuClick("Profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
 
@@ -83,7 +95,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle} preview={false}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle} preview={false} onSolved={handleSolved}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
