@@ -22,6 +22,45 @@
     position: relative;
 }
 
+.puzzle-status-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.puzzle-status-row span {
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.7rem;
+    color: white; 
+}
+
+.puzzle-status-rating {
+    background-color: #30363d;
+    margin-right: auto;
+}
+
+.puzzle-status-previously-failed {
+    background-color: #542c32;
+    
+}
+
+.puzzle-status-neutral {
+    background-color: #30363d;
+}
+
+.puzzle-status-failed {
+    background-color: #9b2929;
+    margin-left: 0.5rem;
+}
+
+.puzzle-status-solved {
+    background-color: #245c38;
+}
+
 .feedback-mark-container {
     position: absolute;
     width: 12.5%;

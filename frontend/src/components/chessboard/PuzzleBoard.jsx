@@ -11,6 +11,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 	const [game, setGame] = useState(() => new Chess(puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
 	const [puzzleStatus, setPuzzleStatus] = useState('playing')
+	const [attemptFailed, setAttemptFailed] = useState(false)
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
 	const[lastMove, setLastMove] = useState(puzzle.lastMove)
@@ -58,6 +59,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		setPuzzleMoveIndex(puzzleMoveIndex - 1)
 		setSelectedSquare(null)
 		setMoveFeedback(null)
+		setFeedbackMark(null)
 		if (puzzleStatus !== 'solved') {
 			setPuzzleStatus('viewing')
 		}
@@ -109,6 +111,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			return
 		}
 		computerMove(nextMove, 'solution move failed')
+		setAttemptFailed(true)
 		setPuzzleStatus('playing')
 		if(!failedPuzzle.current) {
 			setFailedPuzzle(puzzle.id).then((result) => {
@@ -253,6 +256,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			})
 			// Check if move matches puzzle solution
 			if (move !== puzzleMoves[puzzleMoveIndex]) {
+				setAttemptFailed(true)
 				setPuzzleStatus('viewing')
 				setMoveFeedback('wrong')
 				setFeedbackMark({
@@ -282,6 +286,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			}
 
 			setMoveFeedback('right')
+			
 			setFeedbackMark({
     			square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
     			type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
@@ -289,6 +294,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			if (!gameCopy.isCheckmate()) {
 				setTimeout(() => {
 				setFeedbackMark(null)
+				setMoveFeedback(null)
 				},700)
 			}
 			setPendingPromotion(null)
@@ -373,9 +379,40 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 	}
 	
 
+	const status = moveFeedback === 'wrong' 
+		? 'failed'
+			: puzzleStatus === 'solved' || moveFeedback === 'right'
+				? 'solved'
+					: 'neutral'
+
+	const statusText = (puzzleStatus === 'solved') ? '✓ Solved'
+				: moveFeedback === 'wrong' ? 'Wrong move'
+					: moveFeedback === 'right' ? 'Correct move'
+						: puzzleStatus === 'viewing' ? 'Viewing puzzle'
+							: game.turn() === playerColor ? 'Your turn' 
+								: 'Opponent turn'
+
 	return (
 	//Render the chessboard with handlers.
 		<div className="chessboard-container">
+			<div className="puzzle-status-row">
+				<span className='puzzle-status-rating'>Puzzle rating: {puzzle.rating}</span>
+				<span className={`puzzle-status-${status}`}>{statusText}</span>
+				{puzzleStatus === 'solved' &&
+					(attemptFailed || puzzle.previouslyFailed) && (
+						<span className='puzzle-status-failed'>
+							Puzzle failed
+						</span>
+					)}
+				{puzzleStatus !== 'solved' && puzzle.previouslyFailed && !attemptFailed && (
+					<span className='puzzle-status-previously-failed'>
+						Previously failed
+					</span>
+				)}
+				{puzzleStatus !== 'solved' && attemptFailed && (
+					<span className='puzzle-status-failed'>Puzzle failed</span>
+				)}
+			</div>
 			<div className= "board-wrapper">
 				<Chessboard
 					options={{
@@ -395,19 +432,20 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 						squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
 					}}
 				/>
-					{feedbackMark && (
-						<div className="feedback-mark-container" style={getMarkPosition(feedbackMark.square)}>
-							<div className={`feedback-mark-${feedbackMark.type}`}>
-								{feedbackMark.type === 'right' ? '✓' : feedbackMark.type === 'wrong' ? '✗' : '#'}
-							</div>
+				{feedbackMark && (
+					<div className="feedback-mark-container" style={getMarkPosition(feedbackMark.square)}>
+						<div className={`feedback-mark-${feedbackMark.type}`}>
+							{feedbackMark.type === 'right' ? '✓' : feedbackMark.type === 'wrong' ? '✗' : '#'}
 						</div>
-					)}
+					</div>
+				)}
+				<PromotionChooser
+					pendingPromotion={pendingPromotion}
+					onSelect={completePromotion}
+					playerColor={playerColor}
+				/>
 			</div>			
-			{puzzleStatus === "solved" ? <p>Puzzle ratkaistu</p> : null}
-			<PromotionChooser
-				pendingPromotion={pendingPromotion}
-				onSelect={completePromotion}
-			/>
+			
 		</div>
 
 	)

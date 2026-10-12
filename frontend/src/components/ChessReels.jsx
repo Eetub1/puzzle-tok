@@ -14,8 +14,9 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen})
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
+	const [showMoveControls, setShowMoveControls] = useState(true)
 
-	const puzzleBoardRef = useRef(null)
+	const boardRef = useRef(null)
 
 	const {
 		isPuzzlesMenu,
@@ -34,26 +35,32 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 			case "YourMatches":
 				setShowBottomBar(false)
 				setShowScrollControls(false)
+				setShowMoveControls(false)
 				break
 			case "Puzzles":
 				setShowBottomBar(true)
 				setShowScrollControls(true)
+				setShowMoveControls(true)
 				break
 			case "Openings":
 				setShowBottomBar(false)
 				setShowScrollControls(false)
+				setShowMoveControls(true)
 				break
 			case "DailyPuzzle":
 				setShowBottomBar(true)
 				setShowScrollControls(false)
+				setShowMoveControls(true)
 				break
 			case "Profile":
 				setShowBottomBar(false)
 				setShowScrollControls(false)
+				setShowMoveControls(false)
 				break
 			default:
 				setShowBottomBar(false)
 				setShowScrollControls(false)
+				setShowMoveControls(false)
 		}
 	}
 
@@ -83,7 +90,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle} preview={false}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -94,9 +101,9 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 					</div>
 				) : (
 					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
-						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
+						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
 						{menuOpen === "YourMatches" && <Matches/>}
-						{menuOpen === "Openings" && <ChessBoard/>}
+						{menuOpen === "Openings" && <ChessBoard ref={boardRef}/>}
 						{menuOpen === "Profile" && <Profile setMessage={setMessage}></Profile>}
 					</div>
 				)}
@@ -106,18 +113,20 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
 				</div>}
 			</div>
-
-			{showBottomBar && <div className="bottom-bar">
+			
+			<div className="bottom-bar">
+				{showBottomBar && 
 				<div className="action-buttons">
-					<button onClick={() => puzzleBoardRef?.current?.giveHint()} className="hint-btn">Hint</button>
-					<button onClick={() => puzzleBoardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
-				</div>
+					<button onClick={() => boardRef?.current?.giveHint()} className="hint-btn">Hint</button>
+					<button onClick={() => boardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
+				</div>}
 
+				{showMoveControls && 
 				<div className="step-controls">
-					<button onClick={() => puzzleBoardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
-					<button onClick={() => puzzleBoardRef?.current?.moveForward()} aria-label="Next move">▶</button>
-				</div>
-			</div>}
+					<button onClick={() => boardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
+					<button onClick={() => boardRef?.current?.moveForward()} aria-label="Next move">▶</button>
+				</div>}
+			</div>
 		</div>
 	)
 }

@@ -154,6 +154,7 @@ body,
   flex-shrink: 0;
   display: flex;
   gap: 10px;
+  margin-left: auto;
 }
 
 /* Icon Buttons (Jaetut ympyrät napeille) */

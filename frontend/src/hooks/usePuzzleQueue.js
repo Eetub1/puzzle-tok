@@ -34,10 +34,13 @@ export function usePuzzleQueue({ menuOpen }) {
 			const controller = new AbortController() //
 			const puzzleDaily = async () => {
 				try {
-					const result = await getDaily(controller.signal)
+					const [result, failedPuzzleIds] = await Promise.all([
+						getDaily(controller.signal),
+						getFailedPuzzles(controller.signal),
+					])
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setDailyPuzzle(result)
+						setDailyPuzzle({ ...result, previouslyFailed: failedPuzzleIds.includes(result.id) })
 						console.log('daily puzzle:', result)
 					}
 				} catch (error) {
@@ -66,11 +69,14 @@ export function usePuzzleQueue({ menuOpen }) {
 						getFailedPuzzles(controller.signal),
 					])
 					const failedPuzzles = await Promise.all(
-						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId))
+						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId, controller.signal))
 					)
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setBatch(shuffle([...batch, ...failedPuzzles]))
+						setBatch(shuffle([...batch, ...failedPuzzles].map(puzzle => ({
+							...puzzle,
+							previouslyFailed: failedPuzzleIds.includes(puzzle.id),
+						}))))
 					}
 				} catch (error) {
 					if (error.name !== 'AbortError') { // Ignore abort errors

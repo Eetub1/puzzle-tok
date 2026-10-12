@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useImperativeHandle, forwardRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './ChessBoard.css'
@@ -7,11 +7,41 @@ import './SquareStyles.css'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // ChessBoard component, renders the chessboard and handles game logic
-function ChessBoard() {
+const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 	const [game, setGame] = useState(() => new Chess())
 	const [selectedSquare, setSelectedSquare] = useState(null)
+	const [lastMove, setLastMove] = useState(null)
 	const [gameover, setGameover] = useState(false)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
+	const [positions, setPositions] = useState([{
+		fen: new Chess().fen(),
+		lastMove: null
+	}])
+	const [moveIndex, setmoveIndex] = useState(0)
+
+	// Moves back in move history
+	function moveBack() {
+		if (moveIndex === 0) return
+		const newIndex = moveIndex - 1
+		setmoveIndex(newIndex)
+		setGame(new Chess(positions[newIndex].fen))
+		setLastMove(positions[newIndex].lastMove)
+	}
+
+	// Moves forward in move history
+	function moveForward() {
+		if (moveIndex >= positions.length - 1) return
+		const newIndex = moveIndex + 1
+		setmoveIndex(newIndex)
+		setGame(new Chess(positions[newIndex].fen))
+		setLastMove(positions[newIndex].lastMove)
+	}
+
+	// Expose methods to parent component: ChessReels
+	useImperativeHandle(ref, () => ({
+		moveBack,
+		moveForward,
+	}))
 
 	// Completes pawn promotion and make move
 	function completePromotion(promotionPiece) {
@@ -104,7 +134,7 @@ function ChessBoard() {
 
 	// Attempts to make a move and returns whether it was successful.
 	function makeMove(sourceSquare, targetSquare, promotionPiece) {
-
+		const move = sourceSquare + targetSquare + (promotionPiece ?? "")
 		const gameCopy = new Chess(game.fen()) // Make copy of the current game
 
 		try {
@@ -115,7 +145,16 @@ function ChessBoard() {
 			})
 			setPendingPromotion(null)
 			setGame(gameCopy)
+			setLastMove(move)
 			setSelectedSquare(null)
+			setPositions([ // If new move is made remove all future positions and add new one
+    			...positions.slice(0, moveIndex + 1),
+				{
+					fen: gameCopy.fen(),
+					lastMove: move,
+				},
+			])
+			setmoveIndex(moveIndex + 1) 
 			if (gameCopy.isGameOver()) {
 				setGameover(true)
 			}
@@ -148,7 +187,7 @@ function ChessBoard() {
 					onSquareClick, // Handle square click events
 					canDragPiece,  // Determine if piece can be dragged
 					numericNotationStyle: {fontSize: '1.2rem'}, // Font size for numeric notation
-					squareStyles: getSquareStyles(game, selectedSquare, undefined), // Apply styles to squares
+					squareStyles: getSquareStyles(game, selectedSquare, lastMove), // Apply styles to squares
 				}}
 			/>
 			<PromotionChooser
@@ -158,5 +197,5 @@ function ChessBoard() {
 		</div>
 
 	)
-};
+})
 export default ChessBoard
