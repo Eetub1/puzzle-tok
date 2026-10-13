@@ -61,7 +61,7 @@ const getToken = () => {
 
 
 const getAccessToken = async (response) => {
-	response = await fetch(`/api/auth/getAuth`)
+	response = await fetch(`/api/oauth/getAuth`)
 	console.log('auth result', response)
 	return response.json()
 }

@@ -17,9 +17,9 @@ app.use(cookieParser())
 
 app.use("/api/auth", authRouter)
 app.use("/api/puzzles", puzzlesRouter)
-app.use("/api/auth", oauthRouter)
-app.use("/api/user", userRouter)
+app.use("/api/oauth", oauthRouter)
 app.use("/api/user/preferences", prefRouter)
+app.use("/api/user", userRouter)
 
 app.get("/", (req, res) => {
     //res.send("<a href='/api/auth/getAuth'>auth</a>")

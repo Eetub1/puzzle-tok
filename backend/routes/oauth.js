@@ -4,7 +4,7 @@ const base_url = `https://lichess.org`
 const CLIENT_ID = 'puzzle-tok'
 const BACKEND_URL = 'http://localhost:5173' // TODO: move
 //const BACKEND_URL = '/api/puzzles'
-const token_url = `${BACKEND_URL}/api/auth/token`
+const token_url = `${BACKEND_URL}/api/oauth/token`
 import {createHash} from 'node:crypto'
 
 const challenge = 'kissa123trololol1234512345123451111111111111111111111111111111111111111111111111111111' //TODO: auto gen
