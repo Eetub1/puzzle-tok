@@ -4,6 +4,7 @@ import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import Profile from "./Profile.jsx"
 import "./ChessReels.css"
+import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 
