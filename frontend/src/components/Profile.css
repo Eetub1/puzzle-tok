@@ -7,8 +7,8 @@
 }
 
 #account-card, #chess-accounts-card {
-    margin-top: 8px;
-    width: 500px;
+    margin-top: 25px;
+    width: min(600px, 90%);
     background-color: #0f0f11;
     color: white;
 }
@@ -18,4 +18,18 @@
     background: none;
     border-color: red;
     color: red
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+#send-verification-btn {
+    padding: 0;
+}
+
+.cool-btn {
+    padding: 0px;
+    margin-left: 10px;
 }
