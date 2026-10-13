@@ -64,7 +64,7 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     const query = new URLSearchParams({
         "difficulty": req.query.difficulty,
-        "nb": 1, 
+        "nb": 5, 
         "color": req.query.color
 	})
 
