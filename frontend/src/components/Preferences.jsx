@@ -6,7 +6,7 @@ const Preferences = ({user_id, difficulty, color, setDifficulty, setColor}) => {
 		event.preventDefault()
 
 		try {
-			const data = await prefChange({ color, difficulty,user_id })
+			const data = await prefChange({ color, difficulty, user_id })
 			console.log(data)
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)

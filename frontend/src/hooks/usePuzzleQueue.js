@@ -84,7 +84,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
-	}, [puzzleQueue.length, menuOpen, dailyPuzzle])
+	}, [puzzleQueue.length, menuOpen, dailyPuzzle, color, difficulty])
 
 	// Handle moving to next puzzle in queue
 	function handleNextPuzzle() {
