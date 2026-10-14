@@ -49,7 +49,7 @@ const getBatch = async (signal, difficulty, color) => {
 		themes: puzzles.puzzle.themes
 	}))
 }
-	
+
 const getPuzzleById = async (id, signal) => {
 	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()

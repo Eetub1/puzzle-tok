@@ -1,6 +1,8 @@
 import express, { json } from "express"
 import pool from "../db/db.js"
 const prefRouter = express.Router()
+const allowed_colors = ['WHITE','BLACK', 'BOTH']
+const allowed_difficulty = ['EASIEST','EASIER', 'NORMAL', 'HARDER', 'HARDEST']
 
 //TODO: refactor to only 1 function per reference
 
@@ -46,7 +48,16 @@ prefRouter.get("/", async (req, res) => {
 })
 
 prefRouter.post("/", (req, res) => {
-    const { user_id, color, difficulty } = req.body
+    const { user_id, color, difficulty } = req.body ?? {}
+
+    if (!allowed_colors.includes(color.toUpperCase())) {
+        return res.status(400).json({ error: "Unknown color" })
+    }
+
+    if (!allowed_difficulty.includes(difficulty.toUpperCase())) {
+        return res.status(400).json({ error: "Unknown difficulty" })
+    }
+
     console.log('changed color for id',user_id, "color:", color)
     changeColorPreference(user_id, color, difficulty)
     changeDifficultyPreference(user_id, color, difficulty)
