@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react'
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
@@ -7,7 +7,8 @@ import { getSquareStyles } from './SquareStyles.jsx'
 import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved}, ref) {
+	const solutionUsed = useRef(false) //Tracker to see if solution or hint button was used.
 	const [game, setGame] = useState(() => new Chess(puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
 	const [puzzleStatus, setPuzzleStatus] = useState('playing')
@@ -43,8 +44,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
 
-		
-	}, [game, puzzleMoveIndex, playerColor, puzzleStatus])
+	}, [game, puzzleMoveIndex, playerColor])
+
+	// Notify parent when the puzzle is solved without using the solution button
+	useEffect(() => {
+		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
+			onSolved?.(puzzle)
+		}
+	}, [puzzleStatus])
 
 	// Move back in puzzle
 	function moveBack() {
@@ -85,11 +92,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		if (puzzleStatus === 'solved') {
 			return
 		}
-		if(hintSquare) {
-			setHintSquare(null)
-			setMoveFeedback(null)
-			return
-		}
+		solutionUsed.current = true
 		const nextMove = puzzleMoves[puzzleMoveIndex]
 		if(!nextMove) {
 			return
@@ -104,6 +107,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		if (puzzleStatus === 'solved') {
 			return
 		}
+		solutionUsed.current = true
 		const nextMove = puzzleMoves[puzzleMoveIndex]
 		if(!nextMove) {
 			return
@@ -272,7 +276,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 				}, 1000)
 				if(!failedPuzzle.current) {
 					setFailedPuzzle(puzzle.id).then((result) => {
-					console.log(result.message)
+						console.log(result.message)
 					}).catch((error) => {
 						console.error(error)
 					})
@@ -283,12 +287,12 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 
 			setMoveFeedback('right')
 			setFeedbackMark({
-    			square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
-    			type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
+				square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
+				type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
 			})
 			if (!gameCopy.isCheckmate()) {
 				setTimeout(() => {
-				setFeedbackMark(null)
+					setFeedbackMark(null)
 				},700)
 			}
 			setPendingPromotion(null)
@@ -371,7 +375,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			top: `${((8 - Number(square[1])) * 12.5)}%`,
 		}
 	}
-	
+
 
 	return (
 	//Render the chessboard with handlers.
@@ -395,14 +399,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 						squareStyles: getSquareStyles(game, selectedSquare, lastMove, hintSquare, hoveredSquare), // Apply styles to squares
 					}}
 				/>
-					{feedbackMark && (
-						<div className="feedback-mark-container" style={getMarkPosition(feedbackMark.square)}>
-							<div className={`feedback-mark-${feedbackMark.type}`}>
-								{feedbackMark.type === 'right' ? '✓' : feedbackMark.type === 'wrong' ? '✗' : '#'}
-							</div>
+				{feedbackMark && (
+					<div className="feedback-mark-container" style={getMarkPosition(feedbackMark.square)}>
+						<div className={`feedback-mark-${feedbackMark.type}`}>
+							{feedbackMark.type === 'right' ? '✓' : feedbackMark.type === 'wrong' ? '✗' : '#'}
 						</div>
-					)}
-			</div>			
+					</div>
+				)}
+			</div>
 			{puzzleStatus === "solved" ? <p>Puzzle ratkaistu</p> : null}
 			<PromotionChooser
 				pendingPromotion={pendingPromotion}
