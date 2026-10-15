@@ -94,7 +94,7 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 				) : (
 					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
-						{menuOpen === "YourMatches" && <Matches/>}
+						{menuOpen === "YourMatches" && <Matches setMessage={setMessage}/>}
 						{menuOpen === "Openings" && <ChessBoard/>}
 						{menuOpen === "Profile" && <Profile setMessage={setMessage} handleLogout={handleLogout}/>}
 					</div>

@@ -20,11 +20,15 @@ const Profile = ({ setMessage, handleLogout }) => {
 				setLichess(data?.lichess ?? "")
 				setChessCom(data?.chessCom ?? "")
 			} catch (error) {
-				console.error("Failed to fetch user profile:", error)
+				// console.error("Failed to fetch user profile:", error)
+				setMessage({ message: "Failed to fetch user profile: " + error.message, isError: true })
+				setTimeout(() => {
+					setMessage(null)
+				}, 4000)
 			}
 		}
 		fetchData()
-	}, [])
+	}, [setMessage])
 
 	console.log("Profile data:", profile)
 
@@ -117,7 +121,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 					<div className="card-row">
 						{!profile?.emailVerified && (
 							<button id="send-verification-btn" type="button" className="btn btn-link" onClick={handleSendVerification}>
-								Send verification email
+								Send verification email TODO!
 							</button>
 						)}
 
