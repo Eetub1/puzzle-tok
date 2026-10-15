@@ -24,7 +24,7 @@ const Matches = () => {
 			try {
 				const games = await getUserGames(GAMES_PER_SITE)
 				localStorage.setItem("userGames", JSON.stringify(games)) // Store the fetched games in local storage
-				console.log("Fetched matches:", games)
+				// console.log("Fetched matches:", games)
 				setMatches(games)
 			} catch (error) {
 				console.error("Error fetching matches:", error)
@@ -38,7 +38,7 @@ const Matches = () => {
 		const fetchData = async () => {
 			try {
 				const data = await getUserProfile()
-				console.log(data)
+				// console.log(data)
 				setProfile(data)
 			} catch (error) {
 				console.error("Failed to fetch user profile:", error)
@@ -84,11 +84,11 @@ const Matches = () => {
 			return {...match, outcome, opponent}
 		})
 	}
-	const processedMatches =processMatches(matches)
+	const processedMatches = processMatches(matches)
 
 
-	const getGameOutcomeElement = (outcome) => {
-		console.log(outcome)
+	const getGameOutcomeElement = outcome => {
+		// console.log(outcome)
 		switch (outcome) {
 			case "win":
 				return <div className="badge bg-success text-white">W</div>
@@ -99,15 +99,34 @@ const Matches = () => {
 		}
 	}
 
-	// filter matches based on the selected filter here
+	const filterMatches = matches => {
+		switch (filter) {
+			case "all":
+				return matches
+			case "rapid":
+				return matches.filter(match => match.timeClass === "rapid")
+			case "blitz":
+				return matches.filter(match => match.timeClass === "blitz")
+			case "bullet":
+				return matches.filter(match => match.timeClass === "bullet")
+			case "lichess":
+				return matches.filter(match => match.source === "lichess")
+			case "chesscom":
+				return matches.filter(match => match.source === "chesscom")
+			default:
+				return matches
+		}
+	}
+	const filteredMatches = filterMatches(processedMatches)
 
-	console.log("Profile:", profile)
+
+	// console.log("Profile:", profile)
 
 	return (
 		<div className="your-matches">
 			<div id="matches-header">
 				<h2>Your Matches</h2>
-				<p>{matches.length} recent games</p>
+				<p>{filteredMatches.length} games</p>
 				{profile && !profile.lichess && !profile.chessCom && <p>To fetch matches, please add your Lichess or Chess.com username in your profile.</p>}
 			</div>
 
@@ -116,11 +135,12 @@ const Matches = () => {
 					<button className="btn btn-link" onClick={() => setFilter("all")}>All</button>
 					<button className="btn btn-link" onClick={() => setFilter("rapid")}>Rapid</button>
 					<button className="btn btn-link" onClick={() => setFilter("blitz")}>Blitz</button>
+					<button className="btn btn-link" onClick={() => setFilter("bullet")}>Bullet</button>
 					<button className="btn btn-link" onClick={() => setFilter("lichess")}>Lichess</button>
-					<button className="btn btn-link" onClick={() => setFilter("chessCom")}>Chess.com</button>
+					<button className="btn btn-link" onClick={() => setFilter("chesscom")}>Chess.com</button>
 				</div>
 				<div id="matches-container">
-					{processedMatches.map((match) => (
+					{filteredMatches.map((match) => (
 						<Card key={match.id} className="match-card">
 							{getGameOutcomeElement(match.outcome)}
 							<div className="match-info">
