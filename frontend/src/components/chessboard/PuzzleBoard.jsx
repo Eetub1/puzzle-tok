@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react'
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './PuzzleBoard.css'
@@ -8,7 +8,8 @@ import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleS
 import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved}, ref) {
+	const solutionUsed = useRef(false) //Tracker to see if solution or hint button was used.
 	const savedState = puzzle.savedState
 	const [game, setGame] = useState(() => new Chess(savedState?.fen ?? puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(savedState?.puzzleMoveIndex ?? 0)
@@ -46,8 +47,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			computerMove(nextMove, 'Computer move failed')
 		}, 700) // Delay computer move
 
-		
-	}, [game, puzzleMoveIndex, playerColor, puzzleStatus])
+	}, [game, puzzleMoveIndex, playerColor])
+
+	// Notify parent when the puzzle is solved without using the solution button
+	useEffect(() => {
+		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
+			onSolved?.(puzzle)
+		}
+	}, [puzzleStatus])
 
 	// Move back in puzzle
 	function moveBack() {
@@ -89,11 +96,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		if (puzzleStatus === 'solved') {
 			return
 		}
-		if(hintSquare) {
-			setHintSquare(null)
-			setMoveFeedback(null)
-			return
-		}
+		solutionUsed.current = true
 		const nextMove = puzzleMoves[puzzleMoveIndex]
 		if(!nextMove) {
 			return
@@ -108,6 +111,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 		if (puzzleStatus === 'solved' || puzzleStatus === 'viewing') {
 			return
 		}
+		solutionUsed.current = true
 		const nextMove = puzzleMoves[puzzleMoveIndex]
 		if(!nextMove) {
 			return
@@ -286,7 +290,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 				}, 1000)
 				if(!failedPuzzle.current) {
 					setFailedPuzzle(puzzle.id).then((result) => {
-					console.log(result.message)
+						console.log(result.message)
 					}).catch((error) => {
 						console.error(error)
 					})
@@ -298,8 +302,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false}, r
 			setMoveFeedback('right')
 			
 			setFeedbackMark({
-    			square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
-    			type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
+				square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
+				type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
 			})
 			if (!gameCopy.isCheckmate()) {
 				setTimeout(() => {
