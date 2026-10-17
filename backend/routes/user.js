@@ -74,7 +74,8 @@ userRouter.get("/profile", async (req, res) => {
         }
 
         return res.json({
-            email: profile.email_verified_at ? profile.email : null, // Only return email if it has been verified
+            email: profile.email,
+            emailVerified: profile.email_verified_at !== null,
             username: profile.username,
             lichess: profile.lichess_username,
             chessCom: profile.chesscom_username,
