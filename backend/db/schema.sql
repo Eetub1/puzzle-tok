@@ -31,3 +31,10 @@ CREATE TABLE failed_puzzles (
 
     UNIQUE (user_id, puzzle_id)
 );
+
+CREATE TABLE solved_puzzles (
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    puzzle_fen text        NOT NULL,
+    solved_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, puzzle_fen)
+);

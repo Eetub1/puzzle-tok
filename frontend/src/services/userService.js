@@ -49,9 +49,44 @@ const getUserGames = async (limit = 10) => {
 	return data
 }
 
+const getStreak = async () => {
+    const response = await fetch(`/api/user/streak`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${getToken()}` }
+    })
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(`Couldn't get streak: ${data.error}`)
+    }
+
+    return data.streak
+}
+
+
+const recordSolvedPuzzle = async fen => {
+    const response = await fetch(`/api/user/streak`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getToken()}` },
+        body: JSON.stringify({ fen }),
+    })
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(`Couldn't record solved puzzle: ${data.error}`)
+    }
+
+    return data.streak
+}
+
 
 export {
 	updateUserChessAccounts,
 	getUserProfile,
 	getUserGames,
+	getStreak,
+	recordSolvedPuzzle,
 }
