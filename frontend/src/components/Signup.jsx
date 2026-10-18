@@ -25,6 +25,10 @@ const Signup = ({ setMessage }) => {
 				setMessage(null)
 			}, 4000)
 		} catch (error) {
+			setMessage({ message: "Error with signup: " + error, isError: true})
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
 			console.log("Error with signup: ", error)
 		}
 	}
