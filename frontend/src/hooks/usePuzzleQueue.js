@@ -27,6 +27,10 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 
 	// Fetch puzzles when menuOpen is "Puzzles" and queue is empty, or fetch daily puzzle when menuOpen is "DailyPuzzle"
 	useEffect(() => {
+		//console.log("in useEffect difficulty", difficulty)
+		//console.log("in useEffect color", color)
+		//console.log("in useEffect menuOpen", menuOpen)
+
 		if (menuOpen === "DailyPuzzle") {
 			if (dailyPuzzle) {
 				return
@@ -65,6 +69,9 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 						getBatch(controller.signal, difficulty, color),
 						getFailedPuzzles(controller.signal),
 					])
+
+					console.log('get batch: ', batch)
+
 					const failedPuzzles = await Promise.all(
 						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId))
 					)

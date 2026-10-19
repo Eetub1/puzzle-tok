@@ -62,11 +62,20 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     //console.log('QUERY HERE', req.query)
 
-    const query = new URLSearchParams({
-        "difficulty": req.query.difficulty,
-        "nb": 5, 
-        "color": req.query.color
-	})
+    let query = new URLSearchParams({})
+
+    if (req.query.color === 'both') {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 5
+        })
+    } else {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 1, 
+            "color": req.query.color
+        })
+    }
 
     console.log("Sending multiple puzzles")
 

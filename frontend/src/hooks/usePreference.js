@@ -12,7 +12,7 @@ const usePreference = () => {
 			const init_prefs = await getInitialPreferences()
 			setColor(init_prefs.color)
 			setDifficulty(init_prefs.difficulty)
-			console.log(init_prefs)
+			console.log('init prefs here: ',init_prefs)
 		}
 		fetch_prefs()
 	},[])

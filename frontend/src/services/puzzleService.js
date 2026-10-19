@@ -29,6 +29,9 @@ const getNextPuzzle = async (response) => {
 
 const getBatch = async (signal, difficulty, color) => {
 
+	console.log('service color:', color)
+	console.log('service difficulty:', difficulty)
+
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
 		"color": color

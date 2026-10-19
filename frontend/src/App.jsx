@@ -1,23 +1,16 @@
 import { useState} from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
-
 import ChessReels from "./components/ChessReels"
 import Login from "./components/Login.jsx"
 import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
 import { logout } from "./services/authService.js"
-import { usePuzzleQueue } from "./hooks/usePuzzleQueue.js"
-import { usePreference } from "./hooks/usePreference.js"
 import VerifyEmail from "./components/VerifyEmail.jsx"
-import Preferences from "./components/Preferences.jsx"
 
 const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
-	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {difficulty, color, setDifficulty, setColor} = usePreference()
-	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen,difficulty, color})
 
 	const handleLogout = () => {
 		logout()
@@ -31,20 +24,7 @@ const App = () => {
 					?
 					<div>
 						{message && <Message data={message}/>}
-						<ChessReels
-							key={menuOpen}
-							handleLogout={handleLogout}
-							handleNextPuzzle={handleNextPuzzle}
-							handlePreviousPuzzle={handlePreviousPuzzle}
-							menuOpen={menuOpen}
-							setMenuOpen={setMenuOpen}
-							setMessage={setMessage}
-							currentPuzzle={currentPuzzle}
-							previousPuzzle={previousPuzzle}
-							nextPuzzle={nextPuzzle}
-						>
-						</ChessReels>
-						<Preferences user_id={user.id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>
+						<ChessReels handleLogout={handleLogout} setMessage={setMessage} user_id={user.id}/>
 					</div>
 					: <Navigate to="/login"/>}
 				/>
