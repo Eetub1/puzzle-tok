@@ -142,6 +142,12 @@ const Profile = ({ setMessage, handleLogout }) => {
 						<p>Total failed puzzle attempts: {profile?.puzzleStats?.failedAttempts || 0}</p>
 					</div>
 					<div className="card-row">
+						<p>Solved failed attempts: {profile?.puzzleStats?.solvedFailedAttempts || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Best solved rating: {profile?.puzzleStats?.bestSolvedRating || 0}</p>
+					</div>
+					<div className="card-row">
 						<p>Longest streak: {profile?.puzzleStats?.longestStreak || 0}</p>
 					</div>
 				</Card.Body>

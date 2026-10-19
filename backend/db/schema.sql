@@ -36,6 +36,7 @@ CREATE TABLE puzzle_attempts (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     puzzle_id  text        NOT NULL,
+    puzzle_rating integer     NOT NULL,
     success    boolean     NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now()
 );

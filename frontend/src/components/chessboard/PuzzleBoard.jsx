@@ -54,7 +54,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	useEffect(() => {
 		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
 			onSolved?.(puzzle)
-			setPuzzleAttempt(puzzle.id, true).then((result) => {
+			setPuzzleAttempt(puzzle.id, puzzle.rating, true).then((result) => {
 				console.log(result.message)
 			}).catch((error) => {
 				console.error(error)
@@ -126,7 +126,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setAttemptFailed(true)
 		setPuzzleStatus('playing')
 		if(!failedPuzzle.current) {
-			setFailedPuzzle(puzzle.id).then((result) => {
+			setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
 			console.log(result.message)
 			}).catch((error) => {
 				console.error(error)
@@ -295,7 +295,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 					setPuzzleStatus('playing')
 				}, 1000)
 				if(!failedPuzzle.current) {
-					setFailedPuzzle(puzzle.id).then((result) => {
+					setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
 						console.log(result.message)
 					}).catch((error) => {
 						console.error(error)

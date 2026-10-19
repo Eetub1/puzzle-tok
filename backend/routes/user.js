@@ -79,7 +79,7 @@ userRouter.get("/profile", async (req, res) => {
 
         const result2 = await pool.query(`
             SELECT COUNT(*) AS total_attempts,
-                   SUM(CASE WHEN success THEN 1 ELSE 0 END) AS successful_attempts
+                SUM(CASE WHEN success THEN 1 ELSE 0 END) AS successful_attempts
             FROM puzzle_attempts
             WHERE user_id = $1`, 
             [user.id]
@@ -89,12 +89,40 @@ userRouter.get("/profile", async (req, res) => {
 
         const result3 = await pool.query(`
             SELECT COUNT(*) AS total_attempts,
-                   SUM(CASE WHEN success THEN 0 ELSE 1 END) AS failed_attempts
+                SUM(CASE WHEN success THEN 0 ELSE 1 END) AS failed_attempts
             FROM puzzle_attempts
             WHERE user_id = $1`, 
             [user.id]
         )
-        const puzzleStats2 = result3.rows[0]
+        const failedAttempts = result3.rows[0]
+
+        const result4 = await pool.query(`
+            SELECT COUNT(DISTINCT solved.puzzle_id) AS solved_failed_attempts
+            FROM puzzle_attempts AS solved
+            WHERE solved.user_id = $1
+                AND solved.success = TRUE
+                AND EXISTS (
+                    SELECT 1
+                    FROM puzzle_attempts AS failed
+                    WHERE failed.user_id = solved.user_id
+                        AND failed.puzzle_id = solved.puzzle_id
+                        AND failed.success = FALSE
+                        AND (failed.created_at, failed.id) < (solved.created_at, solved.id)
+                )`,
+            [user.id]
+        )
+        const solvedFailedAttempts = result4.rows[0]
+
+        const result5 = await pool.query(`
+            SELECT puzzle_rating AS best_rating
+            FROM puzzle_attempts
+            WHERE user_id = $1 AND success = TRUE
+            ORDER BY puzzle_rating DESC
+            LIMIT 1`,
+            [user.id]
+        )
+        const bestSolvedRating = result5.rows[0]
+
 
         return res.json({
             email: profile.email,
@@ -104,7 +132,9 @@ userRouter.get("/profile", async (req, res) => {
             chessCom: profile.chesscom_username,
             puzzleStats: {
                 totalSolved: puzzleStats.successful_attempts,
-                failedAttempts: puzzleStats2.failed_attempts,
+                failedAttempts: failedAttempts.failed_attempts,
+                solvedFailedAttempts: solvedFailedAttempts.solved_failed_attempts,
+                bestSolvedRating: bestSolvedRating?.best_rating ?? 0,
                 longestStreak: 0, 
             },
         })
