@@ -5,6 +5,7 @@ import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
 import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
+import { setPuzzleAttempt } from "../../services/puzzleAttemptService.js"
 import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
@@ -53,6 +54,11 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	useEffect(() => {
 		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
 			onSolved?.(puzzle)
+			setPuzzleAttempt(puzzle.id, true).then((result) => {
+				console.log(result.message)
+			}).catch((error) => {
+				console.error(error)
+			})
 		}
 	}, [puzzleStatus])
 

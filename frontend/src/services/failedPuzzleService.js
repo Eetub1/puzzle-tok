@@ -1,4 +1,5 @@
 import { getToken } from "./authService"
+import { setPuzzleAttempt } from "./puzzleAttemptService"
 
 const setFailedPuzzle = async (puzzleId) => {
     const response = await fetch(`/api/user/failed`, {
@@ -10,7 +11,9 @@ const setFailedPuzzle = async (puzzleId) => {
         body: JSON.stringify({ puzzleId})
     })
     const data = await response.json()
-
+    setPuzzleAttempt(puzzleId, false).catch((error) => {
+        console.error("Failed to set puzzle attempt:", error)
+    })
     if (!response.ok) {
         throw new Error(data.error)
     }

@@ -3,6 +3,7 @@ import pool from "../db/db.js"
 import { authenticateToken } from "../middleware/auth.js"
 import { getLichessGames, getChessComGames } from "../utils/games.js"
 import { saveFailedPuzzle, getFailedPuzzle, removeFailedPuzzle } from "../controllers/failedPuzzleController.js"
+import { savePuzzleAttempt } from "../controllers/puzzleAttemptsController.js"
 
 const userRouter = express.Router()
 
@@ -13,6 +14,9 @@ userRouter.use(authenticateToken)
 userRouter.post("/failed", saveFailedPuzzle)
 userRouter.get("/failed", getFailedPuzzle)
 userRouter.delete("/failed/:puzzleId", removeFailedPuzzle)
+
+userRouter.post("/puzzle-attempts", savePuzzleAttempt)
+
 
 userRouter.post("/chess-accounts", async (req, res) => {
     const { usernames } = req.body ?? {}
@@ -73,12 +77,36 @@ userRouter.get("/profile", async (req, res) => {
             return res.status(404).json({ error: "User not found" })
         }
 
+        const result2 = await pool.query(`
+            SELECT COUNT(*) AS total_attempts,
+                   SUM(CASE WHEN success THEN 1 ELSE 0 END) AS successful_attempts
+            FROM puzzle_attempts
+            WHERE user_id = $1`, 
+            [user.id]
+            
+        )
+        const puzzleStats = result2.rows[0]
+
+        const result3 = await pool.query(`
+            SELECT COUNT(*) AS total_attempts,
+                   SUM(CASE WHEN success THEN 0 ELSE 1 END) AS failed_attempts
+            FROM puzzle_attempts
+            WHERE user_id = $1`, 
+            [user.id]
+        )
+        const puzzleStats2 = result3.rows[0]
+
         return res.json({
             email: profile.email,
             emailVerified: profile.email_verified_at !== null,
             username: profile.username,
             lichess: profile.lichess_username,
             chessCom: profile.chesscom_username,
+            puzzleStats: {
+                totalSolved: puzzleStats.successful_attempts,
+                failedAttempts: puzzleStats2.failed_attempts,
+                longestStreak: 0, 
+            },
         })
     } catch (error) {
         console.log("Error retrieving user profile:", error)

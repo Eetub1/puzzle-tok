@@ -131,6 +131,22 @@ const Profile = ({ setMessage, handleLogout }) => {
 
 				</Card.Body>
 			</Card>
+
+			<Card id="puzzle-stats-card">
+				<Card.Header>Puzzle Stats</Card.Header>
+				<Card.Body>
+					<div className="card-row">
+						<p>Total puzzles solved: {profile?.puzzleStats?.totalSolved || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Total failed puzzle attempts: {profile?.puzzleStats?.failedAttempts || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Longest streak: {profile?.puzzleStats?.longestStreak || 0}</p>
+					</div>
+				</Card.Body>
+			</Card>
+
 			<Card id="chess-accounts-card">
 				<Card.Header>Chess Accounts</Card.Header>
 

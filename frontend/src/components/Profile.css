@@ -6,7 +6,7 @@
     color: white;
 }
 
-#account-card, #chess-accounts-card {
+#account-card, #chess-accounts-card, #puzzle-stats-card {
     margin-top: 25px;
     width: min(600px, 90%);
     background-color: #0f0f11;
