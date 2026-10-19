@@ -36,8 +36,6 @@ const Preferences = ({user_id, difficulty, color, setDifficulty, setColor}) => {
 				<br></br>
 				<input type="submit" value="Submit"></input>
 			</form>
-			<p>current color: {color}</p>
-			<p>current difficulty: {difficulty}</p>
 		</div>
 	)
 }
