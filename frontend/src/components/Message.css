@@ -1,0 +1,30 @@
+.message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 2px solid;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+}
+
+.messageError {
+    border-color: red;
+}
+
+.messageSuccess {
+    border-color: green;
+}
+
+.messageText {
+    color: black;
+    text-align: center;
+    margin: 0;
+}

@@ -1,7 +1,9 @@
+import "./Message.css"
+
 const Message = ({ data }) => {
 	return (
-		<div className="message">
-			<p className={data.isError ? "messageError message" : "messageSuccess message"}>{data.message}</p>
+		<div className={data.isError ? "message messageError" : "message messageSuccess"}>
+			<p className="messageText">{data.message}</p>
 		</div>
 	)
 }
