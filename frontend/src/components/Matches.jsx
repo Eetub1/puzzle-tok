@@ -127,6 +127,7 @@ const Matches = ({ setMessage }) => {
 			</div>
 
 			<div id="matches-section">
+				{processedMatches.length > 0 &&
 				<div id="filter-options">
 					<button className="btn" onClick={() => setFilter("all")}>All</button>
 					<button className="btn" onClick={() => setFilter("rapid")}>Rapid</button>
@@ -134,7 +135,7 @@ const Matches = ({ setMessage }) => {
 					<button className="btn" onClick={() => setFilter("bullet")}>Bullet</button>
 					<button className="btn" onClick={() => setFilter("lichess")}>Lichess</button>
 					<button className="btn" onClick={() => setFilter("chesscom")}>Chess.com</button>
-				</div>
+				</div>}
 				{renderMatches(processedMatches)}
 			</div>
 		</div>

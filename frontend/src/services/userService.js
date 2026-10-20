@@ -50,8 +50,25 @@ const getUserGames = async (limit = 10) => {
 }
 
 
+const resendEmailVerification = async () => {
+	const response = await fetch("/api/user/resend-verification", {
+		method: "POST",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Email resend failed: ${data.error}`)
+	}
+
+	return data
+}
+
+
 export {
 	updateUserChessAccounts,
 	getUserProfile,
 	getUserGames,
+	resendEmailVerification
 }

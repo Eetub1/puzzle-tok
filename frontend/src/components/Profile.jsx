@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Card } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
-
+import { resendEmailVerification } from "../services/userService"
 
 const Profile = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -28,14 +28,27 @@ const Profile = ({ setMessage, handleLogout }) => {
 			}
 		}
 		fetchData()
-	}, [setMessage])
+	}, [setMessage]) // this shouldnt be a dependency, but eslint is complaining about it
 
-	console.log("Profile data:", profile)
 
-	const handleSendVerification = () => {
+	const handleSendVerification = async () => {
 		// This should send a new verification email to the user
-		console.log("TODO")
+		try {
+			const result = await resendEmailVerification()
+			console.log(result)
+			setMessage({ message: "Email verification link resent!", isError: false})
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+		} catch (error) {
+			console.log("Couldn't resend email verification link: " + error)
+			setMessage({ message: "Couldn't resend email verification link: " + error, isError: true})
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+		}
 	}
+
 
 	const handleUsernameChanges = async (accounts) => {
 		if (!accounts.lichess && !accounts.chessCom) {
@@ -85,6 +98,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 		if (saved) setEditingLichess(false)
 	}
 
+
 	const handleChessComEdit = async (showEdit) => {
 		if (showEdit) {
 			setChessCom(profile?.chessCom ?? "")
@@ -99,6 +113,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 
 		if (saved) setEditingChessCom(false)
 	}
+
 
 	return (
 
@@ -121,7 +136,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 					<div className="card-row">
 						{!profile?.emailVerified && (
 							<button id="send-verification-btn" type="button" className="btn btn-link" onClick={handleSendVerification}>
-								Send verification email TODO!
+								Send verification email
 							</button>
 						)}
 
