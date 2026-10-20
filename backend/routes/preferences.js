@@ -32,7 +32,7 @@ const changeDifficultyPreference = async (user_id, color, difficulty) => {
     )
     
     const insert_res = await pool.query(
-        `INSERT INTO preferences (user_id, difficulty, color) SELECT $1,$2,$3 WHERE NOT EXISTS (SELECT user_id FROM preferences P where P.user_id = $1)`,
+        `INSERT INTO preferences (user_id, color, difficulty) SELECT $1,$2,$3 WHERE NOT EXISTS (SELECT user_id FROM preferences P where P.user_id = $1)`,
         [user_id,color,difficulty],
     )
 
