@@ -27,10 +27,20 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal) => {
-	const response = await fetch('/api/puzzles/batch', {
-		signal // Pass AbortController signal to fetch
+const getBatch = async (signal, difficulty, color) => {
+
+	console.log('service color:', color)
+	console.log('service difficulty:', difficulty)
+
+	const query = new URLSearchParams({
+		"difficulty": difficulty,
+		"color": color
 	})
+
+	const response = await fetch(`/api/puzzles/batch?${query}`, {
+		signal, // Pass AbortController signal to fetch
+	})
+
 	const data = await response.json()
 	console.log('batch data:', data)
 	return data.puzzles.map(puzzles => ({
@@ -42,7 +52,7 @@ const getBatch = async (signal) => {
 		themes: puzzles.puzzle.themes
 	}))
 }
-	
+
 const getPuzzleById = async (id, signal) => {
 	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()

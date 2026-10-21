@@ -6,7 +6,7 @@ function shuffle(puzzles) {
 	return [...puzzles].sort(() => Math.random() - 0.5)
 }
 
-export function usePuzzleQueue({ menuOpen }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -27,6 +27,10 @@ export function usePuzzleQueue({ menuOpen }) {
 
 	// Fetch puzzles when menuOpen is "Puzzles" and queue is empty, or fetch daily puzzle when menuOpen is "DailyPuzzle"
 	useEffect(() => {
+		//console.log("in useEffect difficulty", difficulty)
+		//console.log("in useEffect color", color)
+		//console.log("in useEffect menuOpen", menuOpen)
+
 		if (menuOpen === "DailyPuzzle") {
 			if (dailyPuzzle) {
 				return
@@ -62,9 +66,12 @@ export function usePuzzleQueue({ menuOpen }) {
 			const puzzleBatch = async () => {
 				try {
 					const [batch, failedPuzzleIds] = await Promise.all([
-						getBatch(controller.signal),
+						getBatch(controller.signal, difficulty, color),
 						getFailedPuzzles(controller.signal),
 					])
+
+					console.log('get batch: ', batch)
+
 					const failedPuzzles = await Promise.all(
 						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId))
 					)
@@ -84,7 +91,7 @@ export function usePuzzleQueue({ menuOpen }) {
 				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
-	}, [puzzleQueue.length, menuOpen, dailyPuzzle])
+	}, [puzzleQueue.length, menuOpen, dailyPuzzle, color, difficulty])
 
 	// Handle moving to next puzzle in queue
 	function handleNextPuzzle() {

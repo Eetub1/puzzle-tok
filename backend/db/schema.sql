@@ -31,3 +31,9 @@ CREATE TABLE failed_puzzles (
 
     UNIQUE (user_id, puzzle_id)
 );
+
+CREATE TABLE preferences (
+    user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    color      text        NOT NULL,
+    difficulty text        NOT NULL
+);
