@@ -1,14 +1,12 @@
 import { useState} from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
-
 import ChessReels from "./components/ChessReels"
 import Login from "./components/Login.jsx"
 import Signup from "./components/Signup.jsx"
 import Message from "./components/Message.jsx"
-import VerifyEmail from "./components/VerifyEmail.jsx"
-
 import { logout } from "./services/authService.js"
+import VerifyEmail from "./components/VerifyEmail.jsx"
 
 const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
@@ -24,10 +22,10 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={user
 					?
-					<>
+					<div>
 						{message && <Message data={message}/>}
-						<ChessReels handleLogout={handleLogout} setMessage={setMessage}></ChessReels>
-					</>
+						<ChessReels handleLogout={handleLogout} setMessage={setMessage} user_id={user.id}/>
+					</div>
 					: <Navigate to="/login"/>}
 				/>
 

@@ -2,6 +2,7 @@ import express from "express"
 import pool from "../db/db.js"
 import { authenticateToken } from "../middleware/auth.js"
 import { getLichessGames, getChessComGames } from "../utils/games.js"
+import { sendVerificationEmail } from "../utils/mail.js"
 import { saveFailedPuzzle, getFailedPuzzle, removeFailedPuzzle } from "../controllers/failedPuzzleController.js"
 
 const userRouter = express.Router()
@@ -72,9 +73,11 @@ userRouter.get("/profile", async (req, res) => {
         if (!profile) {
             return res.status(404).json({ error: "User not found" })
         }
+        console.log(profile.email_verified_at)
 
         return res.json({
-            email: profile.email_verified_at ? profile.email : null, // Only return email if it has been verified
+            email: profile.email,
+            emailVerified: profile.email_verified_at !== null,
             username: profile.username,
             lichess: profile.lichess_username,
             chessCom: profile.chesscom_username,
@@ -146,6 +149,33 @@ userRouter.get("/streak", async (req, res) => {
         return res.json({ streak: result.rows[0].streak })
     } catch (error) {
         console.error("Error retrieving streak:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+userRouter.post("/resend-verification", async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, email, username, email_verified_at
+             FROM users
+             WHERE id = $1`,
+            [req.user.id],
+        )
+        const userRow = result.rows[0]
+
+        if (!userRow) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        if (userRow.email_verified_at !== null) {
+            return res.status(400).json({ error: "Email is already verified" })
+        }
+
+        await sendVerificationEmail(userRow)
+
+        return res.json({ message: "Verification email sent" })
+    } catch (error) {
+        console.error("Error while trying to resend email verification link:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })
