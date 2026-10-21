@@ -14,13 +14,9 @@ import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-<<<<<<< HEAD
-	const puzzleQueue = usePuzzleQueue({menuOpen})
-	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
-=======
 	const {difficulty, color, setDifficulty, setColor} = usePreference()
-	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen, difficulty, color})
->>>>>>> main
+	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color})
+	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
 	const [showMoveControls, setShowMoveControls] = useState(true)
@@ -157,19 +153,12 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 
 				{showMoveControls && 
 				<div className="step-controls">
-<<<<<<< HEAD
 					<button onClick={() => boardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
 					<button onClick={() => boardRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>}
-			</div>
-=======
-					<button onClick={() => puzzleBoardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
-					<button onClick={() => puzzleBoardRef?.current?.moveForward()} aria-label="Next move">▶</button>
-				</div>
 
-				<Preferences user_id={user_id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>
-			</div>}
->>>>>>> main
+				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>}
+			</div>
 		</div>
 	)
 }
