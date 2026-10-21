@@ -124,7 +124,28 @@ userRouter.get("/profile", async (req, res) => {
             [user.id]
         )
         const bestSolvedRating = result5.rows[0]
+        
+        const result6 = await pool.query(`
+            SELECT success
+            FROM puzzle_attempts
+            WHERE user_id = $1
+            ORDER BY created_at, id`,
+            [user.id]
+        )
 
+        let longestStreak = 0
+        let currentStreak = 0
+
+        for (const attempt of result6.rows) {
+            if (attempt.success) {
+                currentStreak++
+                if (currentStreak > longestStreak) {
+                    longestStreak = currentStreak
+                }   
+            } else {
+                currentStreak = 0
+            }
+        }
 
         return res.json({
             email: profile.email,
@@ -137,7 +158,7 @@ userRouter.get("/profile", async (req, res) => {
                 failedAttempts: failedAttempts.failed_attempts,
                 solvedFailedAttempts: solvedFailedAttempts.solved_failed_attempts,
                 bestSolvedRating: bestSolvedRating?.best_rating ?? 0,
-                longestStreak: 0, 
+                longestStreak: longestStreak, 
             },
         })
     } catch (error) {
