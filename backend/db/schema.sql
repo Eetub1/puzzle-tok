@@ -32,6 +32,22 @@ CREATE TABLE failed_puzzles (
     UNIQUE (user_id, puzzle_id)
 );
 
+CREATE TABLE puzzle_attempts (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    puzzle_id  text        NOT NULL,
+    puzzle_rating integer     NOT NULL,
+    success    boolean     NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE solved_puzzles (
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    puzzle_fen text        NOT NULL,
+    solved_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, puzzle_fen)
+);
+
 CREATE TABLE preferences (
     user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     color      text        NOT NULL,

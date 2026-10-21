@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Dropdown from "react-bootstrap/Dropdown"
 import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
@@ -8,6 +8,7 @@ import "./ChessReels.css"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
+import { getStreak, recordSolvedPuzzle } from "../services/userService.js"
 import { usePreference } from "../hooks/usePreference.js"
 
 import Matches from "./Matches.jsx"
@@ -21,12 +22,17 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 
 	const puzzleBoardRef = useRef(null)
 	const [streak, setStreak] = useState(0)
-	const solvedFens = useRef(new Set())
 
-	function handleSolved(puzzle) {
-		if (solvedFens.current.has(puzzle.fen)) return
-		solvedFens.current.add(puzzle.fen)
-		setStreak(s => s + 1)
+	useEffect(() => {
+		getStreak().then(setStreak).catch(console.error)
+	}, [])
+
+	async function handleSolved(puzzle) {
+		try {
+			setStreak(await recordSolvedPuzzle(puzzle.fen))
+		} catch (error) {
+			console.error(error)
+		}
 	}
 
 	const navigate = useNavigate()
