@@ -65,24 +65,6 @@ const getStreak = async () => {
 }
 
 
-const recordSolvedPuzzle = async fen => {
-    const response = await fetch(`/api/user/streak`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${getToken()}` },
-        body: JSON.stringify({ fen }),
-    })
-    const data = await response.json()
-
-    if (!response.ok) {
-        throw new Error(`Couldn't record solved puzzle: ${data.error}`)
-    }
-
-    return data.streak
-}
-
-
 const resendEmailVerification = async () => {
 	const response = await fetch("/api/user/resend-verification", {
 		method: "POST",
@@ -104,6 +86,5 @@ export {
 	getUserProfile,
 	getUserGames,
 	getStreak,
-	recordSolvedPuzzle,
 	resendEmailVerification
 }

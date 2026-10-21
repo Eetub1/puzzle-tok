@@ -1,7 +1,7 @@
 import './StatusRow.css'
 
 // Component display status, current turn, move feedback
-function StatusRow({ puzzle, game, playerColor, puzzleStatus, moveFeedback, attemptFailed, handleRetry }) {
+function StatusRow({ puzzle, game, playerColor, puzzleStatus, moveFeedback, attemptFailed, handleRetry, streak }) {
 
     const isSolved = puzzleStatus === 'solved'
 
@@ -39,7 +39,13 @@ function StatusRow({ puzzle, game, playerColor, puzzleStatus, moveFeedback, atte
 
     return (
         <div className="puzzle-status-row">
-            <span className='puzzle-status-rating'>Puzzle rating: {puzzle.rating}</span>
+            <div className= "puzzle-status-row-left">
+                <span className='puzzle-status-rating'>Puzzle rating: {puzzle.rating}</span>
+                {streak > 2 && (
+                    <span className={`puzzle-status-streak${streak > 13 ? '-ultrahigh' : streak > 8 ? '-high' : streak > 5 ? '-medium': '-low'}`}>{streak}🔥</span>
+                )}
+            </div>
+            
             {(!isSolved || attemptFailed) && (
                 <span className={`puzzle-status-${status}`}>{statusText}</span>
             )}

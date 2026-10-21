@@ -9,9 +9,10 @@ import { setPuzzleAttempt } from "../../services/puzzleAttemptService.js"
 import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved}, ref) {
-	const solutionUsed = useRef(false) //Tracker to see if solution or hint button was used.
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak}, ref) {
 	const savedState = puzzle.savedState
+	const solutionUsed = useRef(savedState?.solutionUsed ?? false)
+	const attemptRecorded = useRef(savedState?.attemptRecorded ?? (savedState?.puzzleStatus === 'solved' || savedState?.attemptFailed || false))
 	const [game, setGame] = useState(() => new Chess(savedState?.fen ?? puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(savedState?.puzzleMoveIndex ?? 0)
 	const [puzzleStatus, setPuzzleStatus] = useState(savedState?.puzzleStatus ?? 'playing')
@@ -50,12 +51,12 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 
 	}, [game, puzzleMoveIndex, playerColor])
 
-	// Notify parent when the puzzle is solved without using the solution button
 	useEffect(() => {
-		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
-			onSolved?.(puzzle)
+		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current && !attemptFailed && !attemptRecorded.current) {
+			attemptRecorded.current = true
 			setPuzzleAttempt(puzzle.id, puzzle.rating, true).then((result) => {
 				console.log(result.message)
+				onEnded?.()
 			}).catch((error) => {
 				console.error(error)
 			})
@@ -126,8 +127,10 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setAttemptFailed(true)
 		setPuzzleStatus('playing')
 		if(!failedPuzzle.current) {
+			attemptRecorded.current = true
 			setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
-			console.log(result.message)
+				console.log(result.message)
+				onEnded?.()
 			}).catch((error) => {
 				console.error(error)
 			})
@@ -295,8 +298,10 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 					setPuzzleStatus('playing')
 				}, 1000)
 				if(!failedPuzzle.current) {
+					attemptRecorded.current = true
 					setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
 						console.log(result.message)
+						onEnded?.()
 					}).catch((error) => {
 						console.error(error)
 					})
@@ -414,6 +419,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setPendingPromotion(null)
 		setHintSquare(null)
 		failedPuzzle.current = false
+		attemptRecorded.current = false
+		solutionUsed.current = false
 		const gameCopy = new Chess(puzzle.fen)
 		setGame(gameCopy)
 		setLastMove(puzzle.lastMove)
@@ -432,6 +439,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 				moveFeedback={moveFeedback} 
 				attemptFailed={attemptFailed} 
 				handleRetry={handleRetry}
+				streak={streak}
 			/>
 			<div className= "board-wrapper">
 				<Chessboard

@@ -8,7 +8,7 @@ import "./ChessReels.css"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
-import { getStreak, recordSolvedPuzzle } from "../services/userService.js"
+import { getStreak } from "../services/userService.js"
 import { usePreference } from "../hooks/usePreference.js"
 
 import Matches from "./Matches.jsx"
@@ -40,9 +40,9 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 		getStreak().then(setStreak).catch(console.error)
 	}, [])
 
-	async function handleSolved(puzzle) {
+	async function handleEnded() {
 		try {
-			setStreak(await recordSolvedPuzzle(puzzle.fen))
+			setStreak(await getStreak())
 		} catch (error) {
 			console.error(error)
 		}
@@ -108,7 +108,6 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					<Dropdown.Item active={menuOpen === "Openings"} onClick={() => handleMenuClick("Openings")}>Openings</Dropdown.Item>
 					<Dropdown.Item active={menuOpen === "DailyPuzzle"} onClick={() => handleMenuClick("DailyPuzzle")}>Daily Puzzle</Dropdown.Item>
 				</Dropdown.Menu>
-				<span className="streak">🔥 {streak}</span>
 				<button onClick={() => navigate("/profile")} className="profile-btn" aria-label="Profile">👤</button>
 				<button onClick={() => handleMenuClick("Profile")} className="profile-btn" aria-label="Profile">👤</button>
 			</div>
@@ -126,7 +125,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onSolved={handleSolved}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -137,7 +136,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					</div>
 				) : (
 					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
-						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle}/> : <p>Loading puzzle...</p>)}
+						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} onEnded={handleEnded} streak={streak}/> : <p>Loading puzzle...</p>)}
 						{menuOpen === "Openings" && <ChessBoard ref={boardRef}/>}
 						{menuOpen === "YourMatches" && <Matches setMessage={setMessage}/>}
 						{menuOpen === "Profile" && <Profile setMessage={setMessage} handleLogout={handleLogout}/>}

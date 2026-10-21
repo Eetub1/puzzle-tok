@@ -200,8 +200,13 @@ userRouter.get("/streak", async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT COUNT(*)::int AS streak
-             FROM solved_puzzles
-             WHERE user_id = $1`,
+             FROM puzzle_attempts AS attempt
+             WHERE attempt.user_id = $1 AND attempt.success = true
+               AND NOT EXISTS (
+                   SELECT 1 FROM puzzle_attempts AS failure
+                   WHERE failure.user_id = $1 AND failure.success = false
+                     AND (failure.created_at, failure.id) > (attempt.created_at, attempt.id)
+               )`,
             [req.user.id],
         )
         return res.json({ streak: result.rows[0].streak })
@@ -237,34 +242,5 @@ userRouter.post("/resend-verification", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" })
     }
 })
-
-
-userRouter.post("/streak", async (req, res) => {
-    const { fen } = req.body ?? {}
-
-    if (typeof fen !== "string" || fen === "" || fen.length > 100) {
-        return res.status(400).json({ error: "Puzzle fen must be a non-empty string" })
-    }
-
-    try {
-        await pool.query(
-            `INSERT INTO solved_puzzles (user_id, puzzle_fen)
-             VALUES ($1, $2)
-             ON CONFLICT DO NOTHING`,
-            [req.user.id, fen],
-        )
-        const result = await pool.query(
-            `SELECT COUNT(*)::int AS streak
-             FROM solved_puzzles
-             WHERE user_id = $1`,
-            [req.user.id],
-        )
-        return res.json({ streak: result.rows[0].streak })
-    } catch (error) {
-        console.error("Error recording solved puzzle:", error)
-        return res.status(500).json({ error: "Internal server error" })
-    }
-})
-
 
 export default userRouter

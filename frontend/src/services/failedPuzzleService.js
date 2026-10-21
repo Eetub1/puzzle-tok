@@ -11,12 +11,10 @@ const setFailedPuzzle = async (puzzleId, puzzleRating) => {
         body: JSON.stringify({puzzleId})
     })
     const data = await response.json()
-    setPuzzleAttempt(puzzleId, puzzleRating, false).catch((error) => {
-        console.error("Failed to set puzzle attempt:", error)
-    })
     if (!response.ok) {
         throw new Error(data.error)
     }
+    await setPuzzleAttempt(puzzleId, puzzleRating, false)
     return data
 }
 

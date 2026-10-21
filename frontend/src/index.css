@@ -5,6 +5,10 @@
     --status-row-solved-color: #245c38;
     --status-row-retry-hover-color: #7a1c1c;
     --status-row-retry-solved-hover-color: #1c7a1c;
+    --status-row-streak-low-color: #30363d;
+    --status-row-streak-medium-color: #8f5e3b;
+    --status-row-streak-high-color: #a84416;
+    --status-row-streak-ultrahigh-color: #6d28d9;
 
     --chessboard-color-last-move: #c8d67a;
     --chessboard-color-selected: rgba(255, 255, 0, 0.5);
