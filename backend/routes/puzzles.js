@@ -3,10 +3,6 @@ import { Chess } from "chess.js"
 const puzzlesRouter = express.Router()
 const base_url = `https://lichess.org`
 
-
-
-
-
 // Retrieve a puzzle by id
 const getGameById = async id => {
 
@@ -64,15 +60,28 @@ puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
 // Route for retrieving many puzzles
 puzzlesRouter.get('/batch', async (req,res) => {
 
-    const query = new URLSearchParams({ //TODO: add possibility to filter
-        "difficulty": "normal",
-        "nb": 5,
-        //"color": "white"
-	})
+    //console.log('QUERY HERE', req.query)
+
+    let query = new URLSearchParams({})
+
+    if (req.query.color === 'both') {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 5
+        })
+    } else {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 1, 
+            "color": req.query.color
+        })
+    }
 
     console.log("Sending multiple puzzles")
 
-    let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`)  //TODO: In the future possibility to filter with theme/opening
+    let response = await fetch(`${base_url}/api/puzzle/batch/mix?${query}`)
+
+    console.log(response)
 
     if (!response.ok) {
 		throw new Error(`Lichess request failed: ${response.status}`)

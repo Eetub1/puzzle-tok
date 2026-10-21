@@ -3,17 +3,24 @@ import Dropdown from "react-bootstrap/Dropdown"
 import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import Profile from "./Profile.jsx"
+import Preferences from "./Preferences.jsx"
 import "./ChessReels.css"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
+import { usePreference } from "../hooks/usePreference.js"
 
 import Matches from "./Matches.jsx"
 
-const ChessReels = ({ handleLogout, setMessage }) => {
+const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
+<<<<<<< HEAD
 	const puzzleQueue = usePuzzleQueue({menuOpen})
 	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
+=======
+	const {difficulty, color, setDifficulty, setColor} = usePreference()
+	const {currentPuzzle, previousPuzzle, nextPuzzle, handleNextPuzzle, handlePreviousPuzzle} = usePuzzleQueue({menuOpen, difficulty, color})
+>>>>>>> main
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
 	const [showMoveControls, setShowMoveControls] = useState(true)
@@ -150,10 +157,19 @@ const ChessReels = ({ handleLogout, setMessage }) => {
 
 				{showMoveControls && 
 				<div className="step-controls">
+<<<<<<< HEAD
 					<button onClick={() => boardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
 					<button onClick={() => boardRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>}
 			</div>
+=======
+					<button onClick={() => puzzleBoardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
+					<button onClick={() => puzzleBoardRef?.current?.moveForward()} aria-label="Next move">▶</button>
+				</div>
+
+				<Preferences user_id={user_id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>
+			</div>}
+>>>>>>> main
 		</div>
 	)
 }
