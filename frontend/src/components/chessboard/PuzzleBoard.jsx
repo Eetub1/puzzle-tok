@@ -11,6 +11,7 @@ import StatusRow from './StatusRow.jsx'
 // PuzzleBoard component that renders chessboard for given puzzle
 const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak}, ref) {
 	const savedState = puzzle.savedState
+	const retryUsed = useRef(savedState?.retryUsed ?? false)
 	const solutionUsed = useRef(savedState?.solutionUsed ?? false)
 	const attemptRecorded = useRef(savedState?.attemptRecorded ?? (savedState?.puzzleStatus === 'solved' || savedState?.attemptFailed || false))
 	const [game, setGame] = useState(() => new Chess(savedState?.fen ?? puzzle.fen))
@@ -54,7 +55,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	useEffect(() => {
 		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current && !attemptFailed && !attemptRecorded.current) {
 			attemptRecorded.current = true
-			setPuzzleAttempt(puzzle.id, puzzle.rating, true).then((result) => {
+			setPuzzleAttempt(puzzle.id, puzzle.rating, true, retryUsed.current).then((result) => {
 				console.log(result.message)
 				onEnded?.()
 			}).catch((error) => {
@@ -128,7 +129,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setPuzzleStatus('playing')
 		if(!failedPuzzle.current) {
 			attemptRecorded.current = true
-			setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
+			setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
 				console.log(result.message)
 				onEnded?.()
 			}).catch((error) => {
@@ -156,6 +157,10 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			puzzleStatus,
 			attemptFailed,
 			positions,
+			solutionUsed: solutionUsed.current,
+			attemptRecorded: attemptRecorded.current,
+			failedPuzzle: failedPuzzle.current,
+			retryUsed: retryUsed.current
 		}),
 	}))
 
@@ -299,7 +304,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 				}, 1000)
 				if(!failedPuzzle.current) {
 					attemptRecorded.current = true
-					setFailedPuzzle(puzzle.id, puzzle.rating).then((result) => {
+					setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
 						console.log(result.message)
 						onEnded?.()
 					}).catch((error) => {
@@ -421,6 +426,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		failedPuzzle.current = false
 		attemptRecorded.current = false
 		solutionUsed.current = false
+		retryUsed.current = true
 		const gameCopy = new Chess(puzzle.fen)
 		setGame(gameCopy)
 		setLastMove(puzzle.lastMove)
