@@ -4,6 +4,8 @@ import calculatePuzzleRating from "../utils/puzzleRating.js"
 // Save puzzle attempt to database and update user puzzle rating
 const savePuzzleAttempt = async (req, res) => {
     const { puzzleId, puzzleRating, success, retryUsed } = req.body ?? {}
+    let newPuzzleRating = null
+    let ratingChange = null
     
     if (!puzzleId) {
         return res.status(400).json({ error: "Puzzle ID is required" })
@@ -31,16 +33,17 @@ const savePuzzleAttempt = async (req, res) => {
                 `SELECT COUNT(*) AS attempt_count FROM puzzle_attempts WHERE user_id = $1`,
                 [req.user.id]
             )
-            const newPuzzleRating = calculatePuzzleRating(puzzleRating, success, playerRating.rows[0].puzzle_rating, countAttempted.rows[0].attempt_count)
+            newPuzzleRating = calculatePuzzleRating(puzzleRating, success, playerRating.rows[0].puzzle_rating, countAttempted.rows[0].attempt_count)
             await pool.query(
                 `UPDATE users
                 SET puzzle_rating = $1
                 WHERE id = $2`,
                 [newPuzzleRating, req.user.id]
             )
+            ratingChange = newPuzzleRating - playerRating.rows[0].puzzle_rating
         }
         
-        res.json({ message: "Puzzle:" + puzzleId + " marked as attempted" })
+        res.json({ message: "Puzzle:" + puzzleId + " marked as attempted", data: { playerRating: newPuzzleRating, ratingChange } })
     } catch (error) {
         console.error("Error saving puzzle to attempts:", error)
         res.status(500).json({ error: "Server error" })

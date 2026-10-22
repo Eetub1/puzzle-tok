@@ -9,7 +9,7 @@ import { setPuzzleAttempt } from "../../services/puzzleAttemptService.js"
 import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak, playerRating}, ref) {
 	const savedState = puzzle.savedState
 	const retryUsed = useRef(savedState?.retryUsed ?? false)
 	const solutionUsed = useRef(savedState?.solutionUsed ?? false)
@@ -17,7 +17,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	const [game, setGame] = useState(() => new Chess(savedState?.fen ?? puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(savedState?.puzzleMoveIndex ?? 0)
 	const [puzzleStatus, setPuzzleStatus] = useState(savedState?.puzzleStatus ?? 'playing')
-	const [attemptFailed, setAttemptFailed] = useState(savedState?.attemptFailed ?? false)
+	const [attemptFailed, setAttemptFailed] = useState(savedState?.attemptFailed ?? false) // Track if the user has failed the puzzle attempt
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
 	const[lastMove, setLastMove] = useState(savedState?.lastMove ?? puzzle.lastMove)
@@ -26,13 +26,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	const [isDragging, setIsDragging] = useState(false)
 	const [moveFeedback, setMoveFeedback] = useState(null)
 	const [feedbackMark, setFeedbackMark] = useState(null)
+	const [ratingChange, setRatingChange] = useState(savedState?.ratingChange ?? null)
 	const [positions, setPositions] = useState(savedState?.positions ?? [
 		{
 			fen: puzzle.fen,
 			lastMove: puzzle.lastMove
 		}
 	])
-	const failedPuzzle = useRef(savedState?.failedPuzzle ?? false)
+	const failedPuzzle = useRef(savedState?.failedPuzzle ?? false) // Track if puzzle has been marked as failed for this attempt
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
 	const playerColor = puzzle.fen.split(' ')[1] ?? 'w'
 
@@ -57,6 +58,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			attemptRecorded.current = true
 			setPuzzleAttempt(puzzle.id, puzzle.rating, true, retryUsed.current).then((result) => {
 				console.log(result.message)
+				setRatingChange(result.ratingChange)
 				onEnded?.()
 			}).catch((error) => {
 				console.error(error)
@@ -131,6 +133,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			attemptRecorded.current = true
 			setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
 				console.log(result.message)
+				setRatingChange(result.ratingChange)
 				onEnded?.()
 			}).catch((error) => {
 				console.error(error)
@@ -160,7 +163,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			solutionUsed: solutionUsed.current,
 			attemptRecorded: attemptRecorded.current,
 			failedPuzzle: failedPuzzle.current,
-			retryUsed: retryUsed.current
+			retryUsed: retryUsed.current,
+			ratingChange: ratingChange,
 		}),
 	}))
 
@@ -306,6 +310,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 					attemptRecorded.current = true
 					setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
 						console.log(result.message)
+						setRatingChange(result.ratingChange)
 						onEnded?.()
 					}).catch((error) => {
 						console.error(error)
@@ -423,6 +428,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setHoveredSquare(null)
 		setPendingPromotion(null)
 		setHintSquare(null)
+		setRatingChange(null)
 		failedPuzzle.current = false
 		attemptRecorded.current = false
 		solutionUsed.current = false
@@ -446,6 +452,9 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 				attemptFailed={attemptFailed} 
 				handleRetry={handleRetry}
 				streak={streak}
+				playerRating={playerRating}
+				ratingChange={ratingChange}
+				retryUsed={retryUsed.current}
 			/>
 			<div className= "board-wrapper">
 				<Chessboard

@@ -14,8 +14,8 @@ const setFailedPuzzle = async (puzzleId, puzzleRating, retryUsed) => {
     if (!response.ok) {
         throw new Error(data.error)
     }
-    await setPuzzleAttempt(puzzleId, puzzleRating, false, retryUsed)
-    return data
+    const result = await setPuzzleAttempt(puzzleId, puzzleRating, false, retryUsed)
+    return { ...data, ...result }
 }
 
 const getFailedPuzzles = async (signal) => {

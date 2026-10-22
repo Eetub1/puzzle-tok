@@ -15,7 +15,7 @@ const setPuzzleAttempt = async (puzzleId, puzzleRating, success, retryUsed) => {
         throw new Error(data.error)
     }
 
-    return data
+    return { playerRating: data.data.playerRating, ratingChange: data.data.ratingChange }
 }
 
 export { setPuzzleAttempt }
