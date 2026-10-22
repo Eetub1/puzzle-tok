@@ -14,6 +14,7 @@ const setPuzzleAttempt = async (puzzleId, puzzleRating, success) => {
     if (!response.ok) {
         throw new Error(data.error)
     }
+
     return data
 }
 

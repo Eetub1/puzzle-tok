@@ -132,7 +132,7 @@ userRouter.get("/profile", async (req, res) => {
             ORDER BY created_at, id`,
             [user.id]
         )
-
+        
         let longestStreak = 0
         let currentStreak = 0
 
@@ -147,18 +147,25 @@ userRouter.get("/profile", async (req, res) => {
             }
         }
 
+        const playerRating = await pool.query(
+            `SELECT puzzle_rating FROM users WHERE id = $1`,
+            [user.id]
+        )
+
         return res.json({
             email: profile.email,
             emailVerified: profile.email_verified_at !== null,
             username: profile.username,
             lichess: profile.lichess_username,
             chessCom: profile.chesscom_username,
+            
             puzzleStats: {
                 totalSolved: puzzleStats.successful_attempts,
                 failedAttempts: failedAttempts.failed_attempts,
                 solvedFailedAttempts: solvedFailedAttempts.solved_failed_attempts,
                 bestSolvedRating: bestSolvedRating?.best_rating ?? 0,
-                longestStreak: longestStreak, 
+                longestStreak: longestStreak,
+                playerRating: playerRating.rows[0]?.puzzle_rating ?? 0,
             },
         })
     } catch (error) {
