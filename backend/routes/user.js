@@ -4,6 +4,7 @@ import { authenticateToken } from "../middleware/auth.js"
 import { getLichessGames, getChessComGames } from "../utils/games.js"
 import { sendVerificationEmail } from "../utils/mail.js"
 import { saveFailedPuzzle, getFailedPuzzle, removeFailedPuzzle } from "../controllers/failedPuzzleController.js"
+import { savePuzzleAttempt } from "../controllers/puzzleAttemptsController.js"
 
 const userRouter = express.Router()
 
@@ -14,6 +15,9 @@ userRouter.use(authenticateToken)
 userRouter.post("/failed", saveFailedPuzzle)
 userRouter.get("/failed", getFailedPuzzle)
 userRouter.delete("/failed/:puzzleId", removeFailedPuzzle)
+
+userRouter.post("/puzzle-attempts", savePuzzleAttempt)
+
 
 userRouter.post("/chess-accounts", async (req, res) => {
     const { usernames } = req.body ?? {}
@@ -75,12 +79,87 @@ userRouter.get("/profile", async (req, res) => {
         }
         console.log(profile.email_verified_at)
 
+        const result2 = await pool.query(`
+            SELECT COUNT(*) AS total_attempts,
+                SUM(CASE WHEN success THEN 1 ELSE 0 END) AS successful_attempts
+            FROM puzzle_attempts
+            WHERE user_id = $1`, 
+            [user.id]
+            
+        )
+        const puzzleStats = result2.rows[0]
+
+        const result3 = await pool.query(`
+            SELECT COUNT(*) AS total_attempts,
+                SUM(CASE WHEN success THEN 0 ELSE 1 END) AS failed_attempts
+            FROM puzzle_attempts
+            WHERE user_id = $1`, 
+            [user.id]
+        )
+        const failedAttempts = result3.rows[0]
+
+        const result4 = await pool.query(`
+            SELECT COUNT(DISTINCT solved.puzzle_id) AS solved_failed_attempts
+            FROM puzzle_attempts AS solved
+            WHERE solved.user_id = $1
+                AND solved.success = TRUE
+                AND EXISTS (
+                    SELECT 1
+                    FROM puzzle_attempts AS failed
+                    WHERE failed.user_id = solved.user_id
+                        AND failed.puzzle_id = solved.puzzle_id
+                        AND failed.success = FALSE
+                        AND (failed.created_at, failed.id) < (solved.created_at, solved.id)
+                )`,
+            [user.id]
+        )
+        const solvedFailedAttempts = result4.rows[0]
+
+        const result5 = await pool.query(`
+            SELECT puzzle_rating AS best_rating
+            FROM puzzle_attempts
+            WHERE user_id = $1 AND success = TRUE
+            ORDER BY puzzle_rating DESC
+            LIMIT 1`,
+            [user.id]
+        )
+        const bestSolvedRating = result5.rows[0]
+        
+        const result6 = await pool.query(`
+            SELECT success
+            FROM puzzle_attempts
+            WHERE user_id = $1
+            ORDER BY created_at, id`,
+            [user.id]
+        )
+
+        let longestStreak = 0
+        let currentStreak = 0
+
+        for (const attempt of result6.rows) {
+            if (attempt.success) {
+                currentStreak++
+                if (currentStreak > longestStreak) {
+                    longestStreak = currentStreak
+                }   
+            } else {
+                currentStreak = 0
+            }
+        }
+
         return res.json({
             email: profile.email,
             emailVerified: profile.email_verified_at !== null,
             username: profile.username,
             lichess: profile.lichess_username,
             chessCom: profile.chesscom_username,
+            puzzleStats: {
+                totalSolved: puzzleStats.successful_attempts,
+                failedAttempts: failedAttempts.failed_attempts,
+                solvedFailedAttempts: solvedFailedAttempts.solved_failed_attempts,
+                bestSolvedRating: bestSolvedRating?.best_rating ?? 0,
+                longestStreak: longestStreak, 
+            },
         })
     } catch (error) {
         console.log("Error retrieving user profile:", error)
@@ -142,8 +221,13 @@ userRouter.get("/streak", async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT COUNT(*)::int AS streak
-             FROM solved_puzzles
-             WHERE user_id = $1`,
+             FROM puzzle_attempts AS attempt
+             WHERE attempt.user_id = $1 AND attempt.success = true
+               AND NOT EXISTS (
+                   SELECT 1 FROM puzzle_attempts AS failure
+                   WHERE failure.user_id = $1 AND failure.success = false
+                     AND (failure.created_at, failure.id) > (attempt.created_at, attempt.id)
+               )`,
             [req.user.id],
         )
         return res.json({ streak: result.rows[0].streak })
@@ -179,34 +263,5 @@ userRouter.post("/resend-verification", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" })
     }
 })
-
-
-userRouter.post("/streak", async (req, res) => {
-    const { fen } = req.body ?? {}
-
-    if (typeof fen !== "string" || fen === "" || fen.length > 100) {
-        return res.status(400).json({ error: "Puzzle fen must be a non-empty string" })
-    }
-
-    try {
-        await pool.query(
-            `INSERT INTO solved_puzzles (user_id, puzzle_fen)
-             VALUES ($1, $2)
-             ON CONFLICT DO NOTHING`,
-            [req.user.id, fen],
-        )
-        const result = await pool.query(
-            `SELECT COUNT(*)::int AS streak
-             FROM solved_puzzles
-             WHERE user_id = $1`,
-            [req.user.id],
-        )
-        return res.json({ streak: result.rows[0].streak })
-    } catch (error) {
-        console.error("Error recording solved puzzle:", error)
-        return res.status(500).json({ error: "Internal server error" })
-    }
-})
-
 
 export default userRouter

@@ -38,10 +38,13 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 			const controller = new AbortController() //
 			const puzzleDaily = async () => {
 				try {
-					const result = await getDaily(controller.signal)
+					const [result, failedPuzzleIds] = await Promise.all([
+						getDaily(controller.signal),
+						getFailedPuzzles(controller.signal),
+					])
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setDailyPuzzle(result)
+						setDailyPuzzle({ ...result, previouslyFailed: failedPuzzleIds.includes(result.id) })
 						console.log('daily puzzle:', result)
 					}
 				} catch (error) {
@@ -73,11 +76,14 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 					console.log('get batch: ', batch)
 
 					const failedPuzzles = await Promise.all(
-						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId))
+						failedPuzzleIds.map(puzzleId => getPuzzleById(puzzleId, controller.signal))
 					)
 					// Only set batch if fetch was not aborted
 					if (!controller.signal.aborted) {
-						setBatch(shuffle([...batch, ...failedPuzzles]))
+						setBatch(shuffle([...batch, ...failedPuzzles].map(puzzle => ({
+							...puzzle,
+							previouslyFailed: failedPuzzleIds.includes(puzzle.id),
+						}))))
 					}
 				} catch (error) {
 					if (error.name !== 'AbortError') { // Ignore abort errors
@@ -94,20 +100,26 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 	}, [puzzleQueue.length, menuOpen, dailyPuzzle, color, difficulty])
 
 	// Handle moving to next puzzle in queue
-	function handleNextPuzzle() {
+	function handleNextPuzzle(savedState) {
 		if (!puzzle || puzzleQueue.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
 
 		const [nextPuzzle, ...remainingPuzzles] = puzzleQueue
 
-		setPuzzleMemory([
+		const updatedMemory = [
 			...puzzleMemory,
-			puzzle,
-		])
-		if(puzzleMemory.length > 10) {
-			setPuzzleMemory(puzzleMemory.slice(-10))
+			{
+				...puzzle,
+				savedState,
+			},
+		]
+		
+		if(updatedMemory.length > 10) {
+			setPuzzleMemory(updatedMemory.slice(-10))
 			console.log('puzzle memory over 10, trimming to last 10 puzzles')
+		} else {
+			setPuzzleMemory(updatedMemory)
 		}
 		setPuzzle(nextPuzzle)
 		console.log('current puzzle:', nextPuzzle)
@@ -115,7 +127,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 	}
 
 	// Handle moving to previous puzzle in memory
-	function handlePreviousPuzzle() {
+	function handlePreviousPuzzle(savedState) {
 		if (!puzzle || puzzleMemory.length === 0 || menuOpen !== "Puzzles") {
 			return
 		}
@@ -123,12 +135,19 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 		const previousPuzzle = puzzleMemory[puzzleMemory.length - 1]
 
 		setPuzzleQueue([
-			puzzle,
-			...puzzleQueue,
-		])
+        	{ 
+				...puzzle, 
+				savedState 
+			},
+        	...puzzleQueue,
+    	])
 		setPuzzle(previousPuzzle)
 		console.log('current puzzle:', previousPuzzle)
 		setPuzzleMemory(puzzleMemory.slice(0, -1))
+	}
+
+	function saveDailyPuzzleState(savedState) {
+		setDailyPuzzle(dailyPuzzle ? { ...dailyPuzzle, savedState } : dailyPuzzle)
 	}
 
 	const currentPuzzle = menuOpen === "DailyPuzzle" ? dailyPuzzle : puzzle
@@ -141,5 +160,6 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 		nextPuzzle,
 		handleNextPuzzle,
 		handlePreviousPuzzle,
+		saveDailyPuzzleState,
 	}
 }

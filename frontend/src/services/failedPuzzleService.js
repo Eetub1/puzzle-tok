@@ -1,19 +1,20 @@
 import { getToken } from "./authService"
+import { setPuzzleAttempt } from "./puzzleAttemptService"
 
-const setFailedPuzzle = async (puzzleId) => {
+const setFailedPuzzle = async (puzzleId, puzzleRating) => {
     const response = await fetch(`/api/user/failed`, {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
             "Authorization": `Bearer ${getToken()}` 
         },
-        body: JSON.stringify({ puzzleId})
+        body: JSON.stringify({puzzleId})
     })
     const data = await response.json()
-
     if (!response.ok) {
         throw new Error(data.error)
     }
+    await setPuzzleAttempt(puzzleId, puzzleRating, false)
     return data
 }
 

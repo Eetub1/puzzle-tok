@@ -1,6 +1,6 @@
 .chessboard-container {
     position: relative;
-    width: min(80dvw,65rem);
+    width: min(80dvw, calc(100dvh - 190px), 65rem);
     margin: 0 auto;
 }
 
@@ -21,6 +21,7 @@
 .board-wrapper {
     position: relative;
 }
+
 
 .feedback-mark-container {
     position: absolute;

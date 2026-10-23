@@ -56,7 +56,6 @@ const getBatch = async (signal, difficulty, color) => {
 const getPuzzleById = async (id, signal) => {
 	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()
-	console.log('here data: ', data)
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
 		id: data.puzzle.id,

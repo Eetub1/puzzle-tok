@@ -1,0 +1,83 @@
+.puzzle-status-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.puzzle-status-row span {
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.7rem;
+    color: var(--status-row-text-color); 
+}
+
+.puzzle-status-row-left {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: auto;
+}
+
+.puzzle-status-streak-low {
+    background-color: var(--status-row-streak-low-color);
+}
+
+.puzzle-status-streak-medium {
+    background-color: var(--status-row-streak-medium-color);
+}
+
+.puzzle-status-streak-high {
+    background-color: var(--status-row-streak-high-color);
+}
+
+.puzzle-status-streak-ultrahigh {
+    background-color: var(--status-row-streak-ultrahigh-color);
+    border: 2px solid gold;
+}
+
+.puzzle-status-rating {
+    background-color: var(--status-row-neutral-color);
+}
+
+.puzzle-status-previously-failed {
+    background-color: var(--status-row-failed-color);
+}
+
+.puzzle-status-neutral {
+    background-color: var(--status-row-neutral-color);
+}
+
+.puzzle-status-failed {
+    background-color: var(--status-row-failed-color);
+    margin-left: 0.5rem;
+}
+
+.puzzle-status-solved {
+    background-color: var(--status-row-solved-color);
+}
+
+.puzzle-retry-button {
+    background-color: var(--status-row-failed-color);
+    color: var(--status-row-text-color);
+    border: none;
+    border-radius: 1rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#puzzle-retry-button:hover {
+    background-color: var(--status-row-retry-hover-color);
+}
+
+#puzzle-retry-button-solved {
+    background-color: var(--status-row-solved-color);
+}
+
+#puzzle-retry-button-solved:hover {
+    background-color: var(--status-row-retry-solved-hover-color);
+}
