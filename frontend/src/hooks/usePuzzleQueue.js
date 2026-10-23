@@ -150,6 +150,10 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 		setDailyPuzzle(dailyPuzzle ? { ...dailyPuzzle, savedState } : dailyPuzzle)
 	}
 
+	function savePuzzleState(savedState) {
+		setPuzzle(puzzle ? { ...puzzle, savedState } : puzzle)
+	}
+
 	const currentPuzzle = menuOpen === "DailyPuzzle" ? dailyPuzzle : puzzle
 	const previousPuzzle = puzzleMemory[puzzleMemory.length - 1] ?? null
 	const nextPuzzle = puzzleQueue[0] ?? null
@@ -161,5 +165,6 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 		handleNextPuzzle,
 		handlePreviousPuzzle,
 		saveDailyPuzzleState,
+		savePuzzleState,
 	}
 }

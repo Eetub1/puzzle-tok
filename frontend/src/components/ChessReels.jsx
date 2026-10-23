@@ -18,7 +18,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {difficulty, color, setDifficulty, setColor} = usePreference()
 	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color})
-	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
+	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState, savePuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
 	const [showMoveControls, setShowMoveControls] = useState(true)
@@ -74,6 +74,9 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 		if (menuOpen === "DailyPuzzle" && clickedOption !== menuOpen) { // Save puzzle state when leaving Daily Puzzle menu
         	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
     	}
+		if (menuOpen === "Puzzles" && clickedOption !== menuOpen) { // Save puzzle state when leaving Puzzles menu
+			puzzleQueue.savePuzzleState(boardRef.current?.getPuzzleState())
+		}
 		setMenuOpen(clickedOption)
 
 		switch (clickedOption) {
