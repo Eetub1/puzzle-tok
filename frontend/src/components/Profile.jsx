@@ -10,6 +10,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const [profile, setProfile] = useState(null) // Contains username, email, verification status and chess account usernames
 	const [editingLichess, setEditingLichess] = useState(false)
 	const [editingChessCom, setEditingChessCom] = useState(false)
+	const [friendUsername, setFriendUsername] = useState("")
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -115,6 +116,12 @@ const Profile = ({ setMessage, handleLogout }) => {
 	}
 
 
+	const handleFriendSearch = async event => {
+		console.log(event.target.value)
+		setFriendUsername(event.target.value)
+	}
+
+
 	return (
 
 		<div id="profile-page">
@@ -144,6 +151,18 @@ const Profile = ({ setMessage, handleLogout }) => {
 					</div>
 
 
+				</Card.Body>
+			</Card>
+
+			<Card id="friends-card">
+				<Card.Header>Friends</Card.Header>
+				<Card.Body>
+					<form>
+						<div>
+							<label htmlFor="friendUsername">Friend username:</label>
+							<input id="friendUsername" value={friendUsername} onChange={handleFriendSearch}></input>
+						</div>
+					</form>
 				</Card.Body>
 			</Card>
 

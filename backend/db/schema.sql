@@ -14,6 +14,20 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_username_lower_unique ON users (lower(username));
 CREATE UNIQUE INDEX users_email_lower_unique ON users (lower(email));
 
+/* connects two people as friends */
+CREATE TABLE friend_relations (
+    id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    person_1 bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    person_2 bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE friend_invitations (
+    id                bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    requester_id      bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    addressee_id      bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    invitation_status varchar(8) /* pending, accepted or declined */
+);
+
 CREATE TABLE email_verification_tokens (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
