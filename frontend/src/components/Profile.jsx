@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
-import { Card } from "react-bootstrap"
+import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
-import { searchUsers } from "../services/friendService"
+import { searchUsers, sendFriendRequest } from "../services/friendService"
 
 const Profile = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -120,17 +120,36 @@ const Profile = ({ setMessage, handleLogout }) => {
 
 	const handleFriendSearch = async event => {
 		const friendQuery = event.target.value
-		console.log(friendQuery)
 		setFriendUsername(friendQuery)
 
-		const data = await searchUsers(friendQuery)
-		console.log(data)
-		setRelevantUsers(data)
+		try {
+			setRelevantUsers(await searchUsers(friendQuery))
+		} catch (error) {
+			setMessage({ message: "Couldn't search people by username: " + error.message, isError: true })
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+		}
+	}
+
+
+	const handleSendFriendInvite = async friendId => {
+		try {
+			await sendFriendRequest(friendId)
+
+			// use the already typed query to get the same users again
+			// this is so that the add friend button disappears for this specific user
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			setMessage({ message: "Failed to send invite: " + error.message, isError: true })
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+		}
 	}
 
 
 	return (
-
 		<div id="profile-page">
 			<button id="logout-btn" onClick={handleLogout}>log out</button>
 
@@ -164,17 +183,17 @@ const Profile = ({ setMessage, handleLogout }) => {
 			<Card id="friends-card">
 				<Card.Header>Friends</Card.Header>
 				<Card.Body>
-					<form>
+					<div>
 						<div id="friend-username-container">
 							<label htmlFor="friend-username">Friend username:</label>
 							<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
 						</div>
-					</form>
+					</div>
 
 					<p>Relevant users:</p>
 					<div id="relevant-users-container">
 						{relevantUsers.map(user => (
-							<div className="user-row" key={user.id}>{user.username}</div>
+							<div className="user-row" key={user.id}>{user.username} <Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button></div>
 						))}
 					</div>
 				</Card.Body>

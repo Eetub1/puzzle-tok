@@ -21,7 +21,7 @@ app.use("/api/puzzles", puzzlesRouter)
 app.use("/api/oauth", oauthRouter)
 app.use("/api/user/preferences", prefRouter)
 app.use("/api/user", userRouter)
-app.use("/api/friend", friendsRouter)
+app.use("/api/friends", friendsRouter)
 
 app.get("/", (req, res) => {
     //res.send("<a href='/api/auth/getAuth'>auth</a>")
