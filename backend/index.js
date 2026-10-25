@@ -10,6 +10,7 @@ import oauthRouter from "./routes/oauth.js"
 import puzzlesRouter from "./routes/puzzles.js"
 import userRouter from "./routes/user.js"
 import prefRouter from "./routes/preferences.js"
+import friendsRouter from "./routes/friendsRouter.js"
 
 app.use(express.json())
 app.use(cors())
@@ -20,6 +21,7 @@ app.use("/api/puzzles", puzzlesRouter)
 app.use("/api/oauth", oauthRouter)
 app.use("/api/user/preferences", prefRouter)
 app.use("/api/user", userRouter)
+app.use("/api/friend", friendsRouter)
 
 app.get("/", (req, res) => {
     //res.send("<a href='/api/auth/getAuth'>auth</a>")

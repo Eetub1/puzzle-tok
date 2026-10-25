@@ -1,6 +1,6 @@
 import { getToken } from "./authService"
 
-const getFriendMatches = async query => {
+const searchUsers = async query => {
 	const response = await fetch(`/api/friend/search?query=${query}`, {
 		method: "GET",
 		headers: {
@@ -11,10 +11,9 @@ const getFriendMatches = async query => {
 	if (!response.ok) {
 		throw new Error(`Couldn't find users based on query: ${data.error}`)
 	}
-
 	return data
 }
 
 export {
-	getFriendMatches
+	searchUsers
 }

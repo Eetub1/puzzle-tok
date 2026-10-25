@@ -33,3 +33,18 @@
     padding: 0px;
     margin-left: 10px;
 }
+
+#friend-username {
+    margin-left: auto;
+}
+
+#friend-username-container {
+    display: flex;
+}
+
+.user-row {
+    border: 2px solid white;
+    border-radius: 7px;
+    padding: 5px;
+    margin-bottom: 12px;
+}

@@ -3,6 +3,7 @@ import { Card } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
+import { searchUsers } from "../services/friendService"
 
 const Profile = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -11,6 +12,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const [editingLichess, setEditingLichess] = useState(false)
 	const [editingChessCom, setEditingChessCom] = useState(false)
 	const [friendUsername, setFriendUsername] = useState("")
+	const [relevantUsers, setRelevantUsers] = useState([]) // usernames found by search
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -117,8 +119,13 @@ const Profile = ({ setMessage, handleLogout }) => {
 
 
 	const handleFriendSearch = async event => {
-		console.log(event.target.value)
-		setFriendUsername(event.target.value)
+		const friendQuery = event.target.value
+		console.log(friendQuery)
+		setFriendUsername(friendQuery)
+
+		const data = await searchUsers(friendQuery)
+		console.log(data)
+		setRelevantUsers(data)
 	}
 
 
@@ -158,11 +165,18 @@ const Profile = ({ setMessage, handleLogout }) => {
 				<Card.Header>Friends</Card.Header>
 				<Card.Body>
 					<form>
-						<div>
-							<label htmlFor="friendUsername">Friend username:</label>
-							<input id="friendUsername" value={friendUsername} onChange={handleFriendSearch}></input>
+						<div id="friend-username-container">
+							<label htmlFor="friend-username">Friend username:</label>
+							<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
 						</div>
 					</form>
+
+					<p>Relevant users:</p>
+					<div id="relevant-users-container">
+						{relevantUsers.map(user => (
+							<div className="user-row" key={user.id}>{user.username}</div>
+						))}
+					</div>
 				</Card.Body>
 			</Card>
 
