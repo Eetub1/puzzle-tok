@@ -125,7 +125,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 		try {
 			setRelevantUsers(await searchUsers(friendQuery))
 		} catch (error) {
-			setMessage({ message: "Couldn't search people by username: " + error.message, isError: true })
+			setMessage({ message: error.message, isError: true })
 			setTimeout(() => {
 				setMessage(null)
 			}, 4000)
@@ -135,13 +135,17 @@ const Profile = ({ setMessage, handleLogout }) => {
 
 	const handleSendFriendInvite = async friendId => {
 		try {
-			await sendFriendRequest(friendId)
+			const result = await sendFriendRequest(friendId)
+			setMessage({ message: result.message, isError: false })
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
 
 			// use the already typed query to get the same users again
 			// this is so that the add friend button disappears for this specific user
 			setRelevantUsers(await searchUsers(friendUsername))
 		} catch (error) {
-			setMessage({ message: "Failed to send invite: " + error.message, isError: true })
+			setMessage({ message: error.message, isError: true })
 			setTimeout(() => {
 				setMessage(null)
 			}, 4000)
@@ -184,13 +188,23 @@ const Profile = ({ setMessage, handleLogout }) => {
 				<Card.Header>Friends</Card.Header>
 				<Card.Body>
 					<div>
+						<div id="your-friends-container">
+							<div>TODO: your friends here</div>
+						</div>
+
+						<div id="sent-invites-container">
+							<div>TODO: sent invites here</div>
+						</div>
+					</div>
+
+					<div>
 						<div id="friend-username-container">
 							<label htmlFor="friend-username">Friend username:</label>
 							<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
 						</div>
 					</div>
 
-					<p>Relevant users:</p>
+					{relevantUsers.length > 0 && <p>Relevant users:</p>}
 					<div id="relevant-users-container">
 						{relevantUsers.map(user => (
 							<div className="user-row" key={user.id}>{user.username} <Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button></div>

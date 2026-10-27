@@ -10,7 +10,7 @@ import oauthRouter from "./routes/oauth.js"
 import puzzlesRouter from "./routes/puzzles.js"
 import userRouter from "./routes/user.js"
 import prefRouter from "./routes/preferences.js"
-import friendsRouter from "./routes/friendsRouter.js"
+import friendsRouter from "./routes/friends.js"
 
 app.use(express.json())
 app.use(cors())

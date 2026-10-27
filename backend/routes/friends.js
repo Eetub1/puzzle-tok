@@ -5,8 +5,6 @@ import pool from "../db/db.js"
 const friendsRouter = express.Router()
 friendsRouter.use(authenticateToken)
 
-const FOREIGN_KEY_VIOLATION = "23503"
-const UNIQUE_VIOLATION = "23505"
 
 friendsRouter.get("/search", async (req, res) => {
     const { query } = req.query ?? {}
@@ -36,6 +34,7 @@ friendsRouter.get("/search", async (req, res) => {
             LIMIT 10`,
             [escapedQuery, userId, trimmedQuery],
         )
+        
 
         // TODO: this also needs a way to search if you have already added these specific people
 
@@ -50,16 +49,45 @@ friendsRouter.get("/search", async (req, res) => {
 friendsRouter.post("/invitation", async (req, res) => {
     const { addressee } = req.body ?? {}
     const requester = req.user.id
-    const status = "pending"
+    const pendingStatus = "pending"
 
-    // TODO: need to validate addressee and check that its not the same as requester
-    // and also a bunch of other stuff
+    if (!addressee) {
+        return res.status(400).json({ error: "Addressee is required" })
+    }
+
+    if (String(addressee) === String(requester)) {
+        return res.status(400).json({ error: "You can't send a friend request to yourself" })
+    }
 
     try {
+        // first check here if you are already friends with this user
+        let result = await pool.query(`
+            SELECT 1 
+            FROM friend_relations
+            WHERE person_1 = $1 AND person_2 = $2 OR person_1 = $2 AND person_2 = $1`,
+            [requester, addressee])
+
+        // status 409 basically means that something already exists
+        if (result.rowCount > 0) {
+            return res.status(409).json({ error: "You are already friends with this user" })
+        }
+
+        // do you have an invite sent to that user, and the invite is still pending
+        result = await pool.query(`
+            SELECT 1
+            FROM friend_invitations
+            WHERE requester_id = $1 AND addressee_id = $2 AND invitation_status = $3`,
+            [requester, addressee, pendingStatus])
+
+        if (result.rowCount) {
+            return res.status(409).json({ error: "You have already sent an invite to this user that is still pending" })
+        }
+
+
         await pool.query(`
             INSERT INTO friend_invitations (requester_id, addressee_id, invitation_status)
             VALUES ($1, $2, $3)`,
-            [requester, addressee, status]
+            [requester, addressee, pendingStatus]
         )
 
         return res.status(201).json({ message: "Invitation sent" })

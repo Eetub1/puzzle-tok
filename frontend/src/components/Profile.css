@@ -34,6 +34,11 @@
     margin-left: 10px;
 }
 
+#your-friends-container, #sent-invites-container {
+    border: 1px solid red;
+    margin-bottom: 8px;
+}
+
 #friend-username {
     margin-left: auto;
 }
