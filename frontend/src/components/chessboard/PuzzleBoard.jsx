@@ -311,15 +311,15 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			}
 
 			setMoveFeedback('right')
-			
+
 			setFeedbackMark({
 				square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
 				type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
 			})
 			if (!gameCopy.isCheckmate()) {
 				setTimeout(() => {
-				setFeedbackMark(null)
-				setMoveFeedback(null)
+					setFeedbackMark(null)
+					setMoveFeedback(null)
 				},700)
 			}
 			setPendingPromotion(null)
@@ -411,7 +411,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setAttemptFailed(false)
 		setPuzzleMoveIndex(0)
 		setLastMove(null)
-		setPositions([])	
+		setPositions([])
 		setFeedbackMark(null)
 		setMoveFeedback(null)
 		setSelectedSquare(null)
@@ -424,7 +424,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		const gameCopy = new Chess(puzzle.fen)
 		setGame(gameCopy)
 		setLastMove(puzzle.lastMove)
-		
+
 	}
 
 
@@ -433,11 +433,11 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		<div className="chessboard-container">
 			<StatusRow
 				puzzle={puzzle}
-				game={game} 
-				playerColor={playerColor} 
-				puzzleStatus={puzzleStatus} 
-				moveFeedback={moveFeedback} 
-				attemptFailed={attemptFailed} 
+				game={game}
+				playerColor={playerColor}
+				puzzleStatus={puzzleStatus}
+				moveFeedback={moveFeedback}
+				attemptFailed={attemptFailed}
 				handleRetry={handleRetry}
 				streak={streak}
 			/>
@@ -472,8 +472,8 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 					onSelect={completePromotion}
 					playerColor={playerColor}
 				/>
-			</div>			
-			
+			</div>
+
 		</div>
 
 	)

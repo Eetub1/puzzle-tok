@@ -27,14 +27,16 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal, difficulty, color) => {
+const getBatch = async (signal, difficulty, color, failed) => {
 
-	console.log('service color:', color)
-	console.log('service difficulty:', difficulty)
+	//console.log('get batch color:', color)
+	//console.log('get batch difficulty:', difficulty)
+	console.log('puzze service get batch failed:', failed)
 
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
-		"color": color
+		"color": color,
+		"failed": failed
 	})
 
 	const response = await fetch(`/api/puzzles/batch?${query}`, {
@@ -43,7 +45,7 @@ const getBatch = async (signal, difficulty, color) => {
 
 	const data = await response.json()
 	console.log('batch data:', data)
-	return data.puzzles.map(puzzles => ({
+	return data.map(puzzles => ({
 		fen: puzzles.puzzle.fen,
 		id: puzzles.puzzle.id,
 		moves: puzzles.puzzle.solution.join(' '),
