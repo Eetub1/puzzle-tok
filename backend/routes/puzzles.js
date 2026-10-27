@@ -135,7 +135,7 @@ puzzlesRouter.get('/batch', async (req,res) => {
     let response
 
     if (req.query.failed === 'failed') {
-        response = await getFailedBatch(1) // TODO: get id from server, not from frontend
+        response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
         console.log('FAILED PUZZLES HERE', response)
         
     } else {

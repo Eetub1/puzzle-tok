@@ -27,7 +27,7 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal, difficulty, color, failed) => {
+const getBatch = async (signal, difficulty, color, failed, user_id) => {
 
 	//console.log('get batch color:', color)
 	//console.log('get batch difficulty:', difficulty)
@@ -36,7 +36,8 @@ const getBatch = async (signal, difficulty, color, failed) => {
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
 		"color": color,
-		"failed": failed
+		"failed": failed,
+		"user_id": user_id
 	})
 
 	const response = await fetch(`/api/puzzles/batch?${query}`, {

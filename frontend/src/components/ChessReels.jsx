@@ -16,7 +16,7 @@ import Matches from "./Matches.jsx"
 const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
-	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed})
+	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
 	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
