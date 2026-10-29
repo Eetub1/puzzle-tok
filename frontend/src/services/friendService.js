@@ -46,8 +46,41 @@ const cancelInvite = async addressee => {
 	return data
 }
 
+
+const getReceivedInvites = async () => {
+	const response = await fetch(`/api/friends/invitation`, {
+		method: "GET",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't fetch received friend requests: ${data.error}`)
+	}
+	return data
+}
+
+
+const getFriends = async () => {
+	const response = await fetch(`/api/friends`, {
+		method: "GET",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't fetch friends: ${data.error}`)
+	}
+	return data
+}
+
+
 export {
 	searchUsers,
 	sendFriendRequest,
-	cancelInvite
+	cancelInvite,
+	getReceivedInvites,
+	getFriends
 }

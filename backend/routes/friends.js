@@ -6,6 +6,8 @@ const friendsRouter = express.Router()
 friendsRouter.use(authenticateToken)
 
 const PENDING_STATUS = "pending"
+const REJECTED_STATUS = "rejected"
+const ACCEPTED_STATUS = "accepted"
 
 
 friendsRouter.get("/search", async (req, res) => {
@@ -57,6 +59,48 @@ friendsRouter.get("/search", async (req, res) => {
         return res.json(processedUsers)
     } catch (error) {
         console.error("Error searching users:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+friendsRouter.get("/", async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const result = await pool.query(`
+            SELECT u.id, u.username
+            FROM friend_relations fr
+            JOIN users u
+                ON u.id = CASE WHEN fr.person_1 = $1 THEN fr.person_2 ELSE fr.person_1 END
+            WHERE fr.person_1 = $1 OR fr.person_2 = $1
+            ORDER BY lower(u.username)`,
+            [userId]
+        )
+
+        return res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching friends:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+friendsRouter.get("/invitation", async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const result = await pool.query(`
+            SELECT fi.requester_id, u.username AS requester_username
+            FROM friend_invitations fi
+            JOIN users u ON u.id = fi.requester_id
+            WHERE fi.addressee_id = $1 AND fi.invitation_status = $2`,
+            [userId, PENDING_STATUS]
+        )
+        console.log(result.rows)
+        return res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching invite:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })

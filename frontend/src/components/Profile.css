@@ -34,9 +34,8 @@
     margin-left: 10px;
 }
 
-#your-friends-container, #sent-invites-container, #received-invites-container {
-    border: 1px solid red;
-    margin-bottom: 8px;
+#your-friends-container, #received-invites-container {
+    margin-bottom: 30px;
 }
 
 #friend-username {
@@ -48,8 +47,12 @@
 }
 
 .user-row {
-    border: 2px solid white;
-    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 5px;
     margin-bottom: 12px;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    border-radius: 7px;
 }

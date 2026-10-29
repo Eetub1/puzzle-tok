@@ -3,7 +3,7 @@ import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
-import { searchUsers, sendFriendRequest, cancelInvite } from "../services/friendService"
+import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends } from "../services/friendService"
 
 const Profile = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -13,20 +13,25 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const [editingChessCom, setEditingChessCom] = useState(false)
 	const [friendUsername, setFriendUsername] = useState("")
 	const [relevantUsers, setRelevantUsers] = useState([]) // usernames found by search
+	const [friendInvites, setFriendInvites] = useState([])
+	const [friends, setFriends] = useState([])
 
-	console.log("Relevant users: ", relevantUsers)
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const data = await getUserProfile()
-				console.log(data)
 				setProfile(data)
 				setLichess(data?.lichess ?? "")
 				setChessCom(data?.chessCom ?? "")
+
+				const invites = await getReceivedInvites()
+				setFriendInvites(invites)
+
+				const friends = await getFriends()
+				setFriends(friends)
 			} catch (error) {
-				// console.error("Failed to fetch user profile:", error)
-				setMessage({ message: "Failed to fetch user profile: " + error.message, isError: true })
+				setMessage({ message: error.message, isError: true })
 				setTimeout(() => {
 					setMessage(null)
 				}, 4000)
@@ -178,7 +183,9 @@ const Profile = ({ setMessage, handleLogout }) => {
 			<button id="logout-btn" onClick={handleLogout}>log out</button>
 
 			<Card id="account-card">
-				<Card.Header>Account</Card.Header>
+				<Card.Header>
+					<h4>Account</h4>
+				</Card.Header>
 				<Card.Body>
 					<div className="card-row">
 						<p>Username</p>
@@ -205,44 +212,57 @@ const Profile = ({ setMessage, handleLogout }) => {
 			</Card>
 
 			<Card id="friends-card">
-				<Card.Header>Friends</Card.Header>
+				<Card.Header>
+					<h4>Friends</h4>
+				</Card.Header>
 				<Card.Body>
-					<div>
+					<div id="friends-section">
 						<div id="received-invites-container">
-							<div>TODO: invites received here</div>
+							<h5>Received Invites</h5>
+							{friendInvites.map(invite => (
+								<div className="user-row" key={invite.requester_id}>
+									{invite.requester_username}
+
+									<div>
+										<Button variant="success">Accept</Button>
+										<Button variant="danger">Decline</Button>
+									</div>
+								</div>
+							))}
 						</div>
 
 						<div id="your-friends-container">
-							<div>TODO: your friends here</div>
+							<h5>Your Friends</h5>
+							{friends.length > 0 ?
+								friends.map(friend => (
+									<div className="user-row" key={friend.id}>{friend.username}</div>
+								)) :
+								<div>No friends yet :(</div>}
 						</div>
 
-						<div id="sent-invites-container">
-							<div>TODO: sent invites here</div>
-						</div>
-					</div>
-
-					<div>
-						<div id="friend-username-container">
-							<label htmlFor="friend-username">Friend username:</label>
-							<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
-						</div>
-					</div>
-
-					{relevantUsers.length > 0 && <p>Relevant users:</p>}
-					<div id="relevant-users-container">
-						{relevantUsers.map(user => (
-							<div className="user-row" key={user.id}>{user.username}
-								{user.pendingInviteToUser ?
-									<Button variant="danger" onClick={() => handleCancelInvite(user.id)}>Cancel request?</Button> :
-									<Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button>}
+						<div id="relevant-users-container">
+							<div id="friend-username-container">
+								<label htmlFor="friend-username">Search for friends here:</label>
+								<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
 							</div>
-						))}
+
+							{relevantUsers.length > 0 && <h5>Relevant users</h5>}
+							{relevantUsers.map(user => (
+								<div className="user-row" key={user.id}>{user.username}
+									{user.pendingInviteToUser ?
+										<Button variant="danger" onClick={() => handleCancelInvite(user.id)}>Cancel request?</Button> :
+										<Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button>}
+								</div>
+							))}
+						</div>
 					</div>
 				</Card.Body>
 			</Card>
 
 			<Card id="puzzle-stats-card">
-				<Card.Header>Puzzle Stats</Card.Header>
+				<Card.Header>
+					<h4>Puzzle Stats</h4>
+				</Card.Header>
 				<Card.Body>
 					<div className="card-row">
 						<p>Total puzzles solved: {profile?.puzzleStats?.totalSolved || 0}</p>
@@ -263,7 +283,9 @@ const Profile = ({ setMessage, handleLogout }) => {
 			</Card>
 
 			<Card id="chess-accounts-card">
-				<Card.Header>Chess Accounts</Card.Header>
+				<Card.Header>
+					<h4>Chess Accounts</h4>
+				</Card.Header>
 
 				<Card.Body>
 					<div className="card-row">
