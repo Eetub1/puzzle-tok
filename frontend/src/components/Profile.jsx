@@ -3,7 +3,7 @@ import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
-import { searchUsers, sendFriendRequest } from "../services/friendService"
+import { searchUsers, sendFriendRequest, cancelInvite } from "../services/friendService"
 
 const Profile = ({ setMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -13,6 +13,8 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const [editingChessCom, setEditingChessCom] = useState(false)
 	const [friendUsername, setFriendUsername] = useState("")
 	const [relevantUsers, setRelevantUsers] = useState([]) // usernames found by search
+
+	console.log("Relevant users: ", relevantUsers)
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -153,6 +155,24 @@ const Profile = ({ setMessage, handleLogout }) => {
 	}
 
 
+	const handleCancelInvite = async friendId => {
+		try {
+			const result = await cancelInvite(friendId)
+			setMessage({ message: result.message, isError: false })
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			setMessage({ message: error.message, isError: true })
+			setTimeout(() => {
+				setMessage(null)
+			}, 4000)
+		}
+	}
+
+
 	return (
 		<div id="profile-page">
 			<button id="logout-btn" onClick={handleLogout}>log out</button>
@@ -188,6 +208,10 @@ const Profile = ({ setMessage, handleLogout }) => {
 				<Card.Header>Friends</Card.Header>
 				<Card.Body>
 					<div>
+						<div id="received-invites-container">
+							<div>TODO: invites received here</div>
+						</div>
+
 						<div id="your-friends-container">
 							<div>TODO: your friends here</div>
 						</div>
@@ -207,7 +231,11 @@ const Profile = ({ setMessage, handleLogout }) => {
 					{relevantUsers.length > 0 && <p>Relevant users:</p>}
 					<div id="relevant-users-container">
 						{relevantUsers.map(user => (
-							<div className="user-row" key={user.id}>{user.username} <Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button></div>
+							<div className="user-row" key={user.id}>{user.username}
+								{user.pendingInviteToUser ?
+									<Button variant="danger" onClick={() => handleCancelInvite(user.id)}>Cancel request?</Button> :
+									<Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button>}
+							</div>
 						))}
 					</div>
 				</Card.Body>

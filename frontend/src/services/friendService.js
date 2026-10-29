@@ -31,7 +31,23 @@ const sendFriendRequest = async addressee => {
 	return data
 }
 
+
+const cancelInvite = async addressee => {
+	const response = await fetch(`/api/friends/invitation/${addressee}`, {
+		method: "DELETE",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't cancel friend request: ${data.error}`)
+	}
+	return data
+}
+
 export {
 	searchUsers,
-	sendFriendRequest
+	sendFriendRequest,
+	cancelInvite
 }

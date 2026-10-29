@@ -5,6 +5,8 @@ import pool from "../db/db.js"
 const friendsRouter = express.Router()
 friendsRouter.use(authenticateToken)
 
+const PENDING_STATUS = "pending"
+
 
 friendsRouter.get("/search", async (req, res) => {
     const { query } = req.query ?? {}
@@ -23,7 +25,7 @@ friendsRouter.get("/search", async (req, res) => {
     const escapedQuery = trimmedQuery.replace(/[\\%_]/g, "\\$&")
 
     try {
-        const result = await pool.query(
+        const users = await pool.query(
            `SELECT id, username
             FROM users
             WHERE lower(username) LIKE lower($1) || '%'
@@ -35,10 +37,24 @@ friendsRouter.get("/search", async (req, res) => {
             [escapedQuery, userId, trimmedQuery],
         )
         
-
-        // TODO: this also needs a way to search if you have already added these specific people
-
-        return res.json(result.rows)
+        // need to search friend_invitations table to see if you have already sent an invite
+        const processedUsers = await Promise.all(users.rows.map(async row => {
+            const status = await pool.query(`
+                SELECT invitation_status
+                FROM friend_invitations
+                WHERE requester_id = $1 AND addressee_id = $2`,
+                [userId, row.id]
+            )
+        
+            const user = {
+                id: row.id, 
+                username: row.username,
+                pendingInviteToUser: status.rows[0]?.invitation_status === PENDING_STATUS
+            }
+            return user
+        }))
+        
+        return res.json(processedUsers)
     } catch (error) {
         console.error("Error searching users:", error)
         return res.status(500).json({ error: "Internal server error" })
@@ -49,7 +65,6 @@ friendsRouter.get("/search", async (req, res) => {
 friendsRouter.post("/invitation", async (req, res) => {
     const { addressee } = req.body ?? {}
     const requester = req.user.id
-    const pendingStatus = "pending"
 
     if (!addressee) {
         return res.status(400).json({ error: "Addressee is required" })
@@ -72,12 +87,12 @@ friendsRouter.post("/invitation", async (req, res) => {
             return res.status(409).json({ error: "You are already friends with this user" })
         }
 
-        // do you have an invite sent to that user, and the invite is still pending
+        // do you have an invite sent to that user, and is the invite still pending
         result = await pool.query(`
             SELECT 1
             FROM friend_invitations
             WHERE requester_id = $1 AND addressee_id = $2 AND invitation_status = $3`,
-            [requester, addressee, pendingStatus])
+            [requester, addressee, PENDING_STATUS])
 
         if (result.rowCount) {
             return res.status(409).json({ error: "You have already sent an invite to this user that is still pending" })
@@ -87,12 +102,37 @@ friendsRouter.post("/invitation", async (req, res) => {
         await pool.query(`
             INSERT INTO friend_invitations (requester_id, addressee_id, invitation_status)
             VALUES ($1, $2, $3)`,
-            [requester, addressee, pendingStatus]
+            [requester, addressee, PENDING_STATUS]
         )
 
         return res.status(201).json({ message: "Invitation sent" })
     } catch (error) {
         console.error("Error sending invite:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+// This id parameter is the id of the person to who you have sent a friend request
+// and want to cancel it now
+friendsRouter.delete("/invitation/:id", async (req, res) => {
+    const addressee = req.params.id
+    const requester = req.user.id
+
+    try {
+        const result = await pool.query(`
+            DELETE FROM friend_invitations
+            WHERE addressee_id = $1 AND requester_id = $2`,
+            [addressee, requester],
+        )
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Invitation not found" })
+        }
+
+        return res.json({ message: "Succesfully cancelled invitation" })
+    } catch (error) {
+        console.error("Error deleting invitation:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })

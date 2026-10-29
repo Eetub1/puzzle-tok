@@ -34,7 +34,7 @@
     margin-left: 10px;
 }
 
-#your-friends-container, #sent-invites-container {
+#your-friends-container, #sent-invites-container, #received-invites-container {
     border: 1px solid red;
     margin-bottom: 8px;
 }
