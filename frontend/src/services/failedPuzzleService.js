@@ -4,11 +4,11 @@ import { setPuzzleAttempt } from "./puzzleAttemptService"
 const setFailedPuzzle = async (puzzleId, puzzleRating) => {
     const response = await fetch(`/api/user/failed`, {
         method: "POST",
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${getToken()}` 
+            "Authorization": `Bearer ${getToken()}`
         },
-        body: JSON.stringify({puzzleId})
+        body: JSON.stringify({ puzzleId })
     })
     const data = await response.json()
     if (!response.ok) {
@@ -22,7 +22,7 @@ const getFailedPuzzles = async (signal) => {
     const response = await fetch(`/api/user/failed`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${getToken()}` 
+            "Authorization": `Bearer ${getToken()}`
         },
         signal
     })
@@ -32,16 +32,16 @@ const getFailedPuzzles = async (signal) => {
         throw new Error(data.error)
     }
     return data
-}   
+}
 
 const removeFailedPuzzle = async (puzzleId) => {
     const response = await fetch(`/api/user/failed/${puzzleId}`, {
         method: "DELETE",
         headers: {
-            "Authorization": `Bearer ${getToken()}` 
+            "Authorization": `Bearer ${getToken()}`
         },
     })
-    const data = await response.json()  
+    const data = await response.json()
     if (!response.ok) {
         throw new Error(data.error)
     }
