@@ -37,6 +37,8 @@ CREATE TABLE email_verification_tokens (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
+
+-- TODO: refactor to remove separate id, use user + puzzle as primary
 CREATE TABLE failed_puzzles (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -46,6 +48,7 @@ CREATE TABLE failed_puzzles (
     UNIQUE (user_id, puzzle_id)
 );
 
+-- TODO: refactor to remove separate id, use user + puzzle as primary
 CREATE TABLE puzzle_attempts (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -58,5 +61,6 @@ CREATE TABLE puzzle_attempts (
 CREATE TABLE preferences (
     user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     color      text        NOT NULL,
-    difficulty text        NOT NULL
+    difficulty text        NOT NULL,
+    failed     text       NOT NULL
 );

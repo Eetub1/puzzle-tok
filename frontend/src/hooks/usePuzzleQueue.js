@@ -6,7 +6,7 @@ function shuffle(puzzles) {
 	return [...puzzles].sort(() => Math.random() - 0.5)
 }
 
-export function usePuzzleQueue({ menuOpen, difficulty, color }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color, failed, user_id }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -69,7 +69,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 			const puzzleBatch = async () => {
 				try {
 					const [batch, failedPuzzleIds] = await Promise.all([
-						getBatch(controller.signal, difficulty, color),
+						getBatch(controller.signal, difficulty, color, failed, user_id),
 						getFailedPuzzles(controller.signal),
 					])
 
@@ -97,7 +97,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 				controller.abort() // Abort fetch if new batch is requested
 			}
 		}
-	}, [puzzleQueue.length, menuOpen, dailyPuzzle, color, difficulty])
+	}, [puzzleQueue.length, menuOpen, dailyPuzzle, color, difficulty, failed])
 
 	// Handle moving to next puzzle in queue
 	function handleNextPuzzle(savedState) {
@@ -114,7 +114,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 				savedState,
 			},
 		]
-		
+
 		if(updatedMemory.length > 10) {
 			setPuzzleMemory(updatedMemory.slice(-10))
 			console.log('puzzle memory over 10, trimming to last 10 puzzles')
@@ -135,12 +135,12 @@ export function usePuzzleQueue({ menuOpen, difficulty, color }) {
 		const previousPuzzle = puzzleMemory[puzzleMemory.length - 1]
 
 		setPuzzleQueue([
-        	{ 
-				...puzzle, 
-				savedState 
+			{
+				...puzzle,
+				savedState
 			},
-        	...puzzleQueue,
-    	])
+			...puzzleQueue,
+		])
 		setPuzzle(previousPuzzle)
 		console.log('current puzzle:', previousPuzzle)
 		setPuzzleMemory(puzzleMemory.slice(0, -1))
