@@ -5,7 +5,7 @@ import { updateUserChessAccounts, getUserProfile } from "../services/userService
 import { resendEmailVerification } from "../services/userService"
 import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends } from "../services/friendService"
 
-const Profile = ({ setMessage, handleLogout }) => {
+const Profile = ({ showMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
 	const [chessCom, setChessCom] = useState("")
 	const [profile, setProfile] = useState(null) // Contains username, email, verification status and chess account usernames
@@ -31,41 +31,26 @@ const Profile = ({ setMessage, handleLogout }) => {
 				const friends = await getFriends()
 				setFriends(friends)
 			} catch (error) {
-				setMessage({ message: error.message, isError: true })
-				setTimeout(() => {
-					setMessage(null)
-				}, 4000)
+				showMessage(error.message, true)
 			}
 		}
 		fetchData()
-	}, [setMessage]) // this shouldnt be a dependency, but eslint is complaining about it
+	}, [showMessage]) // this probably shouldn't be a dependency, but eslint is complaining about it
 
 
 	const handleSendVerification = async () => {
-		// This should send a new verification email to the user
 		try {
-			const result = await resendEmailVerification()
-			console.log(result)
-			setMessage({ message: "Email verification link resent!", isError: false})
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			await resendEmailVerification()
+			showMessage("Email verification link resent")
 		} catch (error) {
-			console.log("Couldn't resend email verification link: " + error)
-			setMessage({ message: "Couldn't resend email verification link: " + error, isError: true})
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 		}
 	}
 
 
 	const handleUsernameChanges = async (accounts) => {
 		if (!accounts.lichess && !accounts.chessCom) {
-			setMessage({ message: "At least one of Lichess or Chess.com username must be provided", isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage("At least one of Lichess or Chess.com username must be provided", true)
 			return false
 		}
 
@@ -74,21 +59,14 @@ const Profile = ({ setMessage, handleLogout }) => {
 			localStorage.removeItem("userGames")
 
 			const data = await getUserProfile()
-			console.log(data)
 			setProfile(data)
 
-			console.log("Chess accounts updated successfully:", data)
-			setMessage({ message: "Chess account updated successfully", isError: false })
-			setTimeout(() => {
-				setMessage(null)
-			}, 2000)
+			showMessage("Chess account updated successfully")
+
 			return true
 		} catch (error) {
 			console.error("Failed to update chess accounts:", error)
-			setMessage({ message: error.message, isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 			return false
 		}
 	}
@@ -132,10 +110,7 @@ const Profile = ({ setMessage, handleLogout }) => {
 		try {
 			setRelevantUsers(await searchUsers(friendQuery))
 		} catch (error) {
-			setMessage({ message: error.message, isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 		}
 	}
 
@@ -143,19 +118,13 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const handleSendFriendInvite = async friendId => {
 		try {
 			const result = await sendFriendRequest(friendId)
-			setMessage({ message: result.message, isError: false })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(result.message)
 
 			// use the already typed query to get the same users again
 			// this is so that the add friend button disappears for this specific user
 			setRelevantUsers(await searchUsers(friendUsername))
 		} catch (error) {
-			setMessage({ message: error.message, isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 		}
 	}
 
@@ -163,18 +132,22 @@ const Profile = ({ setMessage, handleLogout }) => {
 	const handleCancelInvite = async friendId => {
 		try {
 			const result = await cancelInvite(friendId)
-			setMessage({ message: result.message, isError: false })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(result.message)
 
 			setRelevantUsers(await searchUsers(friendUsername))
 		} catch (error) {
-			setMessage({ message: error.message, isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 		}
+	}
+
+
+	const handleAcceptInvite = async requesterId => {
+
+	}
+
+
+	const handleDeclineInvite = async requesterId => {
+		
 	}
 
 
@@ -220,12 +193,12 @@ const Profile = ({ setMessage, handleLogout }) => {
 						<div id="received-invites-container">
 							<h5>Received Invites</h5>
 							{friendInvites.map(invite => (
-								<div className="user-row" key={invite.requester_id}>
-									{invite.requester_username}
+								<div className="user-row" key={invite.requesterId}>
+									{invite.requesterUsername}
 
 									<div>
-										<Button variant="success">Accept</Button>
-										<Button variant="danger">Decline</Button>
+										<Button variant="success" onClick={() => handleAcceptInvite(invite.requesterId)}>Accept</Button>
+										<Button variant="danger" onClick={() => handleDeclineInvite(invite.requesterId)}>Decline</Button>
 									</div>
 								</div>
 							))}

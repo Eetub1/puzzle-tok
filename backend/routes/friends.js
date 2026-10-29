@@ -98,7 +98,15 @@ friendsRouter.get("/invitation", async (req, res) => {
             [userId, PENDING_STATUS]
         )
         console.log(result.rows)
-        return res.json(result.rows)
+        const data = result.rows.map(row => (
+            { 
+                requesterId: row.requester_id, 
+                username: row.username,
+                requesterUsername: row.requester_username
+            }
+        ))
+
+        return res.json(data)
     } catch (error) {
         console.error("Error fetching invite:", error)
         return res.status(500).json({ error: "Internal server error" })
