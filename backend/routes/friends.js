@@ -189,4 +189,53 @@ friendsRouter.delete("/invitation/:id", async (req, res) => {
     }
 })
 
+
+friendsRouter.post("/invitation/accept", async (req, res) => {
+    const { requester } = req.body ?? {}
+    const addressee = req.user.id
+
+    if (!requester) {
+        return res.status(400).json({ error: "Requester ID is required" })
+    }
+
+    try {
+        // first need to check that there is a pending invite from requester to addressee
+        const result = await pool.query(`
+            SELECT 1 
+            FROM friend_invitations
+            WHERE requester_id = $1 AND 
+                  addressee_id = $2 AND
+                  invitation_status = $3`,
+            [requester, addressee, PENDING_STATUS]
+        )
+
+        if (result.rowCount !== 1) {
+            return res.status(404).json({ error: "No invitation found in database"})
+        }
+
+        // add as friend
+        await pool.query(`
+            INSERT INTO friend_relations (person_1, person_2)
+            VALUES ($1, $2)`, 
+            [addressee, requester]
+        )
+
+        // change the invitation state to accepted
+        await pool.query(`
+            UPDATE friend_invitations
+            SET invitation_status = $3
+            WHERE requester_id = $1 AND 
+                  addressee_id = $2 AND
+                  invitation_status = $4`, 
+            [requester, addressee, ACCEPTED_STATUS, PENDING_STATUS]
+        )
+
+        return res.status(200).json({ message: "Added friend"})
+    } catch (error) {
+        console.error("Error accepting invitation:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
 export default friendsRouter

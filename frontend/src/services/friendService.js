@@ -77,10 +77,28 @@ const getFriends = async () => {
 }
 
 
+const acceptFriendInvite = async requester => {
+	const response = await fetch(`/api/friends/invitation/accept`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${getToken()}` },
+		body: JSON.stringify({ requester })
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't accept friend request: ${data.error}`)
+	}
+	return data
+}
+
+
 export {
 	searchUsers,
 	sendFriendRequest,
 	cancelInvite,
 	getReceivedInvites,
-	getFriends
+	getFriends,
+	acceptFriendInvite
 }
