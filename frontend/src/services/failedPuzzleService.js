@@ -1,7 +1,7 @@
 import { getToken } from "./authService"
 import { setPuzzleAttempt } from "./puzzleAttemptService"
 
-const setFailedPuzzle = async (puzzleId, puzzleRating) => {
+const setFailedPuzzle = async (puzzleId, puzzleRating, retryUsed) => {
     const response = await fetch(`/api/user/failed`, {
         method: "POST",
         headers: {
@@ -14,8 +14,8 @@ const setFailedPuzzle = async (puzzleId, puzzleRating) => {
     if (!response.ok) {
         throw new Error(data.error)
     }
-    await setPuzzleAttempt(puzzleId, puzzleRating, false)
-    return data
+    const result = await setPuzzleAttempt(puzzleId, puzzleRating, false, retryUsed)
+    return { ...data, ...result }
 }
 
 const getFailedPuzzles = async (signal) => {

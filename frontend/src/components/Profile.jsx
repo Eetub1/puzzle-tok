@@ -151,6 +151,9 @@ const Profile = ({ setMessage, handleLogout }) => {
 				<Card.Header>Puzzle Stats</Card.Header>
 				<Card.Body>
 					<div className="card-row">
+						<p>Player Rating: {profile?.puzzleStats?.playerRating || 0}</p>
+					</div>
+					<div className="card-row">
 						<p>Total puzzles solved: {profile?.puzzleStats?.totalSolved || 0}</p>
 					</div>
 					<div className="card-row">

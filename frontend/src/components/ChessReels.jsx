@@ -10,6 +10,7 @@ import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
 import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 import { getStreak } from "../services/userService.js"
 import { usePreference } from "../hooks/usePreference.js"
+import { getUserProfile } from "../services/userService.js"
 
 import Matches from "./Matches.jsx"
 
@@ -17,10 +18,11 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
 	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
-	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState} = puzzleQueue
+	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState, savePuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
 	const [showMoveControls, setShowMoveControls] = useState(true)
+	const [playerRating, setPlayerRating] = useState(null)
 
 	const boardRef = useRef(null)
 
@@ -38,11 +40,19 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 
 	useEffect(() => {
 		getStreak().then(setStreak).catch(console.error)
+		getUserProfile().then(profile => setPlayerRating(profile.puzzleStats.playerRating)).catch(console.error) 
+		// TODO: Create dedicated API endpoint to fetch only player rating
 	}, [])
 
 	async function handleEnded() {
 		try {
-			setStreak(await getStreak())
+			const [newStreak, profile] = await Promise.all([
+				getStreak(),
+				getUserProfile(), // TODO: Create dedicated API endpoint to fetch only player rating
+			])
+
+			setStreak(newStreak)
+			setPlayerRating(profile.puzzleStats.playerRating)
 		} catch (error) {
 			console.error(error)
 		}
@@ -62,7 +72,10 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 
 	const handleMenuClick = (clickedOption) => {
 		if (menuOpen === "DailyPuzzle" && clickedOption !== menuOpen) { // Save puzzle state when leaving Daily Puzzle menu
-			saveDailyPuzzleState(boardRef.current?.getPuzzleState())
+        	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
+    	}
+		if (menuOpen === "Puzzles" && clickedOption !== menuOpen) { // Save puzzle state when leaving Puzzles menu
+			savePuzzleState(boardRef.current?.getPuzzleState())
 		}
 		setMenuOpen(clickedOption)
 
@@ -125,7 +138,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} />)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -136,7 +149,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					</div>
 				) : (
 					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
-						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} onEnded={handleEnded} streak={streak}/> : <p>Loading puzzle...</p>)}
+						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} onEnded={handleEnded} streak={streak} playerRating={playerRating} /> : <p>Loading puzzle...</p>)}
 						{menuOpen === "Openings" && <ChessBoard ref={boardRef}/>}
 						{menuOpen === "YourMatches" && <Matches setMessage={setMessage}/>}
 						{menuOpen === "Profile" && <Profile setMessage={setMessage} handleLogout={handleLogout}/>}

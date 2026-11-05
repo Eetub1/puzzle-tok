@@ -20,6 +20,22 @@
     margin-right: auto;
 }
 
+.puzzle-status-retry {
+    background-color: var(--status-row-neutral-color);
+}
+
+.puzzle-status-player-rating {
+    background-color: var(--status-row-neutral-color);
+}
+
+.puzzle-status-player-rating-decrease {
+    background-color: var(--status-row-failed-color);
+}
+
+.puzzle-status-player-rating-increase {
+    background-color: var(--status-row-solved-color);
+}
+
 .puzzle-status-streak-low {
     background-color: var(--status-row-streak-low-color);
 }
