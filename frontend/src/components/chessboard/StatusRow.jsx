@@ -3,39 +3,39 @@ import './StatusRow.css'
 // Component display status, current turn, move feedback
 function StatusRow({ puzzle, game, playerColor, puzzleStatus, moveFeedback, attemptFailed, handleRetry, streak, playerRating, ratingChange, retryUsed }) {
 
-    const isSolved = puzzleStatus === 'solved'
+	const isSolved = puzzleStatus === 'solved'
 
-    let status = 'neutral'
-    let statusText = game.turn() === playerColor ? 'Your turn' : 'Opponent turn'
+	let status = 'neutral'
+	let statusText = game.turn() === playerColor ? 'Your turn' : 'Opponent turn'
 
-    if (puzzleStatus === 'viewing') {
-        statusText = 'Reviewing moves'
-    }
-    if (moveFeedback === 'right') {
-        status = 'solved'
-        statusText = 'Correct move'
-    } else if (moveFeedback === 'wrong') {
-        status = 'failed'
-        statusText = 'Wrong move'
-    }
-    if (isSolved && attemptFailed) {
-        status = 'failed'
-        statusText = 'Puzzle ended'
-    } 
+	if (puzzleStatus === 'viewing') {
+		statusText = 'Reviewing moves'
+	}
+	if (moveFeedback === 'right') {
+		status = 'solved'
+		statusText = 'Correct move'
+	} else if (moveFeedback === 'wrong') {
+		status = 'failed'
+		statusText = 'Wrong move'
+	}
+	if (isSolved && attemptFailed) {
+		status = 'failed'
+		statusText = 'Puzzle ended'
+	}
 
-    let resultStatus = null
-    let resultText = null
+	let resultStatus = null
+	let resultText = null
 
-    if (attemptFailed) {
-        resultStatus = 'failed'
-        resultText = 'Failed'
-    } else if (isSolved) {
-        resultStatus = 'solved'
-        resultText = '✓ Solved'
-    } else if (puzzle.previouslyFailed) {
-        resultStatus = 'previously-failed'
-        resultText = 'Previously failed'
-    }
+	if (attemptFailed) {
+		resultStatus = 'failed'
+		resultText = 'Failed'
+	} else if (isSolved) {
+		resultStatus = 'solved'
+		resultText = '✓ Solved'
+	} else if (puzzle.previouslyFailed) {
+		resultStatus = 'previously-failed'
+		resultText = 'Previously failed'
+	}
 
     let ratingChangeText = ''
     if (ratingChange > 0) {

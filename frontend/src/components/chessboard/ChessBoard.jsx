@@ -146,13 +146,13 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 			setLastMove(move)
 			setSelectedSquare(null)
 			setPositions([ // If new move is made remove all future positions and add new one
-    			...positions.slice(0, moveIndex + 1),
+				...positions.slice(0, moveIndex + 1),
 				{
 					fen: gameCopy.fen(),
 					lastMove: move,
 				},
 			])
-			setmoveIndex(moveIndex + 1) 
+			setmoveIndex(moveIndex + 1)
 			if (gameCopy.isGameOver()) {
 				setGameover(true)
 			}

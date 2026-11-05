@@ -16,8 +16,8 @@ import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {difficulty, color, setDifficulty, setColor} = usePreference()
-	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color})
+	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
+	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
 	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState, savePuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
@@ -27,15 +27,15 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	const boardRef = useRef(null)
 
 
-	// Functions to handle navigate between puzzle and saving puzzle state 
+	// Functions to handle navigate between puzzle and saving puzzle state
 	function handleNextPuzzle() {
-    	puzzleQueue.handleNextPuzzle(boardRef.current?.getPuzzleState())
+		puzzleQueue.handleNextPuzzle(boardRef.current?.getPuzzleState())
 	}
 
 	function handlePreviousPuzzle() {
 		puzzleQueue.handlePreviousPuzzle(boardRef.current?.getPuzzleState())
 	}
-	
+
 	const [streak, setStreak] = useState(0)
 
 	useEffect(() => {
@@ -75,7 +75,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
         	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
     	}
 		if (menuOpen === "Puzzles" && clickedOption !== menuOpen) { // Save puzzle state when leaving Puzzles menu
-			puzzleQueue.savePuzzleState(boardRef.current?.getPuzzleState())
+			savePuzzleState(boardRef.current?.getPuzzleState())
 		}
 		setMenuOpen(clickedOption)
 
@@ -161,21 +161,23 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
 				</div>}
 			</div>
-			
+
 			<div className="bottom-bar">
-				{showBottomBar && 
+				{showBottomBar &&
 				<div className="action-buttons">
 					<button onClick={() => boardRef?.current?.giveHint()} className="hint-btn">Hint</button>
 					<button onClick={() => boardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
 				</div>}
 
-				{showMoveControls && 
+				{showMoveControls &&
 				<div className="step-controls">
 					<button onClick={() => boardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
 					<button onClick={() => boardRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>}
 
-				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty} color={color} setDifficulty={setDifficulty} setColor={setColor}/>}
+				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty}
+					color={color} setDifficulty={setDifficulty} setColor={setColor}
+					failed={failed} setFailed={setFailed}/>}
 			</div>
 		</div>
 	)

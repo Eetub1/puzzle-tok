@@ -8,9 +8,9 @@ export function PromotionChooser({ pendingPromotion, onSelect, playerColor }) {
 
 
 	const promotionPosition = playerColor === 'b' ? {
-			left: `${(7 - (pendingPromotion.to.charCodeAt(0) - 'a'.charCodeAt(0))) * 12.5}%`,
-			top: `${(Number(pendingPromotion.to[1])- 1) * 12.5}%`,
-		}
+		left: `${(7 - (pendingPromotion.to.charCodeAt(0) - 'a'.charCodeAt(0))) * 12.5}%`,
+		top: `${(Number(pendingPromotion.to[1])- 1) * 12.5}%`,
+	}
 		: {
 			left: `${(pendingPromotion.to.charCodeAt(0) - 'a'.charCodeAt(0)) * 12.5}%`,
 			top: `${(8 - Number(pendingPromotion.to[1])) * 12.5}%`,
