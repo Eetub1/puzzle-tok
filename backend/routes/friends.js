@@ -6,7 +6,7 @@ const friendsRouter = express.Router()
 friendsRouter.use(authenticateToken)
 
 const PENDING_STATUS = "pending"
-const REJECTED_STATUS = "rejected"
+const DECLINED_STATUS = "rejected"
 const ACCEPTED_STATUS = "accepted"
 
 
@@ -210,7 +210,7 @@ friendsRouter.post("/invitation/accept", async (req, res) => {
         )
 
         if (result.rowCount !== 1) {
-            return res.status(404).json({ error: "No invitation found in database"})
+            return res.status(404).json({ error: "No invitation found in database" })
         }
 
         // add as friend
@@ -233,6 +233,43 @@ friendsRouter.post("/invitation/accept", async (req, res) => {
         return res.status(200).json({ message: "Added friend"})
     } catch (error) {
         console.error("Error accepting invitation:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+friendsRouter.post("/invitation/decline", async (req, res) => {
+    const { requester } = req.body ?? {}
+    const addressee = req.user.id
+
+    try {
+        // need to mark friend_invitation row as declined, first check if this invitation exists
+        const result = await pool.query(`
+            SELECT 1
+            FROM friend_invitations
+            WHERE requester_id = $1 AND
+                  addressee_id = $2 AND
+                  invitation_status = $3`, 
+            [requester, addressee, PENDING_STATUS]
+        )
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "No invitation found in database" })
+        }
+
+        // change the invitation state to declined
+        await pool.query(`
+            UPDATE friend_invitations
+            SET invitation_status = $3
+            WHERE requester_id = $1 AND 
+                  addressee_id = $2 AND
+                  invitation_status = $4`, 
+            [requester, addressee, DECLINED_STATUS, PENDING_STATUS]
+        )
+
+        return res.status(200).json({ message: "Declined invitation"})
+    } catch (error) {
+        console.error("Error declining invitation:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })

@@ -94,11 +94,29 @@ const acceptFriendInvite = async requester => {
 }
 
 
+const declineFriendInvite = async requester => {
+	const response = await fetch(`/api/friends/invitation/decline`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${getToken()}` },
+		body: JSON.stringify({ requester })
+	})
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't decline friend request: ${data.error}`)
+	}
+	return data
+}
+
+
 export {
 	searchUsers,
 	sendFriendRequest,
 	cancelInvite,
 	getReceivedInvites,
 	getFriends,
-	acceptFriendInvite
+	acceptFriendInvite,
+	declineFriendInvite
 }

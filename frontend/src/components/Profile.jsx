@@ -3,7 +3,7 @@ import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
-import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends, acceptFriendInvite } from "../services/friendService"
+import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends, acceptFriendInvite, declineFriendInvite } from "../services/friendService"
 
 const Profile = ({ showMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
@@ -153,7 +153,6 @@ const Profile = ({ showMessage, handleLogout }) => {
 
 	const handleDeclineInvite = async requesterId => {
 		try {
-			// TODO: this in friendService
 			const result = await declineFriendInvite(requesterId)
 			setFriendInvites(prev => prev.filter(invite => invite.requesterId !== requesterId))
 			showMessage(result.message)
