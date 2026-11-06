@@ -1,84 +1,69 @@
 import { useState, useEffect } from "react"
-import { Card } from "react-bootstrap"
+import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
+import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends, acceptFriendInvite, declineFriendInvite } from "../services/friendService"
 
-const Profile = ({ setMessage, handleLogout }) => {
+const Profile = ({ showMessage, handleLogout }) => {
 	const [lichess, setLichess] = useState("")
 	const [chessCom, setChessCom] = useState("")
 	const [profile, setProfile] = useState(null) // Contains username, email, verification status and chess account usernames
 	const [editingLichess, setEditingLichess] = useState(false)
 	const [editingChessCom, setEditingChessCom] = useState(false)
+	const [friendUsername, setFriendUsername] = useState("")
+	const [relevantUsers, setRelevantUsers] = useState([]) // usernames found by search
+	const [friendInvites, setFriendInvites] = useState([])
+	const [friends, setFriends] = useState([])
+
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const data = await getUserProfile()
-				console.log(data)
 				setProfile(data)
 				setLichess(data?.lichess ?? "")
 				setChessCom(data?.chessCom ?? "")
+
+				const invites = await getReceivedInvites()
+				setFriendInvites(invites)
+
+				const friends = await getFriends()
+				setFriends(friends)
 			} catch (error) {
-				// console.error("Failed to fetch user profile:", error)
-				setMessage({ message: "Failed to fetch user profile: " + error.message, isError: true })
-				setTimeout(() => {
-					setMessage(null)
-				}, 4000)
+				showMessage(error.message, true)
 			}
 		}
 		fetchData()
-	}, [setMessage]) // this shouldnt be a dependency, but eslint is complaining about it
+	}, [showMessage]) // this probably shouldn't be a dependency, but eslint is complaining about it
 
 
 	const handleSendVerification = async () => {
-		// This should send a new verification email to the user
 		try {
-			const result = await resendEmailVerification()
-			console.log(result)
-			setMessage({ message: "Email verification link resent!", isError: false})
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			await resendEmailVerification()
+			showMessage("Email verification link resent")
 		} catch (error) {
-			console.log("Couldn't resend email verification link: " + error)
-			setMessage({ message: "Couldn't resend email verification link: " + error, isError: true})
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 		}
 	}
 
 
 	const handleUsernameChanges = async (accounts) => {
 		if (!accounts.lichess && !accounts.chessCom) {
-			setMessage({ message: "At least one of Lichess or Chess.com username must be provided", isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage("At least one of Lichess or Chess.com username must be provided", true)
 			return false
 		}
 
 		try {
 			await updateUserChessAccounts(accounts)
 			localStorage.removeItem("userGames")
-
 			const data = await getUserProfile()
-			console.log(data)
 			setProfile(data)
-
-			console.log("Chess accounts updated successfully:", data)
-			setMessage({ message: "Chess account updated successfully", isError: false })
-			setTimeout(() => {
-				setMessage(null)
-			}, 2000)
+			showMessage("Chess account updated successfully")
 			return true
 		} catch (error) {
 			console.error("Failed to update chess accounts:", error)
-			setMessage({ message: error.message, isError: true })
-			setTimeout(() => {
-				setMessage(null)
-			}, 4000)
+			showMessage(error.message, true)
 			return false
 		}
 	}
@@ -115,13 +100,78 @@ const Profile = ({ setMessage, handleLogout }) => {
 	}
 
 
-	return (
+	const handleFriendSearch = async event => {
+		const friendQuery = event.target.value
+		setFriendUsername(friendQuery)
 
+		try {
+			setRelevantUsers(await searchUsers(friendQuery))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleSendFriendInvite = async friendId => {
+		try {
+			const result = await sendFriendRequest(friendId)
+			showMessage(result.message)
+
+			// use the already typed query to get the same users again
+			// this is so that the add friend button disappears for this specific user
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleCancelInvite = async friendId => {
+		try {
+			const result = await cancelInvite(friendId)
+			showMessage(result.message)
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleAcceptInvite = async requesterId => {
+		console.log("Requester id: ", requesterId)
+
+		try {
+			const result = await acceptFriendInvite(requesterId)
+			setFriendInvites(prev => prev.filter(invite => invite.requesterId !== requesterId))
+			setFriends(await getFriends())
+			showMessage(result.message)
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleDeclineInvite = async requesterId => {
+		try {
+			const result = await declineFriendInvite(requesterId)
+			setFriendInvites(prev => prev.filter(invite => invite.requesterId !== requesterId))
+			showMessage(result.message)
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+	console.log("Friend invites: ", friendInvites)
+
+
+	return (
 		<div id="profile-page">
 			<button id="logout-btn" onClick={handleLogout}>log out</button>
 
 			<Card id="account-card">
-				<Card.Header>Account</Card.Header>
+				<Card.Header>
+					<h4>Account</h4>
+				</Card.Header>
 				<Card.Body>
 					<div className="card-row">
 						<p>Username</p>
@@ -147,8 +197,58 @@ const Profile = ({ setMessage, handleLogout }) => {
 				</Card.Body>
 			</Card>
 
+			<Card id="friends-card">
+				<Card.Header>
+					<h4>Friends</h4>
+				</Card.Header>
+				<Card.Body>
+					<div id="friends-section">
+						<div id="received-invites-container">
+							<h5>Received Invites</h5>
+							{friendInvites.map(invite => (
+								<div className="user-row" key={invite.requesterId}>
+									{invite.requesterUsername}
+
+									<div>
+										<Button variant="success" onClick={() => handleAcceptInvite(invite.requesterId)}>Accept</Button>
+										<Button variant="danger" onClick={() => handleDeclineInvite(invite.requesterId)}>Decline</Button>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<div id="your-friends-container">
+							<h5>Your Friends</h5>
+							{friends.length > 0 ?
+								friends.map(friend => (
+									<div className="user-row" key={friend.id}>{friend.username}</div>
+								)) :
+								<div>No friends yet :(</div>}
+						</div>
+
+						<div id="relevant-users-container">
+							<div id="friend-username-container">
+								<label htmlFor="friend-username">Search for friends here:</label>
+								<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
+							</div>
+
+							{relevantUsers.length > 0 && <h5>Relevant users</h5>}
+							{relevantUsers.map(user => (
+								<div className="user-row" key={user.id}>{user.username}
+									{user.pendingInviteToUser ?
+										<Button variant="danger" onClick={() => handleCancelInvite(user.id)}>Cancel request?</Button> :
+										<Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button>}
+								</div>
+							))}
+						</div>
+					</div>
+				</Card.Body>
+			</Card>
+
 			<Card id="puzzle-stats-card">
-				<Card.Header>Puzzle Stats</Card.Header>
+				<Card.Header>
+					<h4>Puzzle Stats</h4>
+				</Card.Header>
 				<Card.Body>
 					<div className="card-row">
 						<p>Player Rating: {profile?.puzzleStats?.playerRating || 0}</p>
@@ -172,7 +272,9 @@ const Profile = ({ setMessage, handleLogout }) => {
 			</Card>
 
 			<Card id="chess-accounts-card">
-				<Card.Header>Chess Accounts</Card.Header>
+				<Card.Header>
+					<h4>Chess Accounts</h4>
+				</Card.Header>
 
 				<Card.Body>
 					<div className="card-row">

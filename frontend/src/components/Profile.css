@@ -6,7 +6,7 @@
     color: white;
 }
 
-#account-card, #chess-accounts-card, #puzzle-stats-card {
+#account-card, #chess-accounts-card, #puzzle-stats-card, #friends-card {
     margin-top: 25px;
     width: min(600px, 90%);
     background-color: #0f0f11;
@@ -32,4 +32,27 @@
 .cool-btn {
     padding: 0px;
     margin-left: 10px;
+}
+
+#your-friends-container, #received-invites-container {
+    margin-bottom: 30px;
+}
+
+#friend-username {
+    margin-left: auto;
+}
+
+#friend-username-container {
+    display: flex;
+}
+
+.user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    margin-bottom: 12px;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    border-radius: 7px;
 }

@@ -12,6 +12,15 @@ const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
 
+
+	const showMessage = (text, isError = false) => {
+		setMessage({ message: text, isError })
+		setTimeout(() => {
+			setMessage(null)
+		}, 4000)
+	}
+
+
 	const handleLogout = () => {
 		logout()
 		setUser(null)
@@ -24,7 +33,7 @@ const App = () => {
 					?
 					<div>
 						{message && <Message data={message}/>}
-						<ChessReels handleLogout={handleLogout} setMessage={setMessage} user_id={user.id}/>
+						<ChessReels handleLogout={handleLogout} showMessage={showMessage} setMessage={setMessage} user_id={user.id}/>
 					</div>
 					: <Navigate to="/login"/>}
 				/>
