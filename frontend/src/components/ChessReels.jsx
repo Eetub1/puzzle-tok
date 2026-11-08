@@ -14,7 +14,7 @@ import { getUserProfile } from "../services/userService.js"
 
 import Matches from "./Matches.jsx"
 
-const ChessReels = ({ handleLogout, setMessage, user_id }) => {
+const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
 	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
 	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
@@ -152,7 +152,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} onEnded={handleEnded} streak={streak} playerRating={playerRating} /> : <p>Loading puzzle...</p>)}
 						{menuOpen === "Openings" && <ChessBoard ref={boardRef}/>}
 						{menuOpen === "YourMatches" && <Matches setMessage={setMessage}/>}
-						{menuOpen === "Profile" && <Profile setMessage={setMessage} handleLogout={handleLogout}/>}
+						{menuOpen === "Profile" && <Profile showMessage={showMessage} handleLogout={handleLogout}/>}
 					</div>
 				)}
 
