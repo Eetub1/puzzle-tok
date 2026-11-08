@@ -125,10 +125,21 @@ puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
     res.send(game)
 })
 
+// Route for retrieving puzzles with certain theme
+puzzlesRouter.get('/theme', async (req,res) => {
+
+    console.log('theme req')
+    const theme = req.body.theme
+    console.log("Sending themed puzzles")
+
+    let response = await fetch(`${base_url}/api/puzzle/batch/${theme}`)
+    res.send(await response.json())
+})
+
 // Route for retrieving many puzzles
 puzzlesRouter.get('/batch', async (req,res) => {
 
-    console.log('QUERY HERE', req.query)
+    //console.log('QUERY HERE', req.query)
 
     //console.log('QUERY failed HERE', req.query.failed)
 
@@ -136,11 +147,11 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     if (req.query.failed === 'failed') {
         response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
-        console.log('FAILED PUZZLES HERE', response)
+        //console.log('FAILED PUZZLES HERE', response)
         
     } else {
         response = await getFilteredBatch(req)
-        console.log('RESULT HERE', response)
+        //console.log('RESULT HERE', response)
     }
     
     const data = response

@@ -1,12 +1,12 @@
 import { prefChange} from "../services/preferenceService"
 
-const Preferences = ({user_id, difficulty, color, failed, setDifficulty, setColor, setFailed}) => {
+const Preferences = ({user_id, difficulty, color, failed, theme, setDifficulty, setColor, setFailed, setTheme}) => {
 
 	const handleSubmit = async event => {
 		event.preventDefault()
 
 		try {
-			const data = await prefChange({ color, difficulty, failed, user_id })
+			const data = await prefChange({ color, difficulty, failed, theme, user_id })
 			console.log('data!:', data)
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
@@ -40,6 +40,9 @@ const Preferences = ({user_id, difficulty, color, failed, setDifficulty, setColo
 					<option value="normal">Normal</option>
 					<option value="failed">Failed</option>
 				</select>
+				<br></br>
+				<label>Themes: </label>
+				<input id="themes-filter" value={theme} onChange={(event) => setTheme(event.target.value)}></input>
 				<br></br>
 				<input type="submit" value="Submit"></input>
 			</form>

@@ -63,5 +63,6 @@ CREATE TABLE preferences (
     user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     color      text        NOT NULL,
     difficulty text        NOT NULL,
-    failed     text       NOT NULL
+    failed     text       NOT NULL,
+    theme     text
 );

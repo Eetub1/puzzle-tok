@@ -1,0 +1,2 @@
+GET https://lichess.org/api/puzzle/batch/sicilian_defense
+Content-Type: application/json

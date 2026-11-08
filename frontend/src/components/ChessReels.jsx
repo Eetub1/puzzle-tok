@@ -16,7 +16,7 @@ import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
+	const {difficulty, color, failed, theme, setDifficulty, setColor, setFailed, setTheme} = usePreference()
 	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
 	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState, savePuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
@@ -40,7 +40,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 	useEffect(() => {
 		getStreak().then(setStreak).catch(console.error)
-		getUserProfile().then(profile => setPlayerRating(profile.puzzleStats.playerRating)).catch(console.error) 
+		getUserProfile().then(profile => setPlayerRating(profile.puzzleStats.playerRating)).catch(console.error)
 		// TODO: Create dedicated API endpoint to fetch only player rating
 	}, [])
 
@@ -72,8 +72,8 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 	const handleMenuClick = (clickedOption) => {
 		if (menuOpen === "DailyPuzzle" && clickedOption !== menuOpen) { // Save puzzle state when leaving Daily Puzzle menu
-        	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
-    	}
+			saveDailyPuzzleState(boardRef.current?.getPuzzleState())
+		}
 		if (menuOpen === "Puzzles" && clickedOption !== menuOpen) { // Save puzzle state when leaving Puzzles menu
 			savePuzzleState(boardRef.current?.getPuzzleState())
 		}
@@ -177,7 +177,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty}
 					color={color} setDifficulty={setDifficulty} setColor={setColor}
-					failed={failed} setFailed={setFailed}/>}
+					failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme}/>}
 			</div>
 		</div>
 	)

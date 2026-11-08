@@ -1,0 +1,2 @@
+GET https://lichess.org/api/puzzle/batch/long
+Content-Type: application/json
