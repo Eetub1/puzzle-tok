@@ -1,4 +1,4 @@
-import { getToken } from "./authService"
+import { getToken, isTokenValid } from "./authService"
 
 const updateUserChessAccounts = async usernames => {
 	const response = await fetch(`/api/user/chess-accounts`, {
@@ -9,6 +9,8 @@ const updateUserChessAccounts = async usernames => {
 		body: JSON.stringify({ usernames }),
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Update failed: ${data.error}`)
@@ -26,6 +28,8 @@ const getUserProfile = async () => {
 	})
 	const data = await response.json()
 
+	isTokenValid(response.status)
+
 	if (!response.ok) {
 		throw new Error(`Couldn't get profile: ${data.error}`)
 	}
@@ -42,6 +46,8 @@ const getUserGames = async (limit = 10) => {
 	})
 	const data = await response.json()
 
+	isTokenValid(response.status)
+
 	if (!response.ok) {
 		throw new Error(`Couldn't get user games: ${data.error}`)
 	}
@@ -56,6 +62,8 @@ const getStreak = async () => {
 			"Authorization": `Bearer ${getToken()}` }
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Couldn't get streak: ${data.error}`)
@@ -72,6 +80,8 @@ const resendEmailVerification = async () => {
 			"Authorization": `Bearer ${getToken()}` }
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Email resend failed: ${data.error}`)

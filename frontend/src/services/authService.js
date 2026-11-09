@@ -67,6 +67,16 @@ const getAccessToken = async (response) => {
 }
 
 
+const isTokenValid = (responseStatus) => {
+	// 401 means that the user lacks valid credentials
+	if (responseStatus === 401) {
+		// create a new event that is then picked up in App.jsx useEffect so we can logout properly
+		window.dispatchEvent(new Event("logoutEvent"))
+		throw new Error("Your session has expired. Log in again.")
+	}
+}
+
+
 export {
 	signup,
 	login,
@@ -74,4 +84,5 @@ export {
 	getAccessToken,
 	verifyEmail,
 	getToken,
+	isTokenValid
 }

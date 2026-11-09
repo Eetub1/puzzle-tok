@@ -19,8 +19,7 @@ const App = () => {
 		setUser(null)
 	}
 
-	// when application loads, check if the token has expired
-	// If it has, logout immediately
+	// when application loads, check if the token has expired. If it has, logout immediately
 	useEffect(() => {
 		const wrapper = () => {
 			if (!user) return
@@ -32,6 +31,12 @@ const App = () => {
 		}
 		wrapper()
 	}, [user])
+
+	// is responsible for logging a user out when trying to access a resource that requires
+	// a valid token, when their token is already expired
+	useEffect(() => {
+		window.addEventListener("logoutEvent", handleLogout)
+	}, [])
 
 	const showMessage = (text, isError = false) => {
 		setMessage({ message: text, isError })

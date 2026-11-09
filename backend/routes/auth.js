@@ -8,7 +8,7 @@ const authRouter = express.Router()
 
 const SALT_ROUNDS = 12
 const UNIQUE_VIOLATION = "23505" // status code that postgreSQL returns if a user with the name already exists
-const TOKEN_EXPIRATION_TIME = "1m" // TODO: change this to 1d when done testing
+const TOKEN_EXPIRATION_TIME = "1d"
 
 authRouter.post("/signup", async (req, res) => {
     const { username, email, password } = req.body ?? {}
