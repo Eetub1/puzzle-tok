@@ -1,35 +1,202 @@
 #profile-page {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #f2f2f2;
 }
 
-#account-card, #chess-accounts-card {
-    margin-top: 25px;
-    width: min(600px, 90%);
-    background-color: #0f0f11;
-    color: white;
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+}
+
+.profile-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
 }
 
 #logout-btn {
-    border-radius: 8px;
-    background: none;
-    border-color: red;
-    color: red
+  background: transparent;
+  color: #ff5555;
+  border: 1px solid #ff5555;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
+#logout-btn:hover {
+  background: #ff5555;
+  color: #10140f;
+}
+
+/* Card Styling */
+.profile-card {
+  background-color: #141416 !important;
+  border: 1px solid #2a2a2e !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.profile-card-header {
+  background-color: #1a1a1e !important;
+  border-bottom: 1px solid #2a2a2e !important;
+  color: #50a3a6 !important;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 20px !important;
+}
+
+.profile-card-body {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-description {
+  color: #a0a0a0;
+  font-size: 0.88rem;
+  margin: 0 0 8px 0;
+}
+
+/* Table-like Row Layout */
 .card-row {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #222226;
 }
 
-#send-verification-btn {
-    padding: 0;
+.card-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
-.cool-btn {
-    padding: 0px;
-    margin-left: 10px;
+.row-label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.row-value {
+  color: #f2f2f2;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Status Badges */
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.status-badge.verified {
+  background-color: rgba(80, 163, 166, 0.15);
+  color: #50a3a6;
+  border: 1px solid #50a3a6;
+}
+
+.status-badge.unverified {
+  background-color: rgba(255, 170, 0, 0.15);
+  color: #ffaa00;
+  border: 1px solid #ffaa00;
+}
+
+.verify-btn {
+  background: none;
+  border: none;
+  color: #50a3a6;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.verify-btn:hover {
+  color: #68c5c8;
+}
+
+/* Edit Rows & Inputs */
+.account-value-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-name {
+  font-size: 0.95rem;
+  color: #f2f2f2;
+}
+
+.account-name.empty {
+  color: #666;
+  font-style: italic;
+}
+
+.inline-edit-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-input {
+  background: #09090b;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.profile-input:focus {
+  border-color: #50a3a6;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--text, #fff);
+  border-radius: 14px;
+  color: #fff;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn.edit:hover,
+.action-btn.confirm:hover {
+  background: #50a3a6;
+  border-color: #50a3a6;
+  color: #10140f;
+}
+
+.action-btn.cancel {
+  border-color: #666;
+  color: #aaa;
+}
+
+.action-btn.cancel:hover {
+  background: #333;
+  color: #fff;
 }
