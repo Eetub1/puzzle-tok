@@ -1,4 +1,4 @@
-import { useState} from "react"
+import { useState, useEffect } from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
 import ChessReels from "./components/ChessReels"
@@ -12,6 +12,26 @@ const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
 
+	console.log("User", user)
+
+	const handleLogout = () => {
+		logout()
+		setUser(null)
+	}
+
+	// when application loads, check if the token has expired
+	// If it has, logout immediately
+	useEffect(() => {
+		const wrapper = () => {
+			if (!user) return
+
+			const time = Date.now()
+			if (time >= user.tokenExpiresAt) {
+				handleLogout()
+			}
+		}
+		wrapper()
+	}, [user])
 
 	const showMessage = (text, isError = false) => {
 		setMessage({ message: text, isError })
@@ -20,11 +40,6 @@ const App = () => {
 		}, 4000)
 	}
 
-
-	const handleLogout = () => {
-		logout()
-		setUser(null)
-	}
 
 	return (
 		<>

@@ -8,7 +8,7 @@ const authRouter = express.Router()
 
 const SALT_ROUNDS = 12
 const UNIQUE_VIOLATION = "23505" // status code that postgreSQL returns if a user with the name already exists
-
+const TOKEN_EXPIRATION_TIME = "1m" // TODO: change this to 1d when done testing
 
 authRouter.post("/signup", async (req, res) => {
     const { username, email, password } = req.body ?? {}
@@ -93,11 +93,12 @@ authRouter.post("/login", async (req, res) => {
             { sub: String(user.id), // Subject, for who the token belongs to
                 username: user.username },
             process.env.JWT_SECRET,
-            { expiresIn: "1d" },
+            { expiresIn: TOKEN_EXPIRATION_TIME },
         )
 
         const resultObject = {
             token: token,
+            tokenExpiresAt: jwt.decode(token).exp * 1000, // time has to be milliseconds
             id: user.id,
             email: user.email,
             username: user.username
