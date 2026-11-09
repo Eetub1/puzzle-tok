@@ -7,7 +7,7 @@ import { getSquareStyles } from './SquareStyles.jsx'
 import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved, onCleared}, ref) {
 	const solutionUsed = useRef(false) //Tracker to see if solution or hint button was used.
 	const [game, setGame] = useState(() => new Chess(puzzle.fen))
 	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
@@ -46,11 +46,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 
 	}, [game, puzzleMoveIndex, playerColor])
 
-	// Notify parent when the puzzle is solved without using the solution button
 	useEffect(() => {
-		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current) {
-			onSolved?.(puzzle)
-		}
+    if (puzzleStatus === 'solved' && !preview) {
+        onCleared?.(puzzle)  // Unlocks comments when successfully cleared
+        
+        if (!solutionUsed.current) {
+            onSolved?.(puzzle) // Notify parent that puzzle is solved without hints/solutions
+        }
+    }
 	}, [puzzleStatus])
 
 	// Move back in puzzle

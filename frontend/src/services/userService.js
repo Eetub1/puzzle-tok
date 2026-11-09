@@ -98,6 +98,53 @@ const resendEmailVerification = async () => {
 	return data
 }
 
+const getComments = async puzzleId => {
+    const response = await fetch(`/api/user/comments/${encodeURIComponent(puzzleId)}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${getToken()}` }
+    })
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(`Couldn't get comments: ${data.error}`)
+    }
+
+    return data
+}
+
+
+const postComment = async (puzzleId, body) => {
+    const response = await fetch(`/api/user/comments`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getToken()}` },
+        body: JSON.stringify({ puzzleId, body }),
+    })
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(`Couldn't post comment: ${data.error}`)
+    }
+
+    return data
+}
+
+
+const deleteComment = async commentId => {
+    const response = await fetch(`/api/user/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${getToken()}` }
+    })
+
+    if (!response.ok) {
+        const data = await response.json()
+        throw new Error(`Couldn't delete comment: ${data.error}`)
+    }
+}
+
 
 export {
 	updateUserChessAccounts,
@@ -105,5 +152,8 @@ export {
 	getUserGames,
 	getStreak,
 	recordSolvedPuzzle,
-	resendEmailVerification
+	resendEmailVerification,
+	getComments,
+	postComment,
+	deleteComment
 }

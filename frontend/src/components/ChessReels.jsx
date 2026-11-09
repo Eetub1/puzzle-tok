@@ -4,6 +4,7 @@ import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import Profile from "./Profile.jsx"
 import Preferences from "./Preferences.jsx"
+import Comments from "./Comments.jsx"
 import "./ChessReels.css"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
@@ -34,6 +35,15 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 			console.error(error)
 		}
 	}
+
+	const [clearedFen, setClearedFen] = useState(null)
+	const [commentsOpen, setCommentsOpen] = useState(false)
+	const puzzleCleared = clearedFen !== null && clearedFen === currentPuzzle?.fen
+
+	// New puzzle on screen: lock and close the comments again (TLDR; preventing spoilers per new puzzle)
+	useEffect(() => {
+		setCommentsOpen(false)
+	}, [currentPuzzle?.fen])
 
 	const navigate = useNavigate()
 
@@ -104,7 +114,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle} preview={false} onSolved={handleSolved}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={puzzleBoardRef} puzzle={currentPuzzle} preview={false} onSolved={handleSolved} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -122,6 +132,12 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					</div>
 				)}
 
+				{isPuzzlesMenu && puzzleCleared && commentsOpen && (
+					<aside className="comments-panel">
+						<Comments puzzleId={currentPuzzle.puzzle?.id ?? currentPuzzle.id}/>
+					</aside>
+				)}
+
 				{showScrollControls && <div className="scroll-controls">
 					<button onClick={() => goPrev()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
@@ -132,6 +148,9 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 				<div className="action-buttons">
 					<button onClick={() => puzzleBoardRef?.current?.giveHint()} className="hint-btn">Hint</button>
 					<button onClick={() => puzzleBoardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
+					{isPuzzlesMenu && puzzleCleared && (
+						<button onClick={() => setCommentsOpen(open => !open)} className="comments-btn">💬 Comments</button>
+					)}
 				</div>
 
 				<div className="step-controls">

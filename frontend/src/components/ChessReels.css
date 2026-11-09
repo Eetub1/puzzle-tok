@@ -91,7 +91,7 @@ body,
 .reels-container {
   position: relative;
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   overscroll-behavior: none;
 }
 
@@ -139,7 +139,8 @@ body,
 }
 
 .hint-btn,
-.solution-btn {
+.solution-btn,
+.comments-btn {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--text);
@@ -196,7 +197,9 @@ body,
 .hint-btn:hover,
 .hint-btn:active,
 .solution-btn:hover,
-.solution-btn:active {
+.solution-btn:active,
+.comments-btn:hover,
+.comments-btn:active {
   background: var(--accent);
   color: #10140f;
 }
