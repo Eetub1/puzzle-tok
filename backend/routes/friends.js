@@ -127,24 +127,41 @@ friendsRouter.post("/invitation", async (req, res) => {
     }
 
     try {
-        // first check here if you are already friends with this user
+        // first check if you are already friends with this user
         let result = await pool.query(`
             SELECT 1 
             FROM friend_relations
             WHERE person_1 = $1 AND person_2 = $2 OR person_1 = $2 AND person_2 = $1`,
-            [requester, addressee])
+            [requester, addressee]
+        )
 
         // status 409 basically means that something already exists
         if (result.rowCount > 0) {
             return res.status(409).json({ error: "You are already friends with this user" })
         }
 
+
+        // has the user already sent you an invite that is pending? If yes, then you are not allowed
+        // to send an invite to them
+        result = await pool.query(`
+            SELECT 1
+            FROM friend_invitations
+            WHERE requester_id = $1 AND addressee_id = $2 AND invitation_status = $3`,
+            [addressee, requester, PENDING_STATUS]
+        )
+
+        if (result.rowCount > 0) {
+            return res.status(409).json({ error: "User has already sent you an invite" })
+        }
+
+
         // do you have an invite sent to that user, and is the invite still pending
         result = await pool.query(`
             SELECT 1
             FROM friend_invitations
             WHERE requester_id = $1 AND addressee_id = $2 AND invitation_status = $3`,
-            [requester, addressee, PENDING_STATUS])
+            [requester, addressee, PENDING_STATUS]
+        )
 
         if (result.rowCount) {
             return res.status(409).json({ error: "You have already sent an invite to this user that is still pending" })

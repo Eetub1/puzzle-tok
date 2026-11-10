@@ -1,4 +1,4 @@
-import { getToken } from "./authService"
+import { getToken, isTokenValid } from "./authService"
 
 const searchUsers = async query => {
 	const response = await fetch(`/api/friends/search?query=${encodeURIComponent(query)}`, {
@@ -7,6 +7,8 @@ const searchUsers = async query => {
 			"Authorization": `Bearer ${getToken()}` }
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Couldn't find users based on query: ${data.error}`)
@@ -25,6 +27,8 @@ const sendFriendRequest = async addressee => {
 	})
 	const data = await response.json()
 
+	isTokenValid(response.status)
+
 	if (!response.ok) {
 		throw new Error(`Couldn't send friend request: ${data.error}`)
 	}
@@ -39,6 +43,8 @@ const cancelInvite = async addressee => {
 			"Authorization": `Bearer ${getToken()}` }
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Couldn't cancel friend request: ${data.error}`)
@@ -55,6 +61,8 @@ const getReceivedInvites = async () => {
 	})
 	const data = await response.json()
 
+	isTokenValid(response.status)
+
 	if (!response.ok) {
 		throw new Error(`Couldn't fetch received friend requests: ${data.error}`)
 	}
@@ -69,6 +77,8 @@ const getFriends = async () => {
 			"Authorization": `Bearer ${getToken()}` }
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Couldn't fetch friends: ${data.error}`)
@@ -87,6 +97,8 @@ const acceptFriendInvite = async requester => {
 	})
 	const data = await response.json()
 
+	isTokenValid(response.status)
+
 	if (!response.ok) {
 		throw new Error(`Couldn't accept friend request: ${data.error}`)
 	}
@@ -103,6 +115,8 @@ const declineFriendInvite = async requester => {
 		body: JSON.stringify({ requester })
 	})
 	const data = await response.json()
+
+	isTokenValid(response.status)
 
 	if (!response.ok) {
 		throw new Error(`Couldn't decline friend request: ${data.error}`)
