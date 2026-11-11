@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react"
 import "./Matches.css"
-import { Card } from "react-bootstrap"
+import { Card, Button } from "react-bootstrap"
 import { getUserGames } from "../services/userService.js"
 import { getUserProfile } from "../services/userService.js"
+import { generatePuzzles } from "../utils/puzzleGenerator.js"
 
 const GAMES_PER_SITE = 10
 
-const Matches = ({ setMessage }) => {
+const Matches = ({ showMessage }) => {
 	const [profile, setProfile] = useState(null) // Contains username, lichess and chess.com usernames and email if it has been verified
 	const [matches, setMatches] = useState(() => JSON.parse(localStorage.getItem("userGames")) ?? [])
 	const [filter, setFilter] = useState("all")
 
-	// Fetch matches from the backend when the component mounts
+	// Fetch matches from the backend
 	useEffect(() => {
 		if (matches.length > 0) {
 			return // If matches are already in state, no need to fetch again
@@ -21,25 +22,20 @@ const Matches = ({ setMessage }) => {
 			try {
 				const games = await getUserGames(GAMES_PER_SITE)
 				localStorage.setItem("userGames", JSON.stringify(games)) // Store the fetched games in local storage
-				// console.log("Fetched matches:", games)
 				setMatches(games)
 			} catch (error) {
-				// console.error("Error fetching matches:", error)
-				setMessage({ message: "Failed to fetch matches: " + error.message, isError: true })
-				setTimeout(() => {
-					setMessage(null)
-				}, 4000)
+				console.error("Error fetching matches:", error)
+				showMessage({ message: "Failed to fetch matches: " + error.message, isError: true })
 			}
 		}
 		fetchMatches()
-	}, [matches.length, setMessage])
+	}, [matches, showMessage])
 
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const data = await getUserProfile()
-				// console.log(data)
 				setProfile(data)
 			} catch (error) {
 				console.error("Failed to fetch user profile:", error)
@@ -111,11 +107,21 @@ const Matches = ({ setMessage }) => {
 			const playedToday = played.toDateString() === today.toDateString()
 			const playedYesterday = played.toDateString() === new Date(today.setDate(today.getDate() - 1)).toDateString()
 			played = played.toLocaleDateString("fi-FI") // the date of the game
+
 			return {...match, outcome, opponent, ownSide, playedToday, playedYesterday, played}
 		})
 	}
 	const processedMatches = processMatches(matches) // filters based on selected filter and adds additional fields to the data
-	// console.log(processedMatches)
+	console.log("Processed matches: ", processedMatches)
+
+	const handleGeneratePuzzles = () => {
+		if (processMatches.length == 0) {
+			showMessage({ message: "No matches available to generate puzzles from.", isError: true })
+			return
+		}
+
+		generatePuzzles(processMatches)
+	}
 
 
 	return (
@@ -127,7 +133,6 @@ const Matches = ({ setMessage }) => {
 			</div>
 
 			<div id="matches-section">
-				{processedMatches.length > 0 &&
 				<div id="filter-options">
 					<button className="btn" onClick={() => setFilter("all")}>All</button>
 					<button className="btn" onClick={() => setFilter("rapid")}>Rapid</button>
@@ -135,7 +140,12 @@ const Matches = ({ setMessage }) => {
 					<button className="btn" onClick={() => setFilter("bullet")}>Bullet</button>
 					<button className="btn" onClick={() => setFilter("lichess")}>Lichess</button>
 					<button className="btn" onClick={() => setFilter("chesscom")}>Chess.com</button>
-				</div>}
+				</div>
+
+				<div id="generate-puzzles-section">
+					<Button onClick={handleGeneratePuzzles}>Generate puzzles</Button>
+				</div>
+
 				{renderMatches(processedMatches)}
 			</div>
 		</div>
@@ -165,7 +175,8 @@ const renderMatch = match => {
 						<span>{match.timeClass} </span>
 						<span>vs. {match.opponent}</span>
 					</div>
-					<span>On {match.source}</span>
+					<span>{match.source}</span>
+					<span> {match.played}</span>
 				</div>
 				<a href={match.url} target="_blank" rel="noopener noreferrer">link</a>
 			</div>

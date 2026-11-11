@@ -2,13 +2,7 @@
     width: 100%;
 }
 
-#matches-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#matches-section {
+#matches-header, #matches-section {
     display: flex;
     flex-direction: column;
     align-items: center;
