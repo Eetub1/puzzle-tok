@@ -5,7 +5,7 @@ const prefChange = async preferences => {
 	//console.log('color is service', preferences.color)
 	//console.log('difficulty is service', preferences.difficulty)
 	//console.log('failed service', preferences.failed)
-	//console.log('theme service', preferences.theme)
+	// console.log('theme service', preferences.theme)
 
 	const response = await fetch(`/api/user/preferences`, {
 		method: "POST",

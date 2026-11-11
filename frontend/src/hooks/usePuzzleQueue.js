@@ -6,7 +6,7 @@ function shuffle(puzzles) {
 	return [...puzzles].sort(() => Math.random() - 0.5)
 }
 
-export function usePuzzleQueue({ menuOpen, difficulty, color, failed, user_id }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color, failed, theme, user_id }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -69,7 +69,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color, failed, user_id })
 			const puzzleBatch = async () => {
 				try {
 					const [batch, failedPuzzleIds] = await Promise.all([
-						getBatch(controller.signal, difficulty, color, failed, user_id),
+						getBatch(controller.signal, difficulty, color, failed, theme,user_id),
 						getFailedPuzzles(controller.signal),
 					])
 

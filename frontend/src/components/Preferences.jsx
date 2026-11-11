@@ -7,7 +7,7 @@ const Preferences = ({user_id, difficulty, color, failed, theme, setDifficulty, 
 
 		try {
 			const data = await prefChange({ color, difficulty, failed, theme, user_id })
-			console.log('data!:', data)
+			// console.log('pref jsx data!:', data)
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
 		}

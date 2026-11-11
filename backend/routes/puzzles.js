@@ -36,6 +36,39 @@ const getFilteredBatch = async (req) => {
     return json.puzzles
 }
 
+// Form batch of accurately filtered puzzles
+const getThemedBatch = async (req) => {
+
+    /*
+    let query = new URLSearchParams({})
+
+    if (req.query.color === 'both') {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 5
+        })
+    } else {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 1, 
+            "color": req.query.color
+        })
+    }*/
+
+    console.log("Sending themed puzzles")
+
+    let response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}`)
+
+    const json = await response.json()
+    console.log('themed games', json)
+
+    if (!response.ok) {
+        throw new Error(`Lichess request failed: ${response.status}`)
+    }
+
+    return json.puzzles
+}
+
 // Form batch of failed puzzles
 const getFailedBatch = async (user_id) => {
 
@@ -125,23 +158,12 @@ puzzlesRouter.get('/puzzleID/:id', async (req,res) => {
     res.send(game)
 })
 
-// Route for retrieving puzzles with certain theme
-puzzlesRouter.get('/theme', async (req,res) => {
-
-    console.log('theme req')
-    const theme = req.body.theme
-    console.log("Sending themed puzzles")
-
-    let response = await fetch(`${base_url}/api/puzzle/batch/${theme}`)
-    res.send(await response.json())
-})
-
 // Route for retrieving many puzzles
 puzzlesRouter.get('/batch', async (req,res) => {
 
-    //console.log('QUERY HERE', req.query)
+    console.log('QUERY HERE', req.query)
 
-    //console.log('QUERY failed HERE', req.query.failed)
+    //console.log('QUERY specify HERE', req.query.theme)
 
     let response
 
@@ -149,6 +171,8 @@ puzzlesRouter.get('/batch', async (req,res) => {
         response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
         //console.log('FAILED PUZZLES HERE', response)
         
+    } else if (req.query.theme) {
+        response = await getThemedBatch(req)
     } else {
         response = await getFilteredBatch(req)
         //console.log('RESULT HERE', response)
