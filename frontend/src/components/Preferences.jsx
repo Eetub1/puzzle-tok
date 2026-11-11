@@ -1,12 +1,17 @@
 import { useState } from "react"
-import { prefChange} from "../services/preferenceService"
+import { prefChange } from "../services/preferenceService"
+import { themes } from "../themes.js"
 
 const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
-
 	const [pressed, setPressed] = useState("None")
+	const checkTheme = theme => themes.includes(theme) || theme == ''
 
 	const handleSubmit = async event => {
 		event.preventDefault()
+		if (pressed == 'Theme' && !checkTheme(theme)) {
+			setTheme('')
+			return
+		}
 
 		try {
 			const data = await prefChange({ color, difficulty, failed, theme, opening, user_id })
@@ -15,6 +20,9 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 			console.log("Error with setting preferences: ", error)
 		}
 	}
+
+
+
 
 	const handlePressed = async event => {
 		setPressed(event.target.value)
