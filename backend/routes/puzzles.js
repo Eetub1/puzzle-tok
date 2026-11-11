@@ -39,7 +39,6 @@ const getFilteredBatch = async (req) => {
 // Form batch of accurately filtered puzzles
 const getThemedBatch = async (req) => {
 
-    /*
     let query = new URLSearchParams({})
 
     if (req.query.color === 'both') {
@@ -53,11 +52,11 @@ const getThemedBatch = async (req) => {
             "nb": 1, 
             "color": req.query.color
         })
-    }*/
+    }
 
     console.log("Sending themed puzzles")
 
-    let response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}`)
+    let response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}?${query}`)
 
     const json = await response.json()
     console.log('themed games', json)
@@ -170,7 +169,6 @@ puzzlesRouter.get('/batch', async (req,res) => {
     if (req.query.failed === 'failed') {
         response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
         //console.log('FAILED PUZZLES HERE', response)
-        
     } else if (req.query.theme) {
         response = await getThemedBatch(req)
     } else {
