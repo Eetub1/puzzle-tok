@@ -1,6 +1,9 @@
+import { useState } from "react"
 import { prefChange} from "../services/preferenceService"
 
 const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
+
+	const [pressed, setPressed] = useState("None")
 
 	const handleSubmit = async event => {
 		event.preventDefault()
@@ -11,6 +14,37 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
 		}
+	}
+
+	const handlePressed = async event => {
+		setPressed(event.target.value)
+
+		if (event.target.value === 'Theme') {
+			setOpening('')
+		} else if (event.target.value === 'Opening') {
+			setTheme('')
+		} else {
+			setOpening('')
+			setTheme('')
+		}
+	}
+
+	const comp_map = {
+		'Theme':
+		<div>
+			<label>Theme</label>
+			<input id="themes-filter" value={theme} onChange={(event) => setTheme(event.target.value)}></input>
+			<br></br>
+		</div>,
+
+		'Opening':
+		<div>
+			<label>Opening</label>
+			<input id="openings-filter" value={opening} onChange={(event) => setOpening(event.target.value)}></input>
+		</div>,
+
+		'None':
+		<></>
 	}
 
 	return (
@@ -41,12 +75,29 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 					<option value="failed">Failed</option>
 				</select>
 				<br></br>
-				<label>Theme</label>
-				<input id="themes-filter" value={theme} onChange={(event) => setTheme(event.target.value)}></input>
-				<br></br>
 
-				<label>Opening</label>
-				<input id="openings-filter" value={opening} onChange={(event) => setOpening(event.target.value)}></input>
+				<div className="theme-opening">
+					<div>
+						<label>Theme</label>
+						<input type="radio" name="theme-opening-bar" id="theme" value="Theme"
+							onChange={handlePressed} />
+					</div>
+
+					<div>
+						<label>Opening</label>
+						<input type="radio" name="theme-opening-bar" id="opening" value="Opening"
+							onChange={handlePressed}/>
+					</div>
+
+					<div>
+						<label>None</label>
+						<input type="radio" name="theme-opening-bar" id="none" value="None"
+							onChange={handlePressed}/>
+					</div>
+				</div>
+
+				{comp_map[pressed]}
+
 				<br></br>
 				<input type="submit" value="Submit"></input>
 			</form>
