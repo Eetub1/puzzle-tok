@@ -37,13 +37,9 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 	}
 
 	const [clearedFen, setClearedFen] = useState(null)
-	const [commentsOpen, setCommentsOpen] = useState(false)
+	const [commentsFen, setCommentsFen] = useState(null)
 	const puzzleCleared = clearedFen !== null && clearedFen === currentPuzzle?.fen
-
-	// New puzzle on screen: lock and close the comments again (TLDR; preventing spoilers per new puzzle)
-	useEffect(() => {
-		setCommentsOpen(false)
-	}, [currentPuzzle?.fen])
+	const commentsOpen = puzzleCleared && commentsFen === currentPuzzle?.fen
 
 	const navigate = useNavigate()
 
@@ -149,7 +145,7 @@ const ChessReels = ({ handleLogout, setMessage, user_id }) => {
 					<button onClick={() => puzzleBoardRef?.current?.giveHint()} className="hint-btn">Hint</button>
 					<button onClick={() => puzzleBoardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
 					{isPuzzlesMenu && puzzleCleared && (
-						<button onClick={() => setCommentsOpen(open => !open)} className="comments-btn">💬 Comments</button>
+						<button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
 					)}
 				</div>
 
