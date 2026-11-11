@@ -54,9 +54,15 @@ const getThemedBatch = async (req) => {
         })
     }
 
-    console.log("Sending themed puzzles")
+    let response
 
-    let response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}?${query}`)
+    if (req.query.theme) {
+        console.log("Sending themed puzzles")
+        response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}?${query}`)
+    } else if (req.query.opening) {
+        console.log("Sending puzzles by opening")
+        response = await fetch(`${base_url}/api/puzzle/batch/${req.query.opening}?${query}`)
+    }
 
     const json = await response.json()
     console.log('themed games', json)
@@ -162,14 +168,14 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     console.log('QUERY HERE', req.query)
 
-    //console.log('QUERY specify HERE', req.query.theme)
+    //console.log('QUERY specify HERE', req.query.opening)
 
     let response
 
     if (req.query.failed === 'failed') {
         response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
         //console.log('FAILED PUZZLES HERE', response)
-    } else if (req.query.theme) {
+    } else if (req.query.theme || req.query.opening) {
         response = await getThemedBatch(req)
     } else {
         response = await getFilteredBatch(req)

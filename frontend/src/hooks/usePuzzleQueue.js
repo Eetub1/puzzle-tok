@@ -6,7 +6,7 @@ function shuffle(puzzles) {
 	return [...puzzles].sort(() => Math.random() - 0.5)
 }
 
-export function usePuzzleQueue({ menuOpen, difficulty, color, failed, theme, user_id }) {
+export function usePuzzleQueue({ menuOpen, difficulty, color, failed, theme, opening, user_id }) {
 	const [puzzle, setPuzzle] = useState(null)
 	const [puzzleQueue, setPuzzleQueue] = useState([])
 	const [puzzleMemory, setPuzzleMemory] = useState([])
@@ -27,9 +27,6 @@ export function usePuzzleQueue({ menuOpen, difficulty, color, failed, theme, use
 
 	// Fetch puzzles when menuOpen is "Puzzles" and queue is empty, or fetch daily puzzle when menuOpen is "DailyPuzzle"
 	useEffect(() => {
-		//console.log("in useEffect difficulty", difficulty)
-		//console.log("in useEffect color", color)
-		//console.log("in useEffect menuOpen", menuOpen)
 
 		if (menuOpen === "DailyPuzzle") {
 			if (dailyPuzzle) {
@@ -69,7 +66,7 @@ export function usePuzzleQueue({ menuOpen, difficulty, color, failed, theme, use
 			const puzzleBatch = async () => {
 				try {
 					const [batch, failedPuzzleIds] = await Promise.all([
-						getBatch(controller.signal, difficulty, color, failed, theme,user_id),
+						getBatch(controller.signal, difficulty, color, failed, theme, opening, user_id),
 						getFailedPuzzles(controller.signal),
 					])
 

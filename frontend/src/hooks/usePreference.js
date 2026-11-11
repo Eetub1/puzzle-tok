@@ -6,6 +6,7 @@ const usePreference = () => {
 	const [color, setColor] = useState("")
 	const [failed, setFailed] = useState("")
 	const [theme, setTheme] = useState("")
+	const [opening, setOpening] = useState("")
 
 	// Fetch initial preferences when site opens
 	useEffect(() => {
@@ -16,6 +17,7 @@ const usePreference = () => {
 			setDifficulty(init_prefs.difficulty)
 			setFailed(init_prefs.failed)
 			setTheme(init_prefs.theme)
+			setOpening(init_prefs.opening)
 			console.log('init prefs here: ',init_prefs)
 		}
 		fetch_prefs()
@@ -26,10 +28,12 @@ const usePreference = () => {
 		color,
 		failed,
 		theme,
+		opening,
 		setTheme,
 		setDifficulty,
 		setColor,
-		setFailed
+		setFailed,
+		setOpening
 	}
 
 }

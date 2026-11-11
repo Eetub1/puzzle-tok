@@ -1,13 +1,13 @@
 import { prefChange} from "../services/preferenceService"
 
-const Preferences = ({user_id, difficulty, color, failed, theme, setDifficulty, setColor, setFailed, setTheme}) => {
+const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
 
 	const handleSubmit = async event => {
 		event.preventDefault()
 
 		try {
-			const data = await prefChange({ color, difficulty, failed, theme, user_id })
-			// console.log('pref jsx data!:', data)
+			const data = await prefChange({ color, difficulty, failed, theme, opening, user_id })
+			console.log('pref jsx data!:', data)
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
 		}
@@ -41,8 +41,12 @@ const Preferences = ({user_id, difficulty, color, failed, theme, setDifficulty, 
 					<option value="failed">Failed</option>
 				</select>
 				<br></br>
-				<label>Themes: </label>
+				<label>Theme</label>
 				<input id="themes-filter" value={theme} onChange={(event) => setTheme(event.target.value)}></input>
+				<br></br>
+
+				<label>Opening</label>
+				<input id="openings-filter" value={opening} onChange={(event) => setOpening(event.target.value)}></input>
 				<br></br>
 				<input type="submit" value="Submit"></input>
 			</form>

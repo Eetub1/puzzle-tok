@@ -1,2 +1,2 @@
-GET https://lichess.org/api/puzzle/batch/sicilian_defense
+GET https://lichess.org/api/puzzle/batch/Sicilian_Defense?difficulty=easiest
 Content-Type: application/json

@@ -6,6 +6,7 @@ const prefChange = async preferences => {
 	//console.log('difficulty is service', preferences.difficulty)
 	//console.log('failed service', preferences.failed)
 	// console.log('theme service', preferences.theme)
+	// console.log('opening service', preferences.opening)
 
 	const response = await fetch(`/api/user/preferences`, {
 		method: "POST",
@@ -27,7 +28,7 @@ const getInitialPreferences = async (response) => {
 		throw new Error("Failed to fetch preferences")
 	}
 	const json = await response.json()
-	console.log("jason:", json)
+	// console.log("jason:", json)
 	const data = JSON.parse(json)
 	//console.log('service data: ',data, data["color"])
 	return {

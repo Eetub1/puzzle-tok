@@ -64,5 +64,6 @@ CREATE TABLE preferences (
     color      text        NOT NULL,
     difficulty text        NOT NULL,
     failed     text       NOT NULL,
-    theme     text
+    theme     text,
+    opening text
 );

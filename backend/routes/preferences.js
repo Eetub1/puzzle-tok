@@ -21,16 +21,12 @@ prefRouter.get("/", async (req, res) => {
 
 prefRouter.post("/", (req, res) => {
     console.log('post body:',req.body)
-    const { user_id, color, difficulty, failed, theme } = req.body ?? {}
-    console.log('post failed:', failed)
-    console.log('post color:', color)
-    console.log('post diffi:', difficulty)
-    console.log('post theme:', theme)
+    const { user_id, color, difficulty, failed, theme, opening } = req.body ?? {}
 
-    console.log('changed preferences for id',user_id, "color:", color, "failed", failed, "theme",theme)
-    updatePreferences(user_id, color, difficulty, failed, theme)
+    console.log('changed preferences for id',user_id, "color:", color, "failed", failed, "theme",theme, "opening", opening)
+    updatePreferences(user_id, color, difficulty, failed, theme, opening)
 
-    return res.status(201).json({ color: color, difficulty: difficulty, failed: failed, theme: theme})
+    return res.status(201).json({ color: color, difficulty: difficulty, failed: failed, theme: theme, opening: opening})
 })
 
 export default prefRouter
