@@ -120,7 +120,7 @@ const Matches = ({ showMessage }) => {
 			return
 		}
 
-		generatePuzzles(processMatches)
+		generatePuzzles(processedMatches)
 	}
 
 

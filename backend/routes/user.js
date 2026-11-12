@@ -77,7 +77,6 @@ userRouter.get("/profile", async (req, res) => {
         if (!profile) {
             return res.status(404).json({ error: "User not found" })
         }
-        console.log(profile.email_verified_at)
 
         const result2 = await pool.query(`
             SELECT COUNT(*) AS total_attempts,

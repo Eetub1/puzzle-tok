@@ -40,7 +40,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 	useEffect(() => {
 		getStreak().then(setStreak).catch(console.error)
-		getUserProfile().then(profile => setPlayerRating(profile.puzzleStats.playerRating)).catch(console.error) 
+		getUserProfile().then(profile => setPlayerRating(profile.puzzleStats.playerRating)).catch(console.error)
 		// TODO: Create dedicated API endpoint to fetch only player rating
 	}, [])
 
@@ -72,8 +72,8 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 	const handleMenuClick = (clickedOption) => {
 		if (menuOpen === "DailyPuzzle" && clickedOption !== menuOpen) { // Save puzzle state when leaving Daily Puzzle menu
-        	saveDailyPuzzleState(boardRef.current?.getPuzzleState())
-    	}
+			saveDailyPuzzleState(boardRef.current?.getPuzzleState())
+		}
 		if (menuOpen === "Puzzles" && clickedOption !== menuOpen) { // Save puzzle state when leaving Puzzles menu
 			savePuzzleState(boardRef.current?.getPuzzleState())
 		}
