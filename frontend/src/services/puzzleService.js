@@ -27,25 +27,27 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal, difficulty, color, failed, user_id) => {
+const getBatch = async (signal, difficulty, color, failed, theme, opening, user_id) => {
 
 	//console.log('get batch color:', color)
 	//console.log('get batch difficulty:', difficulty)
-	console.log('puzze service get batch failed:', failed)
+	//console.log('puzze service get batch failed:', failed)
 
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
 		"color": color,
 		"failed": failed,
-		"user_id": user_id
+		"user_id": user_id,
+		"theme": theme,
+		"opening": opening
 	})
 
-	const response = await fetch(`/api/puzzles/batch?${query}`, {
+	const response = await fetch(`api/puzzles/batch?${query}`, {
 		signal, // Pass AbortController signal to fetch
 	})
 
 	const data = await response.json()
-	console.log('batch data:', data)
+	//console.log('batch data:', data)
 	return data.map(puzzles => ({
 		fen: puzzles.puzzle.fen,
 		id: puzzles.puzzle.id,
