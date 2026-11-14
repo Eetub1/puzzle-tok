@@ -3,8 +3,46 @@ import { Chess } from "chess.js"
 // Skip boring opening theory
 const SKIP_FIRST_MOVES = 10
 
+
 const generatePuzzles = matches => {
-	const candidates = [] // these could be potential puzzles
+	const candidates = findCandidates(matches)
+	const engine = createEngine()
+
+
+	candidates.forEach(position => evaluateCandidate(engine, position))
+
+
+	console.log(`${candidates.length} candidate positions found`)
+	return candidates
+}
+
+
+const evaluateCandidate = (worker, position) => {
+
+}
+
+
+const createEngine = () => {
+	const worker = new Worker("/stockfish-19-lite-single.js")
+
+	const lines = []
+
+	// with onmessage, you can set where the engine output goes to
+	worker.onmessage = event => {
+		const line = event.data
+		console.log("ENGINE RESPONSE: ", line)
+		lines.push(line)
+	}
+
+	worker.postMessage("uci")
+	worker.postMessage("setoption name MultiPV value 2") // we want to know the 2 best moves
+	worker.postMessage("isready")
+	return worker
+}
+
+
+const findCandidates = matches => {
+	const candidates = []
 
 	for (const match of matches) {
 		const game = new Chess()
@@ -38,15 +76,8 @@ const generatePuzzles = matches => {
 			})
 		})
 	}
-
-	// test that stockfish is working
-	const worker = new Worker("/stockfish-19-lite-single.js")
-	worker.onmessage = event => console.log(event.data)
-	worker.postMessage("uci")
-
-
-	console.log(`${candidates.length} candidate positions found`)
 	return candidates
 }
+
 
 export { generatePuzzles }
