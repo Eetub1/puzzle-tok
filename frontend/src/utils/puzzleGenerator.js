@@ -10,7 +10,7 @@ const generatePuzzles = async matches => {
 
 	const engine = createEngine()
 
-	// A puzzle starts from your move. Its a situation where there is only a single clear best move
+	// A puzzle starts before your move. Its a situation where there is only a single clear best move
 	// that gives you a winning advantage in the position. Therefore we need to compare the best
 	// and second best moves for you in the position to make sure this is the case.
 
@@ -22,8 +22,10 @@ const generatePuzzles = async matches => {
 		// if best is a winning position and second best is not AND
 		// your played move is not best, then this position is a puzzle?
 
+		// TODO: probably need to turn evaluations into win probabilities?
+
 	}
-	engine.terminate() // end search
+	engine.terminate() // shut down the whole engine
 
 	return candidates
 }
@@ -73,8 +75,6 @@ const createEngine = () => {
 	}
 
 
-	// Asks the engine to evaluate a position.
-	// If onlyMove is given, the engine evaluates only that move.
 	const evaluate = (fen, depth = 12) => {
 		return new Promise(resolve => {
 			results = [] // remember to clear this when starting an evaluation
