@@ -4,40 +4,94 @@ import { Chess } from "chess.js"
 const SKIP_FIRST_MOVES = 10
 
 
-const generatePuzzles = matches => {
+const generatePuzzles = async matches => {
 	const candidates = findCandidates(matches)
+	console.log(`${candidates.length} candidate positions found`)
+
 	const engine = createEngine()
 
+	// A puzzle starts from your move. Its a situation where there is only a single clear best move
+	// that gives you a winning advantage in the position. Therefore we need to compare the best
+	// and second best moves for you in the position to make sure this is the case.
 
-	candidates.forEach(position => evaluateCandidate(engine, position))
+	for (const candidate of candidates) {
+		const [best, secondBest] = await engine.evaluate(candidate.fen)
+		console.log("Best:", best, "Second best:", secondBest)
 
+		// TODO: analysis here, compare the two moves to the move you played
+		// if best is a winning position and second best is not AND
+		// your played move is not best, then this position is a puzzle?
 
-	console.log(`${candidates.length} candidate positions found`)
+	}
+	engine.terminate() // end search
+
 	return candidates
 }
 
 
-const evaluateCandidate = (worker, position) => {
-
-}
-
-
 const createEngine = () => {
-	const worker = new Worker("/stockfish-19-lite-single.js")
+	const engine = new Worker("/stockfish-19-lite-single.js")
+	engine.postMessage("uci")
+	engine.postMessage("setoption name MultiPV value 2") // report the 2 best moves
 
-	const lines = []
+	let results = []    // contains the best and second best moves for the current position
+	let whenDone = null // function to call when the engine has finished
 
-	// with onmessage, you can set where the engine output goes to
-	worker.onmessage = event => {
-		const line = event.data
-		console.log("ENGINE RESPONSE: ", line)
-		lines.push(line)
+
+	// Takes one line of engine output and picks out the parts we need.
+	// Example: info depth 14 multipv 1 score cp 132 nodes 1200 pv e2e4 e7e5
+	const readInfoLine = line => {
+		const words = line.split(" ")
+
+		const multipvIndex = words.indexOf("multipv")
+		const scoreIndex = words.indexOf("score")
+		const pvIndex = words.indexOf("pv")
+
+		return {
+			rank: Number(words[multipvIndex + 1]),   // 1 = best move, 2 = second best
+			scoreType: words[scoreIndex + 1],        // "cp" or "mate"
+			score: Number(words[scoreIndex + 2]),    // for example 132
+			move: words[pvIndex + 1],                // for example "e2e4"
+		}
 	}
 
-	worker.postMessage("uci")
-	worker.postMessage("setoption name MultiPV value 2") // we want to know the 2 best moves
-	worker.postMessage("isready")
-	return worker
+
+	// This runs every time the engine sends a line
+	engine.onmessage = event => {
+		const line = event.data
+
+		// Lines with " pv " contain an evaluation. Lines with "bound" are unfinished guesses and we don't need them
+		if (line.startsWith("info") && line.includes(" pv ") && !line.includes("bound")) {
+			const info = readInfoLine(line)
+			results[info.rank - 1] = info
+		}
+
+		// The search is done for this position, end search and return results
+		if (line.startsWith("bestmove")) {
+			whenDone(results)
+		}
+	}
+
+
+	// Asks the engine to evaluate a position.
+	// If onlyMove is given, the engine evaluates only that move.
+	const evaluate = (fen, depth = 12) => {
+		return new Promise(resolve => {
+			results = [] // remember to clear this when starting an evaluation
+			whenDone = resolve // When the engine is done, call this function with the results
+
+			// Start the search
+			engine.postMessage("position fen " + fen)
+			engine.postMessage(`go depth ${depth}`)
+		})
+	}
+
+
+	const terminate = () => {
+		engine.terminate()
+	}
+
+	return { evaluate, terminate }
 }
 
 
@@ -65,17 +119,17 @@ const findCandidates = matches => {
 				return
 			}
 
-			// The position before the user's move is where a puzzle could start
 			candidates.push({
 				gameId: match.id,
 				source: match.source,
 				moveCount,                                   // how many half moves have been played so far
 				fen: move.before,                            // state of the board before the user's move
 				lastMove: moves[moveCount - 1]?.lan ?? null, // the opponent's move that led to this position
-				playedMove: move.lan,                        // what the user actually played in the position, useful for showing what went wrong
+				playedMove: move.lan,                        // what you actually played in the position, useful for showing what went wrong
 			})
 		})
 	}
+
 	return candidates
 }
 
