@@ -1,9 +1,13 @@
 import { useState } from "react"
 import { prefChange } from "../services/preferenceService"
 import { themes } from "../themes.js"
+import { Button } from "react-bootstrap"
 
 const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
 	const [pressed, setPressed] = useState("None")
+	const [relevantThemes, setRelevantThemes] = useState([])
+	const [themeText, setThemeText] = useState("")
+
 	const checkTheme = theme => themes.includes(theme) || theme == ''
 
 	const handleSubmit = async event => {
@@ -21,9 +25,6 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		}
 	}
 
-
-
-
 	const handlePressed = async event => {
 		setPressed(event.target.value)
 
@@ -37,12 +38,36 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		}
 	}
 
+	const handleThemeSearch = async event => {
+
+		setThemeText(event.target.value)
+		setRelevantThemes(themes.filter( theme =>
+			theme.includes(themeText)
+		))
+	}
+
+	const handleThemeSelect = async t => {
+		setTheme(t)
+		setThemeText(t)
+		setRelevantThemes({})
+	}
+
 	const comp_map = {
 		'Theme':
 		<div>
 			<label>Theme</label>
-			<input id="themes-filter" value={theme} onChange={(event) => setTheme(event.target.value)}></input>
+			<input id="themes-filter" value={themeText} onChange={handleThemeSearch}/>
 			<br></br>
+
+			{relevantThemes.length > 0 && themeText.length > 2 ?
+				relevantThemes.map(theme => (
+					<div key={theme}> {theme}
+						<Button onClick={() => handleThemeSelect(theme)}>Choose</Button>
+					</div>
+				)) :
+				<></>
+			}
+
 		</div>,
 
 		'Opening':
