@@ -1,12 +1,15 @@
 import { useState } from "react"
 import { prefChange } from "../services/preferenceService"
 import { themes } from "../themes.js"
+import { openings } from "../openings.js"
 import { Button } from "react-bootstrap"
 
 const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
 	const [pressed, setPressed] = useState("None")
 	const [relevantThemes, setRelevantThemes] = useState([])
+	const [relevantOpenings, setRelevantOpenings] = useState([])
 	const [themeText, setThemeText] = useState("")
+	const [openingText, setOpeningText] = useState("")
 
 	const checkTheme = theme => themes.includes(theme) || theme == ''
 
@@ -52,6 +55,19 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		setRelevantThemes({})
 	}
 
+	const handleOpeningSearch = async event => {
+		setOpeningText(event.target.value)
+		setRelevantOpenings(openings.filter( opening =>
+			opening.includes(openingText)
+		))
+	}
+
+	const handleOpeningSelect = async t => {
+		setOpening(t)
+		setOpeningText(t)
+		setRelevantOpenings({})
+	}
+
 	const comp_map = {
 		'Theme':
 		<div>
@@ -73,7 +89,18 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		'Opening':
 		<div>
 			<label>Opening</label>
-			<input id="openings-filter" value={opening} onChange={(event) => setOpening(event.target.value)}></input>
+			<input id="openings-filter" value={openingText} onChange={handleOpeningSearch}></input>
+			<br></br>
+
+			{relevantOpenings.length > 0 && openingText.length > 2 ?
+				relevantOpenings.map(opening => (
+					<div key={opening}> {opening}
+						<Button onClick={() => handleOpeningSelect(opening)}>Choose</Button>
+					</div>
+				)) :
+				<></>
+			}
+
 		</div>,
 
 		'None':
