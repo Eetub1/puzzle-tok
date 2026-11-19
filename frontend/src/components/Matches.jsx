@@ -11,6 +11,8 @@ const Matches = ({ showMessage }) => {
 	const [profile, setProfile] = useState(null) // Contains username, lichess and chess.com usernames and email if it has been verified
 	const [matches, setMatches] = useState(() => JSON.parse(localStorage.getItem("userGames")) ?? [])
 	const [filter, setFilter] = useState("all")
+	const [generatingPuzzles, setGeneratingPuzzles] = useState(false)
+
 
 	// Fetch matches from the backend
 	useEffect(() => {
@@ -25,11 +27,11 @@ const Matches = ({ showMessage }) => {
 				setMatches(games)
 			} catch (error) {
 				console.error("Error fetching matches:", error)
-				showMessage({ message: "Failed to fetch matches: " + error.message, isError: true })
+				showMessage(error.message, true)
 			}
 		}
 		fetchMatches()
-	}, [matches, showMessage])
+	}, [matches.length, showMessage])
 
 
 	useEffect(() => {
@@ -39,36 +41,15 @@ const Matches = ({ showMessage }) => {
 				setProfile(data)
 			} catch (error) {
 				console.error("Failed to fetch user profile:", error)
+				showMessage(error.message, true)
 			}
 		}
 		fetchData()
-	}, [])
-
-
-	const filterMatches = matches => {
-		switch (filter) {
-			case "all":
-				return matches
-			case "rapid":
-				return matches.filter(match => match.timeClass === "rapid")
-			case "blitz":
-				return matches.filter(match => match.timeClass === "blitz")
-			case "bullet":
-				return matches.filter(match => match.timeClass === "bullet")
-			case "lichess":
-				return matches.filter(match => match.source === "lichess")
-			case "chesscom":
-				return matches.filter(match => match.source === "chesscom")
-			default:
-				return matches
-		}
-	}
+	}, [showMessage])
 
 
 	const processMatches = (matches) => {
 		if (matches.length === 0 || !profile) return []
-
-		matches = filterMatches(matches)
 
 		return matches.map((match) => {
 			let outcome
@@ -111,24 +92,52 @@ const Matches = ({ showMessage }) => {
 			return {...match, outcome, opponent, ownSide, playedToday, playedYesterday, played}
 		})
 	}
-	const processedMatches = processMatches(matches) // filters based on selected filter and adds additional fields to the data
-	console.log("Processed matches: ", processedMatches)
 
-	const handleGeneratePuzzles = () => {
-		if (processMatches.length == 0) {
-			showMessage({ message: "No matches available to generate puzzles from.", isError: true })
+
+	const filterMatches = matches => {
+		switch (filter) {
+			case "all":
+				return matches
+			case "rapid":
+				return matches.filter(match => match.timeClass === "rapid")
+			case "blitz":
+				return matches.filter(match => match.timeClass === "blitz")
+			case "bullet":
+				return matches.filter(match => match.timeClass === "bullet")
+			case "lichess":
+				return matches.filter(match => match.source === "lichess")
+			case "chesscom":
+				return matches.filter(match => match.source === "chesscom")
+			default:
+				return matches
+		}
+	}
+
+
+	const handleGeneratePuzzles = async () => {
+		if (processedMatches.length === 0) {
+			showMessage("No matches available to generate puzzles from.", true)
 			return
 		}
 
-		generatePuzzles(processedMatches)
+		setGeneratingPuzzles(true)
+		try {
+			await generatePuzzles(processedMatches)
+		} catch (error) {
+			showMessage(error.message, true)
+		} finally {
+			setGeneratingPuzzles(false)
+		}
 	}
 
+	const processedMatches = processMatches(matches)
+	const filteredMatches = filterMatches(processedMatches)
 
 	return (
 		<div className="your-matches">
 			<div id="matches-header">
 				<h2>Your Recent Matches</h2>
-				<p>{processedMatches.length} games</p>
+				<p>{filteredMatches.length} games</p>
 				{profile && !profile.lichess && !profile.chessCom && <p>To fetch matches, please add your Lichess or Chess.com username in your profile.</p>}
 			</div>
 
@@ -143,10 +152,10 @@ const Matches = ({ showMessage }) => {
 				</div>
 
 				<div id="generate-puzzles-section">
-					<Button onClick={handleGeneratePuzzles}>Generate puzzles</Button>
+					{generatingPuzzles ? <div>Generating puzzles...</div> : <Button onClick={handleGeneratePuzzles}>Generate puzzles</Button>}
 				</div>
 
-				{renderMatches(processedMatches)}
+				{renderMatches(filteredMatches)}
 			</div>
 		</div>
 	)

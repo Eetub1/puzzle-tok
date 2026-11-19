@@ -2,6 +2,10 @@
     width: 100%;
 }
 
+#generate-puzzles-section {
+    margin-top: 10px;
+}
+
 #matches-header, #matches-section {
     display: flex;
     flex-direction: column;

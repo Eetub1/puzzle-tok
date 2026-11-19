@@ -4,6 +4,15 @@ import { Chess } from "chess.js"
 const SKIP_FIRST_MOVES = 10
 
 
+// moves that are evaluated as mate need to be converted to centipawns
+const toCentipawns = result => {
+	if (result.scoreType === "mate") {
+		return result.score > 0 ? 10000 : -10000
+	}
+	return result.score
+}
+
+
 const generatePuzzles = async matches => {
 	const candidates = findCandidates(matches)
 	console.log(`${candidates.length} candidate positions found`)
@@ -14,20 +23,28 @@ const generatePuzzles = async matches => {
 	// that gives you a winning advantage in the position. Therefore we need to compare the best
 	// and second best moves for you in the position to make sure this is the case.
 
+	const puzzles = []
 	for (const candidate of candidates) {
 		const [best, secondBest] = await engine.evaluate(candidate.fen)
 		console.log("Best:", best, "Second best:", secondBest)
 
-		// TODO: analysis here, compare the two moves to the move you played
-		// if best is a winning position and second best is not AND
-		// your played move is not best, then this position is a puzzle?
+		if (!secondBest) {
+			continue // only one legal move
+		}
 
-		// TODO: probably need to turn evaluations into win probabilities?
+		if (best.move === candidate.playedMove) {
+			continue // you played the best move, so this is not a puzzle
+		}
 
+		if (toCentipawns(best) > 150 && toCentipawns(secondBest) < 0) {
+			puzzles.push({ ...candidate, bestMove: best.move })
+		}
 	}
 	engine.terminate() // shut down the whole engine
 
-	return candidates
+	console.log(`${puzzles.length} puzzles found`)
+
+	return puzzles
 }
 
 
