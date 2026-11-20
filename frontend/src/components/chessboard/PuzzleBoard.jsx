@@ -9,7 +9,7 @@ import { setPuzzleAttempt } from "../../services/puzzleAttemptService.js"
 import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak, playerRating}, ref) {
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak, playerRating, onCleared}, ref) {
 	const savedState = puzzle.savedState
 	const retryUsed = useRef(savedState?.retryUsed ?? false)
 	const solutionUsed = useRef(savedState?.solutionUsed ?? false)
@@ -54,6 +54,10 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	}, [game, puzzleMoveIndex, playerColor])
 
 	useEffect(() => {
+		if (puzzleStatus === 'solved' && !preview) {
+			onCleared?.(puzzle) // Unlocks the comments once the puzzle has been cleared
+		}
+
 		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current && !attemptFailed && !attemptRecorded.current) {
 			attemptRecorded.current = true
 			setPuzzleAttempt(puzzle.id, puzzle.rating, true, retryUsed.current).then((result) => {
