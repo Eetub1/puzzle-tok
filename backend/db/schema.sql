@@ -7,12 +7,27 @@ CREATE TABLE users (
     created_at        timestamptz  NOT NULL DEFAULT now(),
     lichess_username  varchar(30),
     chesscom_username varchar(30),
+    puzzle_rating      integer      NOT NULL DEFAULT 1200,
 
     CONSTRAINT users_username_min_length CHECK (char_length(username) >= 3)
 );
 
 CREATE UNIQUE INDEX users_username_lower_unique ON users (lower(username));
 CREATE UNIQUE INDEX users_email_lower_unique ON users (lower(email));
+
+/* connects two people as friends */
+CREATE TABLE friend_relations (
+    id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    person_1 bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    person_2 bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE friend_invitations (
+    id                bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    requester_id      bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    addressee_id      bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    invitation_status varchar(8) /* pending, accepted or declined */
+);
 
 CREATE TABLE email_verification_tokens (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -23,6 +38,8 @@ CREATE TABLE email_verification_tokens (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
+
+-- TODO: refactor to remove separate id, use user + puzzle as primary
 CREATE TABLE failed_puzzles (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -32,6 +49,7 @@ CREATE TABLE failed_puzzles (
     UNIQUE (user_id, puzzle_id)
 );
 
+-- TODO: refactor to remove separate id, use user + puzzle as primary
 CREATE TABLE puzzle_attempts (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -41,17 +59,13 @@ CREATE TABLE puzzle_attempts (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE TABLE solved_puzzles (
-    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    puzzle_fen text        NOT NULL,
-    solved_at  timestamptz NOT NULL DEFAULT now(),
-    PRIMARY KEY (user_id, puzzle_fen)
-);
-
 CREATE TABLE preferences (
     user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     color      text        NOT NULL,
-    difficulty text        NOT NULL
+    difficulty text        NOT NULL,
+    failed     text       NOT NULL,
+    theme     text,
+    opening text
 );
 
 CREATE TABLE puzzle_comments (

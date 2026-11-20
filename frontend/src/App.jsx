@@ -1,4 +1,4 @@
-import { useState} from "react"
+import { useState, useEffect } from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css"
 import ChessReels from "./components/ChessReels"
@@ -12,10 +12,39 @@ const App = () => {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("puzzleTokUser")))
 	const [message, setMessage] = useState(null)
 
+	console.log("User", user)
+
 	const handleLogout = () => {
 		logout()
 		setUser(null)
 	}
+
+	// when application loads, check if the token has expired. If it has, logout immediately
+	useEffect(() => {
+		const wrapper = () => {
+			if (!user) return
+
+			const time = Date.now()
+			if (time >= user.tokenExpiresAt) {
+				handleLogout()
+			}
+		}
+		wrapper()
+	}, [user])
+
+	// is responsible for logging a user out when trying to access a resource that requires
+	// a valid token, when their token is already expired
+	useEffect(() => {
+		window.addEventListener("logoutEvent", handleLogout)
+	}, [])
+
+	const showMessage = (text, isError = false) => {
+		setMessage({ message: text, isError })
+		setTimeout(() => {
+			setMessage(null)
+		}, 4000)
+	}
+
 
 	return (
 		<>
@@ -24,7 +53,7 @@ const App = () => {
 					?
 					<div>
 						{message && <Message data={message}/>}
-						<ChessReels handleLogout={handleLogout} setMessage={setMessage} user_id={user.id}/>
+						<ChessReels handleLogout={handleLogout} showMessage={showMessage} setMessage={setMessage} user_id={user.id}/>
 					</div>
 					: <Navigate to="/login"/>}
 				/>

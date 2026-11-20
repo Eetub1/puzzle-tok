@@ -5,28 +5,35 @@ import './PuzzleBoard.css'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
 import { setFailedPuzzle, removeFailedPuzzle} from "../../services/failedPuzzleService.js"
+import { setPuzzleAttempt } from "../../services/puzzleAttemptService.js"
+import StatusRow from './StatusRow.jsx'
 
 // PuzzleBoard component that renders chessboard for given puzzle
-const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onSolved, onCleared}, ref) {
-	const solutionUsed = useRef(false) //Tracker to see if solution or hint button was used.
-	const [game, setGame] = useState(() => new Chess(puzzle.fen))
-	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(0)
-	const [puzzleStatus, setPuzzleStatus] = useState('playing')
+const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, onEnded, streak, playerRating, onCleared}, ref) {
+	const savedState = puzzle.savedState
+	const retryUsed = useRef(savedState?.retryUsed ?? false)
+	const solutionUsed = useRef(savedState?.solutionUsed ?? false)
+	const attemptRecorded = useRef(savedState?.attemptRecorded ?? (savedState?.puzzleStatus === 'solved' || savedState?.attemptFailed || false))
+	const [game, setGame] = useState(() => new Chess(savedState?.fen ?? puzzle.fen))
+	const [puzzleMoveIndex, setPuzzleMoveIndex] = useState(savedState?.puzzleMoveIndex ?? 0)
+	const [puzzleStatus, setPuzzleStatus] = useState(savedState?.puzzleStatus ?? 'playing')
+	const [attemptFailed, setAttemptFailed] = useState(savedState?.attemptFailed ?? false) // Track if the user has failed the puzzle attempt
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
-	const[lastMove, setLastMove] = useState(puzzle.lastMove)
+	const[lastMove, setLastMove] = useState(savedState?.lastMove ?? puzzle.lastMove)
 	const [hintSquare, setHintSquare] = useState(null)
 	const [hoveredSquare, setHoveredSquare] = useState(null)
 	const [isDragging, setIsDragging] = useState(false)
 	const [moveFeedback, setMoveFeedback] = useState(null)
 	const [feedbackMark, setFeedbackMark] = useState(null)
-	const [positions, setPositions] = useState([
+	const [ratingChange, setRatingChange] = useState(savedState?.ratingChange ?? null)
+	const [positions, setPositions] = useState(savedState?.positions ?? [
 		{
 			fen: puzzle.fen,
 			lastMove: puzzle.lastMove
 		}
 	])
-	const failedPuzzle = useRef(false)
+	const failedPuzzle = useRef(savedState?.failedPuzzle ?? false) // Track if puzzle has been marked as failed for this attempt
 	const puzzleMoves = puzzle.moves.split(' ') ?? []
 	const playerColor = puzzle.fen.split(' ')[1] ?? 'w'
 
@@ -47,13 +54,20 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 	}, [game, puzzleMoveIndex, playerColor])
 
 	useEffect(() => {
-    if (puzzleStatus === 'solved' && !preview) {
-        onCleared?.(puzzle)  // Unlocks comments when successfully cleared
-        
-        if (!solutionUsed.current) {
-            onSolved?.(puzzle) // Notify parent that puzzle is solved without hints/solutions
-        }
-    }
+		if (puzzleStatus === 'solved' && !preview) {
+			onCleared?.(puzzle) // Unlocks the comments once the puzzle has been cleared
+		}
+
+		if (puzzleStatus === 'solved' && !preview && !solutionUsed.current && !attemptFailed && !attemptRecorded.current) {
+			attemptRecorded.current = true
+			setPuzzleAttempt(puzzle.id, puzzle.rating, true, retryUsed.current).then((result) => {
+				console.log(result.message)
+				setRatingChange(result.ratingChange)
+				onEnded?.()
+			}).catch((error) => {
+				console.error(error)
+			})
+		}
 	}, [puzzleStatus])
 
 	// Move back in puzzle
@@ -68,6 +82,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		setPuzzleMoveIndex(puzzleMoveIndex - 1)
 		setSelectedSquare(null)
 		setMoveFeedback(null)
+		setFeedbackMark(null)
 		if (puzzleStatus !== 'solved') {
 			setPuzzleStatus('viewing')
 		}
@@ -107,7 +122,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 
 	// Give solution for next move
 	function giveSolution() {
-		if (puzzleStatus === 'solved') {
+		if (puzzleStatus === 'solved' || puzzleStatus === 'viewing') {
 			return
 		}
 		solutionUsed.current = true
@@ -116,10 +131,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			return
 		}
 		computerMove(nextMove, 'solution move failed')
+		setAttemptFailed(true)
 		setPuzzleStatus('playing')
 		if(!failedPuzzle.current) {
-			setFailedPuzzle(puzzle.id).then((result) => {
-			console.log(result.message)
+			attemptRecorded.current = true
+			setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
+				console.log(result.message)
+				setRatingChange(result.ratingChange)
+				onEnded?.()
 			}).catch((error) => {
 				console.error(error)
 			})
@@ -138,6 +157,19 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		moveForward,
 		giveHint,
 		giveSolution,
+		getPuzzleState: () => ({
+			fen: game.fen(),
+			lastMove,
+			puzzleMoveIndex,
+			puzzleStatus,
+			attemptFailed,
+			positions,
+			solutionUsed: solutionUsed.current,
+			attemptRecorded: attemptRecorded.current,
+			failedPuzzle: failedPuzzle.current,
+			retryUsed: retryUsed.current,
+			ratingChange: ratingChange,
+		}),
 	}))
 
 	// Completes pawn promotion and make move
@@ -260,6 +292,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			})
 			// Check if move matches puzzle solution
 			if (move !== puzzleMoves[puzzleMoveIndex]) {
+				setAttemptFailed(true)
 				setPuzzleStatus('viewing')
 				setMoveFeedback('wrong')
 				setFeedbackMark({
@@ -278,8 +311,11 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 					setPuzzleStatus('playing')
 				}, 1000)
 				if(!failedPuzzle.current) {
-					setFailedPuzzle(puzzle.id).then((result) => {
+					attemptRecorded.current = true
+					setFailedPuzzle(puzzle.id, puzzle.rating, retryUsed.current).then((result) => {
 						console.log(result.message)
+						setRatingChange(result.ratingChange)
+						onEnded?.()
 					}).catch((error) => {
 						console.error(error)
 					})
@@ -289,6 +325,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			}
 
 			setMoveFeedback('right')
+
 			setFeedbackMark({
 				square: gameCopy.isCheckmate() ? gameCopy.findPiece({ type: 'k', color: gameCopy.turn() })[0] : targetSquare,
 				type: gameCopy.isCheckmate() ? 'checkmate' : 'right',
@@ -296,12 +333,14 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			if (!gameCopy.isCheckmate()) {
 				setTimeout(() => {
 					setFeedbackMark(null)
+					setMoveFeedback(null)
 				},700)
 			}
 			setPendingPromotion(null)
 			setGame(gameCopy)
 			setSelectedSquare(null)
 			setHintSquare(null)
+			setLastMove(move)
 			// Update puzzle move index and check if puzzle is solved
 			const nextIndex = puzzleMoveIndex + 1
 			setPuzzleMoveIndex(nextIndex)
@@ -342,6 +381,7 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 			})
 			setGame(gameCopy)
 			setPuzzleMoveIndex(puzzleMoveIndex + 1)
+			setLastMove(nextMove)
 			setPositions([
 				...positions,
 				{
@@ -379,10 +419,47 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 		}
 	}
 
+	function handleRetry() {
+		console.log('Retrying puzzle:', puzzle.id)
+		setPuzzleStatus('playing')
+		setAttemptFailed(false)
+		setPuzzleMoveIndex(0)
+		setLastMove(null)
+		setPositions([])
+		setFeedbackMark(null)
+		setMoveFeedback(null)
+		setSelectedSquare(null)
+		setHoveredSquare(null)
+		setPendingPromotion(null)
+		setHintSquare(null)
+		setRatingChange(null)
+		failedPuzzle.current = false
+		attemptRecorded.current = false
+		solutionUsed.current = false
+		retryUsed.current = true
+		const gameCopy = new Chess(puzzle.fen)
+		setGame(gameCopy)
+		setLastMove(puzzle.lastMove)
+
+	}
+
 
 	return (
 	//Render the chessboard with handlers.
 		<div className="chessboard-container">
+			<StatusRow
+				puzzle={puzzle}
+				game={game}
+				playerColor={playerColor}
+				puzzleStatus={puzzleStatus}
+				moveFeedback={moveFeedback}
+				attemptFailed={attemptFailed}
+				handleRetry={handleRetry}
+				streak={streak}
+				playerRating={playerRating}
+				ratingChange={ratingChange}
+				retryUsed={retryUsed.current}
+			/>
 			<div className= "board-wrapper">
 				<Chessboard
 					options={{
@@ -409,12 +486,13 @@ const PuzzleBoard = forwardRef(function PuzzleBoard({puzzle, preview = false, on
 						</div>
 					</div>
 				)}
+				<PromotionChooser
+					pendingPromotion={pendingPromotion}
+					onSelect={completePromotion}
+					playerColor={playerColor}
+				/>
 			</div>
-			{puzzleStatus === "solved" ? <p>Puzzle ratkaistu</p> : null}
-			<PromotionChooser
-				pendingPromotion={pendingPromotion}
-				onSelect={completePromotion}
-			/>
+
 		</div>
 
 	)

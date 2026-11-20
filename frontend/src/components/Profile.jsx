@@ -1,228 +1,322 @@
 import { useState, useEffect } from "react"
-import { Card } from "react-bootstrap"
+import { Card, Button } from "react-bootstrap"
 import "./Profile.css"
 import { updateUserChessAccounts, getUserProfile } from "../services/userService"
 import { resendEmailVerification } from "../services/userService"
+import { searchUsers, sendFriendRequest, cancelInvite, getReceivedInvites, getFriends, acceptFriendInvite, declineFriendInvite } from "../services/friendService"
 
-const Profile = ({ setMessage, handleLogout }) => {
-    const [lichess, setLichess] = useState("")
-    const [chessCom, setChessCom] = useState("")
-    const [profile, setProfile] = useState(null) // Contains username, email, verification status and chess account usernames
-    const [editingLichess, setEditingLichess] = useState(false)
-    const [editingChessCom, setEditingChessCom] = useState(false)
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getUserProfile()
-                console.log(data)
-                setProfile(data)
-                setLichess(data?.lichess ?? "")
-                setChessCom(data?.chessCom ?? "")
-            } catch (error) {
-                // console.error("Failed to fetch user profile:", error)
-                setMessage({ message: "Failed to fetch user profile: " + error.message, isError: true })
-                setTimeout(() => {
-                    setMessage(null)
-                }, 4000)
-            }
-        }
-        fetchData()
-    }, [setMessage]) // this shouldnt be a dependency, but eslint is complaining about it
+const Profile = ({ showMessage, handleLogout }) => {
+	const [lichess, setLichess] = useState("")
+	const [chessCom, setChessCom] = useState("")
+	const [profile, setProfile] = useState(null) // Contains username, email, verification status and chess account usernames
+	const [editingLichess, setEditingLichess] = useState(false)
+	const [editingChessCom, setEditingChessCom] = useState(false)
+	const [friendUsername, setFriendUsername] = useState("")
+	const [relevantUsers, setRelevantUsers] = useState([]) // usernames found by search
+	const [friendInvites, setFriendInvites] = useState([])
+	const [friends, setFriends] = useState([])
 
 
-    const handleSendVerification = async () => {
-        // This should send a new verification email to the user
-        try {
-            const result = await resendEmailVerification()
-            console.log(result)
-            setMessage({ message: "Email verification link resent!", isError: false})
-            setTimeout(() => {
-                setMessage(null)
-            }, 4000)
-        } catch (error) {
-            console.log("Couldn't resend email verification link: " + error)
-            setMessage({ message: "Couldn't resend email verification link: " + error, isError: true})
-            setTimeout(() => {
-                setMessage(null)
-            }, 4000)
-        }
-    }
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await getUserProfile()
+				setProfile(data)
+				setLichess(data?.lichess ?? "")
+				setChessCom(data?.chessCom ?? "")
+
+				const invites = await getReceivedInvites()
+				setFriendInvites(invites)
+
+				const friends = await getFriends()
+				setFriends(friends)
+			} catch (error) {
+				showMessage(error.message, true)
+			}
+		}
+		fetchData()
+	}, [showMessage]) // this probably shouldn't be a dependency, but eslint is complaining about it
 
 
-    const handleUsernameChanges = async (accounts) => {
-        if (!accounts.lichess && !accounts.chessCom) {
-            setMessage({ message: "At least one of Lichess or Chess.com username must be provided", isError: true })
-            setTimeout(() => {
-                setMessage(null)
-            }, 4000)
-            return false
-        }
-
-        try {
-            await updateUserChessAccounts(accounts)
-            localStorage.removeItem("userGames")
-
-            const data = await getUserProfile()
-            console.log(data)
-            setProfile(data)
-
-            console.log("Chess accounts updated successfully:", data)
-            setMessage({ message: "Chess account updated successfully", isError: false })
-            setTimeout(() => {
-                setMessage(null)
-            }, 2000)
-            return true
-        } catch (error) {
-            console.error("Failed to update chess accounts:", error)
-            setMessage({ message: error.message, isError: true })
-            setTimeout(() => {
-                setMessage(null)
-            }, 4000)
-            return false
-        }
-    }
-
-    const handleLichessEdit = async (showEdit) => {
-        if (showEdit) {
-            setLichess(profile?.lichess ?? "")
-            setEditingLichess(true)
-            return
-        }
-
-        const saved = await handleUsernameChanges({
-            lichess: lichess.trim(),
-            chessCom: profile?.chessCom ?? "",
-        })
-
-        if (saved) setEditingLichess(false)
-    }
+	const handleSendVerification = async () => {
+		try {
+			await resendEmailVerification()
+			showMessage("Email verification link resent")
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
 
 
-    const handleChessComEdit = async (showEdit) => {
-        if (showEdit) {
-            setChessCom(profile?.chessCom ?? "")
-            setEditingChessCom(true)
-            return
-        }
+	const handleUsernameChanges = async (accounts) => {
+		if (!accounts.lichess && !accounts.chessCom) {
+			showMessage("At least one of Lichess or Chess.com username must be provided", true)
+			return false
+		}
 
-        const saved = await handleUsernameChanges({
-            lichess: profile?.lichess ?? "",
-            chessCom: chessCom.trim(),
-        })
+		try {
+			await updateUserChessAccounts(accounts)
+			localStorage.removeItem("userGames")
+			const data = await getUserProfile()
+			setProfile(data)
+			showMessage("Chess account updated successfully")
+			return true
+		} catch (error) {
+			console.error("Failed to update chess accounts:", error)
+			showMessage(error.message, true)
+			return false
+		}
+	}
 
-        if (saved) setEditingChessCom(false)
-    }
+	const handleLichessEdit = async (showEdit) => {
+		if (showEdit) {
+			setLichess(profile?.lichess ?? "")
+			setEditingLichess(true)
+			return
+		}
 
+		const saved = await handleUsernameChanges({
+			lichess: lichess.trim(),
+			chessCom: profile?.chessCom ?? "",
+		})
 
-    return (
-
-        <div id="profile-page">
-            <h2 className="profile-title">Account Settings</h2>
-
-            <Card className="profile-card">
-                <Card.Header className="profile-card-header">Account</Card.Header>
-                <Card.Body className="profile-card-body">
-                    <div className="card-row">
-                        <span className="row-label">Username</span>
-                        <span className="row-value">{profile?.username || "—"}</span>
-                    </div>
-
-                    <div className="card-row">
-                        <span className="row-label">Email</span>
-                        <span className="row-value">{profile?.email || "—"}</span>
-                    </div>
-
-                    <div className="card-row status-row">
-                        <span className="row-label">Email Status</span>
-                        <div className="status-container">
-                            {profile?.emailVerified ? (
-                                <span className="status-badge verified">✓ Verified</span>
-                            ) : (
-                                <>
-                                    <span className="status-badge unverified">Unverified</span>
-                                    <button 
-                                        id="send-verification-btn" 
-                                        type="button" 
-                                        className="verify-btn" 
-                                        onClick={handleSendVerification}
-                                    >
-                                        Send verification email
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
+		if (saved) setEditingLichess(false)
+	}
 
 
-                </Card.Body>
-            </Card>
-            <Card className="profile-card">
-                <Card.Header className="profile-card-header">Chess Accounts</Card.Header>
+	const handleChessComEdit = async (showEdit) => {
+		if (showEdit) {
+			setChessCom(profile?.chessCom ?? "")
+			setEditingChessCom(true)
+			return
+		}
 
-                <Card.Body className="profile-card-body">
-                    <div className="card-row">
-                        <p className="card-description">Connect your accounts so we can turn your games into puzzles</p>
-                    </div>
+		const saved = await handleUsernameChanges({
+			lichess: profile?.lichess ?? "",
+			chessCom: chessCom.trim(),
+		})
 
-                    <div className="card-row edit-row">
-                        <label className="row-label" htmlFor="lichess">Lichess</label>
-                        {editingLichess ? (
-                            <form className="inline-edit-form" onSubmit={(event) => { event.preventDefault(); handleLichessEdit(false) }}>
-                                <input 
-                                    id="lichess" 
-                                    type="text" 
-                                    className="profile-input"
-                                    onChange={(event) => setLichess(event.target.value)} 
-                                    value={lichess}
-                                    autoFocus
-                                />
-                                <button className="action-btn confirm" type="submit">confirm</button>
-                                <button className="action-btn cancel" type="button" onClick={() => setEditingLichess(false)}>cancel</button>
-                            </form>
-                        ) : (
-                            <div className="account-value-group">
-                                <span className={`account-name ${!profile?.lichess ? "empty" : ""}`}>
-                                    {profile?.lichess || "Not connected"}
-                                </span>
-                                <button className="action-btn edit" onClick={() => handleLichessEdit(true)}>edit</button>
-                            </div>
-                        )}
-                    </div>
+		if (saved) setEditingChessCom(false)
+	}
 
-                    <div className="card-row edit-row">
-                        <label className="row-label" htmlFor="chessCom">Chess.com</label>
-                        {editingChessCom ? (
-                            <form className="inline-edit-form" onSubmit={(event) => { event.preventDefault(); handleChessComEdit(false) }}>
-                                <input 
-                                    id="chessCom" 
-                                    type="text" 
-                                    className="profile-input"
-                                    onChange={(event) => setChessCom(event.target.value)} 
-                                    value={chessCom} 
-                                    autoFocus
-                                />
-                                <button className="action-btn confirm" type="submit">confirm</button>
-                                <button className="action-btn cancel" type="button" onClick={() => setEditingChessCom(false)}>cancel</button>
-                            </form>
-                        ) : (
-                            <div className="account-value-group">
-                                <span className={`account-name ${!profile?.chessCom ? "empty" : ""}`}>
-                                    {profile?.chessCom || "Not connected"}
-                                </span>
-                                <button className="action-btn edit" onClick={() => handleChessComEdit(true)}>edit</button>
-                            </div>
-                        )}
-                    </div>
 
-                </Card.Body>
-            </Card>
+	const handleFriendSearch = async event => {
+		const friendQuery = event.target.value
+		setFriendUsername(friendQuery)
 
-            <div className="profile-footer">
-                <button id="logout-btn" onClick={handleLogout}>log out</button>
-            </div>
-        </div>
-    )
+		try {
+			setRelevantUsers(await searchUsers(friendQuery))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleSendFriendInvite = async friendId => {
+		try {
+			const result = await sendFriendRequest(friendId)
+			showMessage(result.message)
+
+			// use the already typed query to get the same users again
+			// this is so that the add friend button disappears for this specific user
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleCancelInvite = async friendId => {
+		try {
+			const result = await cancelInvite(friendId)
+			showMessage(result.message)
+			setRelevantUsers(await searchUsers(friendUsername))
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleAcceptInvite = async requesterId => {
+		console.log("Requester id: ", requesterId)
+
+		try {
+			const result = await acceptFriendInvite(requesterId)
+			setFriendInvites(prev => prev.filter(invite => invite.requesterId !== requesterId))
+			setFriends(await getFriends())
+			showMessage(result.message)
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+
+	const handleDeclineInvite = async requesterId => {
+		try {
+			const result = await declineFriendInvite(requesterId)
+			setFriendInvites(prev => prev.filter(invite => invite.requesterId !== requesterId))
+			showMessage(result.message)
+		} catch (error) {
+			showMessage(error.message, true)
+		}
+	}
+
+	// console.log("Friend invites: ", friendInvites)
+
+
+	return (
+		<div id="profile-page">
+			<button id="logout-btn" onClick={handleLogout}>log out</button>
+
+			<Card id="account-card">
+				<Card.Header>
+					<h4>Account</h4>
+				</Card.Header>
+				<Card.Body>
+					<div className="card-row">
+						<p>Username</p>
+						<p>{profile?.username}</p>
+					</div>
+
+					<div className="card-row">
+						<p>Email</p>
+						<p>{profile?.email ?? "-"}</p>
+					</div>
+
+					<div className="card-row">
+						{!profile?.emailVerified && (
+							<button id="send-verification-btn" type="button" className="btn btn-link" onClick={handleSendVerification}>
+								Send verification email
+							</button>
+						)}
+
+						{profile?.emailVerified ? <p className="text-success">Email verified</p> : <p className="text-warning">Email not verified</p>}
+					</div>
+
+
+				</Card.Body>
+			</Card>
+
+			<Card id="friends-card">
+				<Card.Header>
+					<h4>Friends</h4>
+				</Card.Header>
+				<Card.Body>
+					<div id="friends-section">
+						<div id="received-invites-container">
+							<h5>Received Invites</h5>
+							{friendInvites.map(invite => (
+								<div className="user-row" key={invite.requesterId}>
+									{invite.requesterUsername}
+
+									<div>
+										<Button variant="success" onClick={() => handleAcceptInvite(invite.requesterId)}>Accept</Button>
+										<Button variant="danger" onClick={() => handleDeclineInvite(invite.requesterId)}>Decline</Button>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<div id="your-friends-container">
+							<h5>Your Friends</h5>
+							{friends.length > 0 ?
+								friends.map(friend => (
+									<div className="user-row" key={friend.id}>{friend.username}</div>
+								)) :
+								<div>No friends yet :(</div>}
+						</div>
+
+						<div id="relevant-users-container">
+							<div id="friend-username-container">
+								<label htmlFor="friend-username">Search for friends here:</label>
+								<input id="friend-username" value={friendUsername} onChange={handleFriendSearch}></input>
+							</div>
+
+							{relevantUsers.length > 0 && <h5>Relevant users</h5>}
+							{relevantUsers.map(user => (
+								<div className="user-row" key={user.id}>{user.username}
+									{user.pendingInviteToUser ?
+										<Button variant="danger" onClick={() => handleCancelInvite(user.id)}>Cancel request?</Button> :
+										<Button onClick={() => handleSendFriendInvite(user.id)}>Add Friend</Button>}
+								</div>
+							))}
+						</div>
+					</div>
+				</Card.Body>
+			</Card>
+
+			<Card id="puzzle-stats-card">
+				<Card.Header>
+					<h4>Puzzle Stats</h4>
+				</Card.Header>
+				<Card.Body>
+					<div className="card-row">
+						<p>Player Rating: {profile?.puzzleStats?.playerRating || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Total puzzles solved: {profile?.puzzleStats?.totalSolved || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Total failed puzzle attempts: {profile?.puzzleStats?.failedAttempts || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Solved failed attempts: {profile?.puzzleStats?.solvedFailedAttempts || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Best solved rating: {profile?.puzzleStats?.bestSolvedRating || 0}</p>
+					</div>
+					<div className="card-row">
+						<p>Longest streak: {profile?.puzzleStats?.longestStreak || 0}</p>
+					</div>
+				</Card.Body>
+			</Card>
+
+			<Card id="chess-accounts-card">
+				<Card.Header>
+					<h4>Chess Accounts</h4>
+				</Card.Header>
+
+				<Card.Body>
+					<div className="card-row">
+						<p>Connect your accounts so we can turn your games into puzzles</p>
+					</div>
+
+					<div className="card-row">
+						<label htmlFor="lichess">Lichess</label>
+						{editingLichess ? (
+							<form className="inputGroup" onSubmit={(event) => { event.preventDefault(); handleLichessEdit(false) }}>
+								<input id="lichess" type="text" onChange={(event) => setLichess(event.target.value)} value={lichess}/>
+								<button className="cool-btn btn btn-link" type="submit">confirm</button>
+								<button className="cool-btn btn btn-link" type="button" onClick={() => setEditingLichess(false)}>cancel</button>
+							</form>
+						) : (
+							<div>
+								{profile?.lichess || "Not connected"}
+								<button className="cool-btn btn btn-link" onClick={() => handleLichessEdit(true)}>edit</button>
+							</div>
+						)}
+					</div>
+
+					<div className="card-row">
+						<label htmlFor="chessCom">Chess.com</label>
+						{editingChessCom ? (
+							<form className="inputGroup" onSubmit={(event) => { event.preventDefault(); handleChessComEdit(false) }}>
+								<input id="chessCom" type="text" onChange={(event) => setChessCom(event.target.value)} value={chessCom} />
+								<button className="cool-btn btn btn-link" type="submit">confirm</button>
+								<button className="cool-btn btn btn-link" type="button" onClick={() => setEditingChessCom(false)}>cancel</button>
+							</form>
+						) : (
+							<div>
+								{profile?.chessCom || "Not connected"}
+								<button className="cool-btn btn btn-link" onClick={() => handleChessComEdit(true)}>edit</button>
+							</div>
+						)}
+					</div>
+
+				</Card.Body>
+			</Card>
+		</div>
+	)
 }
 
 export default Profile

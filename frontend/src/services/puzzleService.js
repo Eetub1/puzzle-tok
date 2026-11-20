@@ -27,23 +27,28 @@ const getNextPuzzle = async (response) => {
 	}
 }
 
-const getBatch = async (signal, difficulty, color) => {
+const getBatch = async (signal, difficulty, color, failed, theme, opening, user_id) => {
 
-	console.log('service color:', color)
-	console.log('service difficulty:', difficulty)
+	//console.log('get batch color:', color)
+	//console.log('get batch difficulty:', difficulty)
+	//console.log('puzze service get batch failed:', failed)
 
 	const query = new URLSearchParams({
 		"difficulty": difficulty,
-		"color": color
+		"color": color,
+		"failed": failed,
+		"user_id": user_id,
+		"theme": theme,
+		"opening": opening
 	})
 
-	const response = await fetch(`/api/puzzles/batch?${query}`, {
+	const response = await fetch(`api/puzzles/batch?${query}`, {
 		signal, // Pass AbortController signal to fetch
 	})
 
 	const data = await response.json()
-	console.log('batch data:', data)
-	return data.puzzles.map(puzzles => ({
+	//console.log('batch data:', data)
+	return data.map(puzzles => ({
 		fen: puzzles.puzzle.fen,
 		id: puzzles.puzzle.id,
 		moves: puzzles.puzzle.solution.join(' '),
@@ -56,7 +61,6 @@ const getBatch = async (signal, difficulty, color) => {
 const getPuzzleById = async (id, signal) => {
 	let response = await fetch(`/api/puzzles/puzzleID/${id}`, { signal })
 	const data = await response.json()
-	console.log('here data: ', data)
 	return { // Return puzzle data for structure:
 		fen : data.puzzle.fen,
 		id: data.puzzle.id,
