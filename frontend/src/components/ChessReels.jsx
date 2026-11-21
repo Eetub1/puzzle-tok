@@ -25,6 +25,8 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 	const [showMoveControls, setShowMoveControls] = useState(true)
 	const [playerRating, setPlayerRating] = useState(null)
 
+	const [pressedPref, setPressedPref] = useState(false)
+
 	const boardRef = useRef(null)
 
 	// Functions to handle navigate between puzzle and saving puzzle state
@@ -143,7 +145,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-                  {currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -171,27 +173,30 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 					<button onClick={() => goPrev()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
 				</div>}
+
+				{menuOpen === "Puzzles" && <div className="filter-buttons">
+					<button onClick={() => setPressedPref(!pressedPref)} className="pref-btn">Filters</button>
+					{pressedPref === true && <Preferences user_id={user_id} difficulty={difficulty}
+						color={color} setDifficulty={setDifficulty} setColor={setColor}
+						failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
+				</div>}
 			</div>
 
 			<div className="bottom-bar">
 				{showBottomBar &&
 				<div className="action-buttons">
-          <button onClick={() => boardRef.current?.giveHint()} className="hint-btn">Hint</button>
-          <button onClick={() => boardRef.current?.giveSolution()} className="solution-btn">Solution</button>
-          {isPuzzlesMenu && puzzleCleared && (
-            <button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
-          )}
-        </div>}
+					<button onClick={() => boardRef.current?.giveHint()} className="hint-btn">Hint</button>
+					<button onClick={() => boardRef.current?.giveSolution()} className="solution-btn">Solution</button>
+					{isPuzzlesMenu && puzzleCleared && (
+						<button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
+					)}
+				</div>}
 
 				{showMoveControls &&
 				<div className="step-controls">
 					<button onClick={() => boardRef?.current?.moveBack()} aria-label="Previous move">◀</button>
 					<button onClick={() => boardRef?.current?.moveForward()} aria-label="Next move">▶</button>
 				</div>}
-
-				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty}
-					color={color} setDifficulty={setDifficulty} setColor={setColor}
-					failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
 			</div>
 		</div>
 	)

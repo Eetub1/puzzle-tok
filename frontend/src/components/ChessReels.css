@@ -125,7 +125,12 @@ body,
   gap: 14px;
 }
 
-/* Bottom Bar (Vinkki/Ratkaisu ja askeleet) */
+
+.filter-buttons {
+  gap: 10px
+}
+
+/* Bottom Bar */
 .bottom-bar {
   display: flex;
   align-items: center;
@@ -149,6 +154,19 @@ body,
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.pref-btn ,
+.save-btn{
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--text);
+  border-radius: 20px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .step-controls {
@@ -200,7 +218,11 @@ body,
 .solution-btn:hover,
 .solution-btn:active,
 .comments-btn:hover,
-.comments-btn:active {
+.comments-btn:active,
+.pref-btn:hover,
+.pref-btn:active,
+.save-btn:hover,
+.save-btn:active {
   background: var(--accent);
   color: #10140f;
 }

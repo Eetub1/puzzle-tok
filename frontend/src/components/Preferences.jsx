@@ -159,7 +159,7 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 				{comp_map[pressed]}
 
 				<br></br>
-				<input type="submit" value="Submit"></input>
+				<input type="submit" value="Save" className="save-btn"></input>
 			</form>
 		</div>
 	)
