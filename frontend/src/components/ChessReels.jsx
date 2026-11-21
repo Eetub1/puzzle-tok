@@ -137,7 +137,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 					<button onClick={() => setPressedPref(!pressedPref)} className="pref-btn">Filter puzzles</button>
 					{pressedPref === true && <Preferences user_id={user_id} difficulty={difficulty}
 						color={color} setDifficulty={setDifficulty} setColor={setColor}
-						failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
+						failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening} showMessage={showMessage}/>}
 				</div>}
 
 				{isPuzzlesMenu ? (

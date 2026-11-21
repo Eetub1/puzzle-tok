@@ -5,7 +5,7 @@ import { openings } from "../openings.js"
 import { Button } from "react-bootstrap"
 import "./Preferences.css"
 
-const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening}) => {
+const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening, showMessage}) => {
 	const [pressed, setPressed] = useState("")
 	const [relevantThemes, setRelevantThemes] = useState([])
 	const [relevantOpenings, setRelevantOpenings] = useState([])
@@ -18,9 +18,13 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		try {
 			const data = await prefChange({ color, difficulty, failed, theme, opening, user_id })
 			console.log('pref jsx data!:', data)
+			showMessage('Preferences saved succesfully')
+
 		} catch (error) {
 			console.log("Error with setting preferences: ", error)
+			showMessage('Error with setting preferences')
 		}
+
 	}
 
 	const handlePressed = async event => {
@@ -43,7 +47,7 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 		setThemeText(event.target.value)
 
 		setRelevantThemes(themes.filter( theme =>
-			theme.includes(event.target.value.toLowerCase())
+			theme.toLowerCase().includes(event.target.value.toLowerCase())
 		))
 	}
 
@@ -56,7 +60,7 @@ const Preferences = ({user_id, difficulty, color, failed, theme, opening, setDif
 	const handleOpeningSearch = async event => {
 		setOpeningText(event.target.value)
 		setRelevantOpenings(openings.filter( opening =>
-			opening.includes(event.target.value)
+			opening.toLowerCase().includes(event.target.value)
 		))
 	}
 
