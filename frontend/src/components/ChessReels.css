@@ -21,7 +21,7 @@ body,
   padding: 0;
   width: 100%;
   min-height: 100dvh;
-  background: #000;
+  background:  #101010;
 }
 
 /* Top Bar (Dropdown header ja profiilinappi) */
@@ -123,11 +123,6 @@ body,
   flex-direction: column;
   align-items: center;
   gap: 14px;
-}
-
-
-.filter-buttons {
-  gap: 10px
 }
 
 /* Bottom Bar */

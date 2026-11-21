@@ -1,154 +1,153 @@
-/* eslint-disable no-undef */
-
-export const themes = [ "advancedPawn"
-	, "advancedPawnDescription"
-	, "advantage"
-	, "advantageDescription"
-	, "anastasiaMate"
-	, "anastasiaMateDescription"
-	, "arabianMate"
-	, "arabianMateDescription"
-	, "attackingF2F7"
-	, "attackingF2F7Description"
-	, "attraction"
-	, "attractionDescription"
-	, "backRankMate"
-	, "backRankMateDescription"
-	, "balestraMate"
-	, "balestraMateDescription"
-	, "blindSwineMate"
-	, "blindSwineMateDescription"
-	, "bishopEndgame"
-	, "bishopEndgameDescription"
-	, "bodenMate"
-	, "bodenMateDescription"
-	, "castling"
-	, "castlingDescription"
-	, "capturingDefender"
-	, "capturingDefenderDescription"
-	, "collinearMove"
-	, "collinearMoveDescription"
-	, "cornerMate"
-	, "cornerMateKnightDeliversDescription"
-	, "crushing"
-	, "crushingDescription"
-	, "discoveredCheck"
-	, "discoveredCheckDescription"
-	, "doubleBishopMate"
-	, "doubleBishopMateDescription"
-	, "dovetailMate"
-	, "dovetailMateDescription"
-	, "equality"
-	, "equalityDescription"
-	, "kingsideAttack"
-	, "kingsideAttackDescription"
-	, "clearance"
-	, "clearanceDescription"
-	, "defensiveMove"
-	, "defensiveMoveDescription"
-	, "deflection"
-	, "deflectionDescription"
-	, "discoveredAttack"
-	, "discoveredAttackDescription"
-	, "doubleCheck"
-	, "doubleCheckDescription"
-	, "endgame"
-	, "endgameDescription"
-	, "enPassant"
-	, "enPassantAdjacentCaptureDescription"
-	, "epauletteMate"
-	, "epauletteMateDescription"
-	, "exposedKing"
-	, "exposedKingDescription"
-	, "fork"
-	, "forkOpposingPiecesDescription"
-	, "hangingPiece"
-	, "hangingPieceDescription"
-	, "hookMate"
-	, "hookMateOpposingPawnDescription"
-	, "interference"
-	, "interferenceDescription"
-	, "intermezzo"
-	, "intermezzoDescription"
-	, "killBoxMate"
-	, "killBoxMateDescription"
-	, "pillsburysMate"
-	, "pillsburyMateRookAndBishopDescription"
-	, "morphysMate"
-	, "morphyMateBishopAndRookDescription"
-	, "swallowstailMate"
-	, "swallowstailMateDescription"
-	, "triangleMate"
-	, "triangleMateDescription"
-	, "vukovicMate"
-	, "vukovicMateDescription"
-	, "knightEndgame"
-	, "knightEndgameDescription"
-	, "long"
-	, "longDescription"
-	, "master"
-	, "masterDescription"
-	, "masterVsMaster"
-	, "masterVsMasterDescription"
-	, "mate"
-	, "mateDescription"
-	, "mateIn1"
-	, "mateIn1Description"
-	, "mateIn2"
-	, "mateIn2Description"
-	, "mateIn3"
-	, "mateIn3Description"
-	, "mateIn4"
-	, "mateIn4Description"
-	, "mateIn5"
-	, "mateIn5Description"
-	, "middlegame"
-	, "middlegameDescription"
-	, "oneMove"
-	, "oneMoveDescription"
-	, "opening"
-	, "openingDescription"
-	, "operaMate"
-	, "operaMateDescription"
-	, "pawnEndgame"
-	, "pawnEndgameDescription"
-	, "pin"
-	, "pinDescription"
-	, "promotion"
-	, "promotePawnToQueenRookOrMinor"
-	, "queenEndgame"
-	, "queenEndgameDescription"
-	, "queenRookEndgame"
-	, "queenRookEndgameDescription"
-	, "queensideAttack"
-	, "queensideAttackDescription"
-	, "quietMove"
-	, "quietMoveDescription"
-	, "rookEndgame"
-	, "rookEndgameDescription"
-	, "sacrifice"
-	, "sacrificeDescription"
-	, "short"
-	, "shortDescription"
-	, "skewer"
-	, "skewerDescription"
-	, "smotheredMate"
-	, "smotheredMateDescription"
-	, "superGM"
-	, "superGMDescription"
-	, "trappedPiece"
-	, "trappedPieceDescription"
-	, "underPromotion"
-	, "underPromotionDescription"
-	, "veryLong"
-	, "veryLongDescription"
-	, "xRayAttack"
-	, "xRayAttackDescription"
-	, "zugzwang"
-	, "zugzwangDescription"
-	, "mix"
-	, "mixDescription"
-	, "playerGames"
-	, "playerGamesDescription"
-	, "puzzleDownloadInformation"
+export const themes = [
+	"advancedpawn",
+	"advancedpawndescription",
+	"advantage",
+	"advantagedescription",
+	"anastasiamate",
+	"anastasiamatedescription",
+	"arabianmate",
+	"arabianmatedescription",
+	"attackingf2f7",
+	"attackingf2f7description",
+	"attraction",
+	"attractiondescription",
+	"backrankmate",
+	"backrankmatedescription",
+	"balestramate",
+	"balestramatedescription",
+	"blindswinemate",
+	"blindswinematedescription",
+	"bishopendgame",
+	"bishopendgamedescription",
+	"bodenmate",
+	"bodenmatedescription",
+	"castling",
+	"castlingdescription",
+	"capturingdefender",
+	"capturingdefenderdescription",
+	"collinearmove",
+	"collinearmovedescription",
+	"cornermate",
+	"cornermateknightdeliversdescription",
+	"crushing",
+	"crushingdescription",
+	"discoveredcheck",
+	"discoveredcheckdescription",
+	"doublebishopmate",
+	"doublebishopmatedescription",
+	"dovetailmate",
+	"dovetailmatedescription",
+	"equality",
+	"equalitydescription",
+	"kingsideattack",
+	"kingsideattackdescription",
+	"clearance",
+	"clearancedescription",
+	"defensivemove",
+	"defensivemovedescription",
+	"deflection",
+	"deflectiondescription",
+	"discoveredattack",
+	"discoveredattackdescription",
+	"doublecheck",
+	"doublecheckdescription",
+	"endgame",
+	"endgamedescription",
+	"enpassant",
+	"enpassantadjacentcapturedescription",
+	"epaulettemate",
+	"epaulettematedescription",
+	"exposedking",
+	"exposedkingdescription",
+	"fork",
+	"forkopposingpiecesdescription",
+	"hangingpiece",
+	"hangingpiecedescription",
+	"hookmate",
+	"hookmateopposingpawndescription",
+	"interference",
+	"interferencedescription",
+	"intermezzo",
+	"intermezzodescription",
+	"killboxmate",
+	"killboxmatedescription",
+	"pillsburysmate",
+	"pillsburymaterookandbishopdescription",
+	"morphysmate",
+	"morphymatebishopandrookdescription",
+	"swallowstailmate",
+	"swallowstailmatedescription",
+	"trianglemate",
+	"trianglematedescription",
+	"vukovicmate",
+	"vukovicmatedescription",
+	"knightendgame",
+	"knightendgamedescription",
+	"long",
+	"longdescription",
+	"master",
+	"masterdescription",
+	"mastervsmaster",
+	"mastervsmasterdescription",
+	"mate",
+	"matedescription",
+	"matein1",
+	"matein1description",
+	"matein2",
+	"matein2description",
+	"matein3",
+	"matein3description",
+	"matein4",
+	"matein4description",
+	"matein5",
+	"matein5description",
+	"middlegame",
+	"middlegamedescription",
+	"onemove",
+	"onemovedescription",
+	"opening",
+	"openingdescription",
+	"operamate",
+	"operamatedescription",
+	"pawnendgame",
+	"pawnendgamedescription",
+	"pin",
+	"pindescription",
+	"promotion",
+	"promotepawntoqueenrookorminor",
+	"queenendgame",
+	"queenendgamedescription",
+	"queenrookendgame",
+	"queenrookendgamedescription",
+	"queensideattack",
+	"queensideattackdescription",
+	"quietmove",
+	"quietmovedescription",
+	"rookendgame",
+	"rookendgamedescription",
+	"sacrifice",
+	"sacrificedescription",
+	"short",
+	"shortdescription",
+	"skewer",
+	"skewerdescription",
+	"smotheredmate",
+	"smotheredmatedescription",
+	"supergm",
+	"supergmdescription",
+	"trappedpiece",
+	"trappedpiecedescription",
+	"underpromotion",
+	"underpromotiondescription",
+	"verylong",
+	"verylongdescription",
+	"xrayattack",
+	"xrayattackdescription",
+	"zugzwang",
+	"zugzwangdescription",
+	"mix",
+	"mixdescription",
+	"playergames",
+	"playergamesdescription",
+	"puzzledownloadinformation"
 ]

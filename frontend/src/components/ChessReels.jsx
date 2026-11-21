@@ -12,7 +12,6 @@ import { usePuzzleQueue } from "../hooks/usePuzzleQueue.js"
 import { getStreak } from "../services/userService.js"
 import { usePreference } from "../hooks/usePreference.js"
 import { getUserProfile } from "../services/userService.js"
-
 import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
@@ -133,6 +132,14 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 			</div>
 
 			<div className="content-row">
+
+				{menuOpen === "Puzzles" && <div className="filter-buttons">
+					<button onClick={() => setPressedPref(!pressedPref)} className="pref-btn">Filter puzzles</button>
+					{pressedPref === true && <Preferences user_id={user_id} difficulty={difficulty}
+						color={color} setDifficulty={setDifficulty} setColor={setColor}
+						failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
+				</div>}
+
 				{isPuzzlesMenu ? (
 					<div className="reels-container" onWheel={handleWheel}>
 						<div
@@ -172,13 +179,6 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 				{showScrollControls && <div className="scroll-controls">
 					<button onClick={() => goPrev()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
-				</div>}
-
-				{menuOpen === "Puzzles" && <div className="filter-buttons">
-					<button onClick={() => setPressedPref(!pressedPref)} className="pref-btn">Filters</button>
-					{pressedPref === true && <Preferences user_id={user_id} difficulty={difficulty}
-						color={color} setDifficulty={setDifficulty} setColor={setColor}
-						failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
 				</div>}
 			</div>
 
