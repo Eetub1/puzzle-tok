@@ -1,0 +1,43 @@
+/*Preferences css*/
+
+.theme-input,
+.opening-input,
+.color-selection {
+    width: 100%;
+    background: transparent;
+    color: white;
+    margin-bottom: 20px;
+}
+
+select {
+    border: 2px solid #dddddd;
+    background: transparent;
+    color: white;
+    align-items: right;
+    width: 55%;
+}
+
+select:hover,
+select:focus {
+    background: transparent;
+    color: white;
+}
+
+.filter-row,
+.search-row {
+    display: flex;
+}
+
+.labelling,
+.selection{
+    display: inline-block;
+}
+
+.labelling{
+    margin-right: auto;
+}
+
+.search-button{
+    margin-left: auto;
+    margin-bottom: 8px;
+}
