@@ -2,12 +2,18 @@ import { useState, useImperativeHandle, forwardRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import './ChessBoard.css'
+import EvalBar from './EvalBar.jsx'
+import { useStockfish } from '../../hooks/useStockfish.js'
 import { PromotionChooser } from './PromotionChooser.jsx'
 import { getSquareStyles } from './SquareStyles.jsx'
 
 // ChessBoard component, renders the chessboard and handles game logic
-const ChessBoard = forwardRef(function ChessBoard(props, ref) {
+const ChessBoard = forwardRef(function ChessBoard({ showEvalBar = false, boardOrientation = 'white' }, ref) {
 	const [game, setGame] = useState(() => new Chess())
+	
+	// Get live engine evaluation from Stockfish hook
+	const { evalScore, mateIn } = useStockfish(game.fen(), showEvalBar)
+
 	const [selectedSquare, setSelectedSquare] = useState(null)
 	const [lastMove, setLastMove] = useState(null)
 	const [pendingPromotion, setPendingPromotion] = useState(null)
@@ -80,7 +86,7 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 
 	// Handles square click events
 	function onSquareClick({ square }) {
-		if(gameover || pendingPromotion) {
+		if(game.isGameOver() || pendingPromotion) {
 			return
 		}
 		// No square is selected yet -> select this one
@@ -142,6 +148,8 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 				promotion: promotionPiece, // Your chosen promotion piece ('q', 'r', 'b', 'n')
 			})
 			setPendingPromotion(null)
+			
+			// Stockfish automatically evaluates the new FEN via the useStockfish hook!
 			setGame(gameCopy)
 			setLastMove(move)
 			setSelectedSquare(null)
@@ -153,9 +161,6 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 				},
 			])
 			setmoveIndex(moveIndex + 1)
-			if (gameCopy.isGameOver()) {
-				setGameover(true)
-			}
 			return true
 
 		} catch {
@@ -174,26 +179,35 @@ const ChessBoard = forwardRef(function ChessBoard(props, ref) {
 
 	return (
 	//Render the chessboard with handlers.
-		<div className="chessboard-container">
-			<Chessboard
-				options={{
-					position: game.fen(), // FEN representing current game state
-					alphaNotationStyle: {fontSize: '1.2rem'}, // Font size for square notation
-					boardStyle: { borderRadius: '10px'}, // Board style with rounded corners
-					onPieceDrag, // Handle piece drag events
-					onPieceDrop,  // Handle piece drop events
-					onSquareClick, // Handle square click events
-					canDragPiece,  // Determine if piece can be dragged
-					numericNotationStyle: {fontSize: '1.2rem'}, // Font size for numeric notation
-					squareStyles: getSquareStyles(game, selectedSquare, lastMove), // Apply styles to squares
-				}}
-			/>
-			<PromotionChooser
-				pendingPromotion={pendingPromotion}
-				onSelect={completePromotion}
-			/>
+		<div style={{ display: 'flex', alignItems: 'stretch' }}>
+			{showEvalBar && (
+				<EvalBar
+					evalScore={evalScore}
+					mateIn={mateIn}
+					orientation={boardOrientation}
+				/>
+			)}
+			<div className="chessboard-container">
+				<Chessboard
+					options={{
+						position: game.fen(), // FEN representing current game state
+						boardOrientation, // Board orientation ('white' or 'black')
+						alphaNotationStyle: {fontSize: '1.2rem'}, // Font size for square notation
+						boardStyle: { borderRadius: '10px'}, // Board style with rounded corners
+						onPieceDrag, // Handle piece drag events
+						onPieceDrop,  // Handle piece drop events
+						onSquareClick, // Handle square click events
+						canDragPiece,  // Determine if piece can be dragged
+						numericNotationStyle: {fontSize: '1.2rem'}, // Font size for numeric notation
+						squareStyles: getSquareStyles(game, selectedSquare, lastMove), // Apply styles to squares
+					}}
+				/>
+				<PromotionChooser
+					pendingPromotion={pendingPromotion}
+					onSelect={completePromotion}
+				/>
+			</div>
 		</div>
-
 	)
 })
 export default ChessBoard

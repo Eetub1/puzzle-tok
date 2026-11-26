@@ -13,6 +13,7 @@ import { getStreak } from "../services/userService.js"
 import { usePreference } from "../hooks/usePreference.js"
 import { getUserProfile } from "../services/userService.js"
 
+import EvalBar from './chessboard/EvalBar.jsx'
 import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
@@ -155,7 +156,14 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 				) : (
 					<div className={`other-content${menuOpen === "DailyPuzzle" || menuOpen === "Openings" ? " no-reels-content" : ""}`}>
 						{menuOpen === "DailyPuzzle" && (currentPuzzle ? <PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} onEnded={handleEnded} streak={streak} playerRating={playerRating} /> : <p>Loading puzzle...</p>)}
-						{menuOpen === "Openings" && <ChessBoard ref={boardRef}/>}
+						{menuOpen === "Openings" && (
+    						<ChessBoard
+        					ref={boardRef} 
+        					showEvalBar={true} 
+        					evalScore={0}
+        					mateIn={null} 
+    						/>
+						)}
 						{menuOpen === "YourMatches" && <Matches setMessage={setMessage}/>}
 						{menuOpen === "Profile" && <Profile showMessage={showMessage} handleLogout={handleLogout}/>}
 					</div>

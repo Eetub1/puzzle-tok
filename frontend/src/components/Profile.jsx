@@ -35,7 +35,8 @@ const Profile = ({ showMessage, handleLogout }) => {
 			}
 		}
 		fetchData()
-	}, [showMessage]) // this probably shouldn't be a dependency, but eslint is complaining about it
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 
 	const handleSendVerification = async () => {
