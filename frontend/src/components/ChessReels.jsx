@@ -4,6 +4,7 @@ import PuzzleBoard from "./chessboard/PuzzleBoard.jsx"
 import ChessBoard from "./chessboard/ChessBoard.jsx"
 import Profile from "./Profile.jsx"
 import Preferences from "./Preferences.jsx"
+import Comments from "./Comments.jsx"
 import "./ChessReels.css"
 import { useNavigate } from "react-router-dom"
 import { usePuzzleReels } from "../hooks/usePuzzleReels.js"
@@ -16,8 +17,8 @@ import Matches from "./Matches.jsx"
 
 const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 	const [menuOpen, setMenuOpen] = useState("DailyPuzzle")
-	const {difficulty, color, failed, setDifficulty, setColor, setFailed} = usePreference()
-	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, user_id})
+	const {difficulty, color, failed, theme, opening, setDifficulty, setColor, setFailed, setTheme, setOpening} = usePreference()
+	const puzzleQueue = usePuzzleQueue({menuOpen, difficulty, color, failed, theme, opening, user_id})
 	const {currentPuzzle, previousPuzzle, nextPuzzle, saveDailyPuzzleState, savePuzzleState} = puzzleQueue
 	const [showBottomBar, setShowBottomBar] = useState(true)
 	const [showScrollControls, setShowScrollControls] = useState(false)
@@ -25,7 +26,6 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 	const [playerRating, setPlayerRating] = useState(null)
 
 	const boardRef = useRef(null)
-
 
 	// Functions to handle navigate between puzzle and saving puzzle state
 	function handleNextPuzzle() {
@@ -57,6 +57,11 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 			console.error(error)
 		}
 	}
+
+	const [clearedFen, setClearedFen] = useState(null)
+	const [commentsFen, setCommentsFen] = useState(null)
+	const puzzleCleared = clearedFen !== null && clearedFen === currentPuzzle?.fen
+	const commentsOpen = puzzleCleared && commentsFen === currentPuzzle?.fen
 
 	const navigate = useNavigate()
 
@@ -138,7 +143,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} />)
+                  {currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -156,6 +161,12 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 					</div>
 				)}
 
+				{isPuzzlesMenu && puzzleCleared && commentsOpen && (
+					<aside className="comments-panel">
+						<Comments puzzleId={currentPuzzle.puzzle?.id ?? currentPuzzle.id}/>
+					</aside>
+				)}
+
 				{showScrollControls && <div className="scroll-controls">
 					<button onClick={() => goPrev()} aria-label="Previous puzzle">▲</button>
 					<button onClick={() => goNext()} aria-label="Next puzzle">▼</button>
@@ -165,9 +176,12 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 			<div className="bottom-bar">
 				{showBottomBar &&
 				<div className="action-buttons">
-					<button onClick={() => boardRef?.current?.giveHint()} className="hint-btn">Hint</button>
-					<button onClick={() => boardRef?.current?.giveSolution()} className="solution-btn">Solution</button>
-				</div>}
+          <button onClick={() => boardRef.current?.giveHint()} className="hint-btn">Hint</button>
+          <button onClick={() => boardRef.current?.giveSolution()} className="solution-btn">Solution</button>
+          {isPuzzlesMenu && puzzleCleared && (
+            <button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
+          )}
+        </div>}
 
 				{showMoveControls &&
 				<div className="step-controls">
@@ -177,7 +191,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 
 				{menuOpen === "Puzzles" && <Preferences user_id={user_id} difficulty={difficulty}
 					color={color} setDifficulty={setDifficulty} setColor={setColor}
-					failed={failed} setFailed={setFailed}/>}
+					failed={failed} setFailed={setFailed} theme={theme} setTheme={setTheme} opening={opening} setOpening={setOpening}/>}
 			</div>
 		</div>
 	)

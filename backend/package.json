@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node --env-file=.env index.js",
+    "dbr": "docker compose down -v && docker compose up -d",
+    "dbi": "docker compose exec -T db psql -U puzzletok puzzletok < db/schema.sql && docker compose exec -T db psql -U puzzletok puzzletok < db/seed.sql",
     "dev": "docker compose up -d && node --watch --env-file=.env index.js"
   },
   "keywords": [],

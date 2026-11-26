@@ -4,6 +4,7 @@ import { authenticateToken } from "../middleware/auth.js"
 import { getLichessGames, getChessComGames } from "../utils/games.js"
 import { sendVerificationEmail } from "../utils/mail.js"
 import { saveFailedPuzzle, getFailedPuzzle, removeFailedPuzzle } from "../controllers/failedPuzzleController.js"
+import { getComments, addComment, removeComment } from "../controllers/commentController.js"
 import { savePuzzleAttempt } from "../controllers/puzzleAttemptsController.js"
 
 const userRouter = express.Router()
@@ -16,6 +17,9 @@ userRouter.post("/failed", saveFailedPuzzle)
 userRouter.get("/failed", getFailedPuzzle)
 userRouter.delete("/failed/:puzzleId", removeFailedPuzzle)
 
+userRouter.get("/comments/:puzzleId", getComments)
+userRouter.post("/comments", addComment)
+userRouter.delete("/comments/:commentId", removeComment)
 userRouter.post("/puzzle-attempts", savePuzzleAttempt)
 
 

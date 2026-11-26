@@ -63,5 +63,17 @@ CREATE TABLE preferences (
     user_id    bigint      NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     color      text        NOT NULL,
     difficulty text        NOT NULL,
-    failed     text       NOT NULL
+    failed     text       NOT NULL,
+    theme     text,
+    opening text
 );
+
+CREATE TABLE puzzle_comments (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    bigint      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    puzzle_id  text        NOT NULL,
+    body       text        NOT NULL CHECK (char_length(body) BETWEEN 1 AND 200),
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX puzzle_comments_puzzle_idx ON puzzle_comments (puzzle_id, created_at DESC);

@@ -36,6 +36,44 @@ const getFilteredBatch = async (req) => {
     return json.puzzles
 }
 
+// Form batch of accurately filtered puzzles
+const getThemedBatch = async (req) => {
+
+    let query = new URLSearchParams({})
+
+    if (req.query.color === 'both') {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 5
+        })
+    } else {
+        query = new URLSearchParams({
+            "difficulty": req.query.difficulty,
+            "nb": 1, 
+            "color": req.query.color
+        })
+    }
+
+    let response
+
+    if (req.query.theme) {
+        console.log("Sending themed puzzles")
+        response = await fetch(`${base_url}/api/puzzle/batch/${req.query.theme}?${query}`)
+    } else if (req.query.opening) {
+        console.log("Sending puzzles by opening")
+        response = await fetch(`${base_url}/api/puzzle/batch/${req.query.opening}?${query}`)
+    }
+
+    const json = await response.json()
+    console.log('themed games', json)
+
+    if (!response.ok) {
+        throw new Error(`Lichess request failed: ${response.status}`)
+    }
+
+    return json.puzzles
+}
+
 // Form batch of failed puzzles
 const getFailedBatch = async (user_id) => {
 
@@ -130,17 +168,18 @@ puzzlesRouter.get('/batch', async (req,res) => {
 
     console.log('QUERY HERE', req.query)
 
-    //console.log('QUERY failed HERE', req.query.failed)
+    //console.log('QUERY specify HERE', req.query.opening)
 
     let response
 
     if (req.query.failed === 'failed') {
         response = await getFailedBatch(req.query.user_id) // TODO: get id from server, not from frontend
-        console.log('FAILED PUZZLES HERE', response)
-        
+        //console.log('FAILED PUZZLES HERE', response)
+    } else if (req.query.theme || req.query.opening) {
+        response = await getThemedBatch(req)
     } else {
         response = await getFilteredBatch(req)
-        console.log('RESULT HERE', response)
+        //console.log('RESULT HERE', response)
     }
     
     const data = response

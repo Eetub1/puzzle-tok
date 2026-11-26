@@ -161,7 +161,7 @@ const Profile = ({ showMessage, handleLogout }) => {
 		}
 	}
 
-	console.log("Friend invites: ", friendInvites)
+	// console.log("Friend invites: ", friendInvites)
 
 
 	return (
