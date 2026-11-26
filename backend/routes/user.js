@@ -274,4 +274,35 @@ userRouter.post("/resend-verification", async (req, res) => {
     }
 })
 
+
+userRouter.post("/own-puzzles", async (req, res) => {
+    const id = req.user.id
+    const { puzzles } = req.body ?? {}
+
+    if (!Array.isArray(puzzles)) {
+        return res.status(400).json({ error: "Puzzles must be an array" })
+    }
+
+    if (puzzles.length === 0) {
+        return res.json({ message: "No puzzles found from game" })
+    }
+
+
+    try {
+        for (const puzzle of puzzles) {
+            await pool.query(
+                `INSERT INTO own_puzzles (user_id, source, game_id, move_count, fen, last_move, best_move, played_move)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                ON CONFLICT DO NOTHING`, // if there already exists a puzzle from same game and moveCount, dont raise error
+                [req.user.id, puzzle.source, puzzle.gameId, puzzle.moveCount, puzzle.fen, puzzle.lastMove, puzzle.bestMove, puzzle.playedMove],
+            )
+        }
+
+        return res.json({ message: "Puzzles added to the database" })
+    } catch (error) {
+        console.error("Error while trying to add own puzzles to database:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
 export default userRouter

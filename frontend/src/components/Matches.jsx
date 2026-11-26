@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
 import "./Matches.css"
 import { Card, Button } from "react-bootstrap"
-import { getUserGames } from "../services/userService.js"
-import { getUserProfile } from "../services/userService.js"
+import { getUserGames, getUserProfile, saveOwnPuzzles } from "../services/userService.js"
 import { generatePuzzles } from "../utils/puzzleGenerator.js"
 
 const GAMES_PER_SITE = 10
@@ -122,7 +121,9 @@ const Matches = ({ showMessage }) => {
 
 		setGeneratingPuzzles(true)
 		try {
-			await generatePuzzles(processedMatches)
+			const puzzles = await generatePuzzles(processedMatches)
+			console.log("Puzzles", puzzles)
+			await saveOwnPuzzles(puzzles)
 		} catch (error) {
 			showMessage(error.message, true)
 		} finally {

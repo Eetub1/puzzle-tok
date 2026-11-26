@@ -143,7 +143,7 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
-                  {currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
+								{currentPuzzle ? (<PuzzleBoard key={currentPuzzle.fen} ref={boardRef} puzzle={currentPuzzle} preview={false} onEnded={handleEnded} streak={streak} playerRating={playerRating} onCleared={puzzle => setClearedFen(puzzle.fen)}/>)
 									: (<p>Loading puzzle...</p>)}
 							</div>
 							<div className="reels-slide">
@@ -176,12 +176,12 @@ const ChessReels = ({ handleLogout, showMessage, setMessage, user_id }) => {
 			<div className="bottom-bar">
 				{showBottomBar &&
 				<div className="action-buttons">
-          <button onClick={() => boardRef.current?.giveHint()} className="hint-btn">Hint</button>
-          <button onClick={() => boardRef.current?.giveSolution()} className="solution-btn">Solution</button>
-          {isPuzzlesMenu && puzzleCleared && (
-            <button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
-          )}
-        </div>}
+					<button onClick={() => boardRef.current?.giveHint()} className="hint-btn">Hint</button>
+					<button onClick={() => boardRef.current?.giveSolution()} className="solution-btn">Solution</button>
+					{isPuzzlesMenu && puzzleCleared && (
+						<button onClick={() => setCommentsFen(commentsOpen ? null : currentPuzzle.fen)} className="comments-btn">💬 Comments</button>
+					)}
+				</div>}
 
 				{showMoveControls &&
 				<div className="step-controls">

@@ -23,10 +23,10 @@
 }
 
 #account-card, #chess-accounts-card, #puzzle-stats-card, #friends-card {
-    margin-top: 25px;
-    width: min(600px, 90%);
-    background-color: #0f0f11;
-    color: white;
+  margin-top: 25px;
+  width: min(600px, 90%);
+  background-color: #0f0f11;
+  color: white;
 }
 
 #logout-btn {
@@ -47,7 +47,7 @@
 }
 
 /* Card Styling */
-.profile-card {
+/*.profile-card {
   background-color: #141416 !important;
   border: 1px solid #2a2a2e !important;
   border-radius: 12px !important;
@@ -74,7 +74,7 @@
   color: #a0a0a0;
   font-size: 0.88rem;
   margin: 0 0 8px 0;
-}
+}*/
 
 /* Table-like Row Layout */
 .card-row {
@@ -82,7 +82,6 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  border-bottom: 1px solid #222226;
 }
 
 .card-row:last-child {
@@ -102,8 +101,36 @@
   font-weight: 600;
 }
 
+.cool-btn {
+  padding: 0px;
+  margin-left: 10px;
+}
+
+#your-friends-container, #received-invites-container {
+  margin-bottom: 30px;
+}
+
+#friend-username {
+  margin-left: auto;
+}
+
+#friend-username-container {
+  display: flex;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  margin-bottom: 12px;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
+  border-radius: 7px;
+}
+
 /* Status Badges */
-.status-container {
+/*.status-container {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -140,10 +167,10 @@
 
 .verify-btn:hover {
   color: #68c5c8;
-}
+}*/
 
 /* Edit Rows & Inputs */
-.account-value-group {
+/*.account-value-group {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -206,32 +233,4 @@
 .action-btn.cancel:hover {
   background: #333;
   color: #fff;
-}
-
-.cool-btn {
-    padding: 0px;
-    margin-left: 10px;
-}
-
-#your-friends-container, #received-invites-container {
-    margin-bottom: 30px;
-}
-
-#friend-username {
-    margin-left: auto;
-}
-
-#friend-username-container {
-    display: flex;
-}
-
-.user-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px;
-    margin-bottom: 12px;
-    border-top: 2px solid white;
-    border-bottom: 2px solid white;
-    border-radius: 7px;
-}
+}*/
