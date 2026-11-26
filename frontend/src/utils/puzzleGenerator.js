@@ -36,7 +36,8 @@ const generatePuzzles = async matches => {
 			continue // you played the best move, so this is not a puzzle
 		}
 
-		if (toCentipawns(best) > 150 && toCentipawns(secondBest) < 0) {
+		// these boundaries can be tweaked
+		if (toCentipawns(best) > 150 && toCentipawns(secondBest) < 50) {
 			puzzles.push({ ...candidate, bestMove: best.move })
 		}
 	}

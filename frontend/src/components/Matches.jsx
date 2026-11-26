@@ -4,7 +4,7 @@ import { Card, Button } from "react-bootstrap"
 import { getUserGames, getUserProfile, saveOwnPuzzles } from "../services/userService.js"
 import { generatePuzzles } from "../utils/puzzleGenerator.js"
 
-const GAMES_PER_SITE = 10
+const GAMES_PER_SITE = 25
 
 const Matches = ({ showMessage }) => {
 	const [profile, setProfile] = useState(null) // Contains username, lichess and chess.com usernames and email if it has been verified

@@ -298,7 +298,7 @@ userRouter.post("/own-puzzles", async (req, res) => {
             )
         }
 
-        return res.json({ message: "Puzzles added to the database" })
+        return res.json({ message: "Puzzles added to the database. You can find these puzzles on the puzzles page" })
     } catch (error) {
         console.error("Error while trying to add own puzzles to database:", error)
         return res.status(500).json({ error: "Internal server error" })
