@@ -1,9 +1,3 @@
-const parsePGN = pgn => {
-    console.log("TODO")
-}
-
-
-// TODO: parse pgn
 const normalizeLichessGame = game => ({
     id: game.id,
     source: "lichess",
@@ -23,7 +17,7 @@ const getChessComResult = game => {
     return "draw"
 }
 
-// TODO: parse pgn
+
 const normalizeChessComGame = game => ({
     id: game.uuid,
     source: "chesscom",
@@ -95,7 +89,6 @@ const getChessComGames = async (username, limit) => {
     
     const data = await response.json()
 
-    console.log(data.games)
     return data.games.slice(0, limit).map(normalizeChessComGame)
 }
 

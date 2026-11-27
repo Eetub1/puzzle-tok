@@ -81,7 +81,6 @@ userRouter.get("/profile", async (req, res) => {
         if (!profile) {
             return res.status(404).json({ error: "User not found" })
         }
-        console.log(profile.email_verified_at)
 
         const result2 = await pool.query(`
             SELECT COUNT(*) AS total_attempts,
@@ -271,6 +270,37 @@ userRouter.post("/resend-verification", async (req, res) => {
         return res.json({ message: "Verification email sent" })
     } catch (error) {
         console.error("Error while trying to resend email verification link:", error)
+        return res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+
+userRouter.post("/own-puzzles", async (req, res) => {
+    const id = req.user.id
+    const { puzzles } = req.body ?? {}
+
+    if (!Array.isArray(puzzles)) {
+        return res.status(400).json({ error: "Puzzles must be an array" })
+    }
+
+    if (puzzles.length === 0) {
+        return res.json({ message: "No puzzles found from game" })
+    }
+
+
+    try {
+        for (const puzzle of puzzles) {
+            await pool.query(
+                `INSERT INTO own_puzzles (user_id, source, game_id, move_count, fen, last_move, best_move, played_move)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                ON CONFLICT DO NOTHING`, // if there already exists a puzzle from same game and moveCount, dont raise error
+                [req.user.id, puzzle.source, puzzle.gameId, puzzle.moveCount, puzzle.fen, puzzle.lastMove, puzzle.bestMove, puzzle.playedMove],
+            )
+        }
+
+        return res.json({ message: "Puzzles added to the database. You can find these puzzles on the puzzles page" })
+    } catch (error) {
+        console.error("Error while trying to add own puzzles to database:", error)
         return res.status(500).json({ error: "Internal server error" })
     }
 })

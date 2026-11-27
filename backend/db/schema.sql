@@ -15,6 +15,21 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_username_lower_unique ON users (lower(username));
 CREATE UNIQUE INDEX users_email_lower_unique ON users (lower(email));
 
+CREATE TABLE own_puzzles (
+    id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id     bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    game_id     text NOT NULL,
+    source      text NOT NULL,
+    fen         text NOT NULL,
+    best_move   varchar(8) NOT NULL,
+    last_move   varchar(8) NOT NULL,
+    played_move varchar(8) NOT NULL,
+    move_count  integer NOT NULL,
+    created_at  timestamptz NOT NULL DEFAULT now(),
+
+    UNIQUE (user_id, game_id, move_count)
+);
+
 /* connects two people as friends */
 CREATE TABLE friend_relations (
     id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

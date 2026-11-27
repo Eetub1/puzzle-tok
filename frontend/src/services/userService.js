@@ -91,50 +91,69 @@ const resendEmailVerification = async () => {
 }
 
 const getComments = async puzzleId => {
-    const response = await fetch(`/api/user/comments/${encodeURIComponent(puzzleId)}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${getToken()}` }
-    })
-    const data = await response.json()
+	const response = await fetch(`/api/user/comments/${encodeURIComponent(puzzleId)}`, {
+		method: "GET",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
+	const data = await response.json()
 
-    if (!response.ok) {
-        throw new Error(`Couldn't get comments: ${data.error}`)
-    }
+	if (!response.ok) {
+		throw new Error(`Couldn't get comments: ${data.error}`)
+	}
 
-    return data
+	return data
 }
 
 
 const postComment = async (puzzleId, body) => {
-    const response = await fetch(`/api/user/comments`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${getToken()}` },
-        body: JSON.stringify({ puzzleId, body }),
-    })
-    const data = await response.json()
+	const response = await fetch(`/api/user/comments`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${getToken()}` },
+		body: JSON.stringify({ puzzleId, body }),
+	})
+	const data = await response.json()
 
-    if (!response.ok) {
-        throw new Error(`Couldn't post comment: ${data.error}`)
-    }
+	if (!response.ok) {
+		throw new Error(`Couldn't post comment: ${data.error}`)
+	}
 
-    return data
+	return data
 }
 
 
 const deleteComment = async commentId => {
-    const response = await fetch(`/api/user/comments/${commentId}`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": `Bearer ${getToken()}` }
-    })
+	const response = await fetch(`/api/user/comments/${commentId}`, {
+		method: "DELETE",
+		headers: {
+			"Authorization": `Bearer ${getToken()}` }
+	})
 
-    if (!response.ok) {
-        const data = await response.json()
-        throw new Error(`Couldn't delete comment: ${data.error}`)
-    }
+	if (!response.ok) {
+		const data = await response.json()
+		throw new Error(`Couldn't delete comment: ${data.error}`)
+	}
+}
+
+
+const saveOwnPuzzles = async puzzles => {
+	const response = await fetch(`/api/user/own-puzzles`, {
+		method: "POST",
+		headers: {
+			"Authorization": `Bearer ${getToken()}`,
+			"Content-Type": "application/json" },
+		body: JSON.stringify({ puzzles })
+	})
+
+	const data = await response.json()
+
+	if (!response.ok) {
+		throw new Error(`Couldn't save own puzzles: ${data.error}`)
+	}
+
+	return data
 }
 
 
@@ -147,4 +166,5 @@ export {
 	getComments,
 	postComment,
 	deleteComment,
+	saveOwnPuzzles
 }

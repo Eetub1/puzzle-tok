@@ -278,7 +278,7 @@ const Profile = ({ showMessage, handleLogout }) => {
 
 				<Card.Body>
 					<div className="card-row">
-						<p>Connect your accounts so we can turn your games into puzzles</p>
+						<p>Connect your accounts so we can turn your games into puzzles. Create puzzles from your own games in Your Matches page.</p>
 					</div>
 
 					<div className="card-row">
